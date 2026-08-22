@@ -1,0 +1,45 @@
+[project]
+name = "yugiohaccess"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11.0,<3.12"
+dependencies = [
+    "appdirs>=1.4",
+    "cyal>=0.4.3",
+    "natsort>=8.4",
+    "pyinstaller>=6.10",
+    "requests>=2.32",
+    "soundfile>=0.12",
+    "wxpython>=4.2",
+    "appscript>=1.2; sys_platform == 'darwin'",
+    "pyobjc>=10.3; sys_platform == 'darwin'",
+    "winpaths; sys_platform == 'win32'",
+    "accessible-output3>=0.1.2",
+    "pypresence>=4.3",
+    "velopack>=0.0.1349",
+    "pythonnet>=3.0.3",
+    "aiohttp>=3.9",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "babel>=2.14",
+    "pygit2>=1.17.0",
+    "pytest-cov>=7.1.0",
+    "pytest-mock>=3.14.0",
+    "pytest-randomly>=3.15.0",
+    "pytest>=8.3.3",
+    "ruff>=0.12.2",
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+omit = [
+    "src/server/*",
+    "src/bot/*",
+    "src/YuGiOhAccess.py",
+]

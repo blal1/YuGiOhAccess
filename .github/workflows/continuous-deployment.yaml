@@ -1,0 +1,165 @@
+name: Continuous Deployment
+
+on:
+  push:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  VPK_PACK_VERSION: "0.0.${{ github.run_number }}"
+  VPK_PACK_ID: "YuGiOhAccess"
+  VPK_PACK_AUTHORS: "YuGiOhAccess and contributors"
+  VPK_PACK_TITLE: "YuGiOhAccess"
+  
+
+defaults:
+  run:
+    shell: bash
+ 
+jobs:
+  builder:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Write the version.py file
+        run: echo "VERSION = '${{ env.VPK_PACK_VERSION }}'" > src/core/version.py
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v6
+      - name: Set up cache
+        uses: actions/cache@v4
+        id: cached-uv-dependencies
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/uv.lock') }}
+      - name: Install dependencies
+        run: uv sync
+        if: steps.cached-uv-dependencies.outputs.cache-hit != 'true'
+      - name: Lint with ruff
+        run: uv run ruff check
+      - name: Run tests
+        run: uv run pytest
+      - name: Build application
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            uv run pyinstaller --clean --noconfirm specs/YuGiOhAccess.win.spec
+          else
+            uv run pyinstaller --clean --noconfirm specs/YuGiOhAccess.mac.spec
+          fi
+      - name: Remove the dist/YuGiOhAccess/ folder on macos
+        run: rm -rf dist/YuGiOhAccess/
+        if: runner.os == 'MacOS'
+      - name: Tar macos app bundleapp
+        run: |
+          tar -czf dist/YuGiOhAccess.tar.gz -C dist YuGiOhAccess.app
+          rm -rf dist/YuGiOhAccess.app
+        if: runner.os == 'MacOS'  
+      - name: Upload artifacts if on default branch
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          path: dist/*
+          name: YuGiOhAccess-${{ matrix.os }}
+          retention-days: 7
+
+  deployer:
+    needs: builder
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: YuGiOhAccess-${{ matrix.os }}
+          path: dist
+      - name: Untar macos app bundle
+        run: |
+            tar -xzf dist/YuGiOhAccess.tar.gz -C dist
+            rm -rf dist/YuGiOhAccess.tar.gz
+        if: runner.os == 'MacOS'
+      - name: install vpk
+        run: dotnet tool install -g vpk
+      - name: Download old release
+        run: vpk download github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }}
+      - name: Pack new release (Windows)
+        if: runner.os == 'Windows'
+        run: vpk pack --packDir dist/YuGiOhAccess --mainExe YuGiOhAccess.exe --packId "${{ env.VPK_PACK_ID }}" --packVersion "${{ env.VPK_PACK_VERSION }}" --packTitle "${{ env.VPK_PACK_TITLE }}" --packAuthors "${{ env.VPK_PACK_AUTHORS }}"
+      - name: Pack new release (macOS)
+        if: runner.os == 'MacOS'
+        run: vpk pack --packDir dist/YuGiOhAccess.app --mainExe YuGiOhAccess --packId "${{ env.VPK_PACK_ID }}" --packVersion "${{ env.VPK_PACK_VERSION }}" --packTitle "${{ env.VPK_PACK_TITLE }}" --packAuthors "${{ env.VPK_PACK_AUTHORS }}"
+      - name: Upload new release
+        run: vpk upload github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} --merge
+
+  promote_release:
+    needs: deployer
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Wait for draft release
+        id: find_release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const targetVersion = '${{ env.VPK_PACK_VERSION }}';
+            let attempts = 0;
+            const maxAttempts = 12;  // 2 minutes total
+            let draftRelease = null;
+            
+            while (attempts < maxAttempts) {
+              const { data: releases } = await github.rest.repos.listReleases({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 10
+              });
+              
+              draftRelease = releases.find(r => 
+                r.draft && 
+                (r.tag_name === targetVersion || 
+                 r.tag_name === `v${targetVersion}` ||
+                 r.name?.includes(targetVersion))
+              );
+              
+              if (draftRelease && draftRelease.assets.length >= 2) {
+                // Found release with expected assets
+                break;
+              }
+              
+              attempts++;
+              console.log(`Attempt ${attempts}/${maxAttempts}: Release not ready yet. Waiting...`);
+              await new Promise(resolve => setTimeout(resolve, 10000));  // 10 seconds
+            }
+            
+            if (!draftRelease) {
+              throw new Error(`Draft release for version ${targetVersion} not found after ${attempts} attempts`);
+            }
+            
+            if (draftRelease.assets.length < 2) {
+              console.log(`Warning: Only ${draftRelease.assets.length} assets found`);
+            }
+            
+            core.setOutput('release_id', draftRelease.id);
+            core.setOutput('release_tag', draftRelease.tag_name);
+      
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit "${{ steps.find_release.outputs.release_tag }}" \
+            --draft=false \
+            --repo ${{ github.repository }}
+          
+          echo "Published release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.find_release.outputs.release_tag }}"

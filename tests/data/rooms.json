@@ -1,0 +1,78 @@
+[
+        {
+            "roomid": 1,
+            "roomname": "",
+            "roomnotes": "",
+            "roommode": 0,
+            "needpass": true,
+            "team1": 1,
+            "team2": 1,
+            "best_of": 3,
+            "duel_flag": 190464,
+            "forbidden_types": 0,
+            "extra_rules": 0,
+            "start_lp": 8000,
+            "start_hand": 5,
+            "draw_count": 1,
+            "time_limit": 180,
+            "rule": 3,
+            "no_check": false,
+            "no_shuffle": false,
+            "banlist_hash": 579969752,
+            "istart": "start",
+            "main_min": 40,
+            "main_max": 60,
+            "extra_min": 0,
+            "extra_max": 15,
+            "side_min": 0,
+            "side_max": 15,
+            "users": [
+                {
+                    "pos": 0,
+                    "name": "Player1"
+                },
+                {
+                    "pos": 1,
+                    "name": "Player2"
+                }
+            ]
+        },
+        {
+            "roomid": 2,
+            "roomname": "",
+            "roomnotes": "",
+            "roommode": 0,
+            "needpass": false,
+            "team1": 1,
+            "team2": 1,
+            "best_of": 1,
+            "duel_flag": 190464,
+            "forbidden_types": 0,
+            "extra_rules": 0,
+            "start_lp": 8000,
+            "start_hand": 5,
+            "draw_count": 1,
+            "time_limit": 180,
+            "rule": 3,
+            "no_check": false,
+            "no_shuffle": false,
+            "banlist_hash": 579969752,
+            "istart": "start",
+            "main_min": 40,
+            "main_max": 60,
+            "extra_min": 0,
+            "extra_max": 15,
+            "side_min": 0,
+            "side_max": 15,
+            "users": [
+                {
+                    "pos": 0,
+                    "name": "Player3"
+                },
+                {
+                    "pos": 1,
+                    "name": "Player4"
+                }
+            ]
+        }
+]

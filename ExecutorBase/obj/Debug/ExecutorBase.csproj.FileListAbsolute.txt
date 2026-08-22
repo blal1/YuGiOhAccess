@@ -1,0 +1,8 @@
+C:\Users\bilal\Downloads\YuGiOhAccess-main\YuGiOhAccess-main\ExecutorBase\bin\Debug\ExecutorBase.dll
+C:\Users\bilal\Downloads\YuGiOhAccess-main\YuGiOhAccess-main\ExecutorBase\bin\Debug\ExecutorBase.pdb
+C:\Users\bilal\Downloads\YuGiOhAccess-main\YuGiOhAccess-main\ExecutorBase\bin\Debug\Mono.Data.Sqlite.dll
+C:\Users\bilal\Downloads\YuGiOhAccess-main\YuGiOhAccess-main\ExecutorBase\obj\Debug\ExecutorBase.csproj.AssemblyReference.cache
+C:\Users\bilal\Downloads\YuGiOhAccess-main\YuGiOhAccess-main\ExecutorBase\obj\Debug\ExecutorBase.csproj.CoreCompileInputs.cache
+C:\Users\bilal\Downloads\YuGiOhAccess-main\YuGiOhAccess-main\ExecutorBase\obj\Debug\Executor.CD5B1A36.Up2Date
+C:\Users\bilal\Downloads\YuGiOhAccess-main\YuGiOhAccess-main\ExecutorBase\obj\Debug\ExecutorBase.dll
+C:\Users\bilal\Downloads\YuGiOhAccess-main\YuGiOhAccess-main\ExecutorBase\obj\Debug\ExecutorBase.pdb

@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>WindBot</RootNamespace>
+    <AssemblyName>WindBot.Desktop</AssemblyName>
+    <LangVersion>10</LangVersion>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.*" />
+  </ItemGroup>
+
+  <!-- ExecutorBase sources (shared AI logic) -->
+  <ItemGroup>
+    <Compile Include="ExecutorBase\Game\AI\*.cs" />
+    <Compile Include="ExecutorBase\Game\AI\Enums\*.cs" />
+    <Compile Include="ExecutorBase\Game\*.cs" />
+    <Compile Include="ExecutorBase\Properties\AssemblyInfo.cs" Link="Properties\ExecutorBaseAssemblyInfo.cs" />
+    <Compile Include="ExecutorBase\YGOSharp.OCGWrapper\*.cs" />
+    <Compile Include="ExecutorBase\YGOSharp.OCGWrapper.Enums\*.cs" />
+  </ItemGroup>
+
+  <!-- WindBot sources -->
+  <ItemGroup>
+    <Compile Include="Game\AI\Deck.cs" />
+    <Compile Include="Game\AI\Decks\*.cs" />
+    <Compile Include="Game\DecksManager.cs" />
+    <Compile Include="Game\GameBehavior.cs" />
+    <Compile Include="Game\GameClient.cs" />
+    <Compile Include="Game\GamePacketFactory.cs" />
+    <Compile Include="Game\Room.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="WindBot.cs" />
+    <Compile Include="WindBotInfo.cs" />
+    <Compile Include="YGOSharp.Network\*.cs" />
+    <Compile Include="YGOSharp.Network\Enums\*.cs" />
+    <Compile Include="YGOSharp.Network\Utils\*.cs" />
+  </ItemGroup>
+
+  <!-- Exclude Program.cs (has Main entry point for exe mode) and Config.cs (HTTP server mode) -->
+  <ItemGroup>
+    <Compile Remove="Program.cs" />
+    <Compile Remove="Config.cs" />
+  </ItemGroup>
+
+  <!-- Content files -->
+  <ItemGroup>
+    <None Include="Decks\*.ydk" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Dialogs\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="bots.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

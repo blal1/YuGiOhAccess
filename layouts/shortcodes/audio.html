@@ -1,0 +1,16 @@
+<audio controls>
+    {{ with .Get "flac" }}
+    <source src="{{ . | absURL }}" type="audio/flac">
+    {{ end }}
+  
+    {{ with .Get "ogg" }}
+    <source src="{{ . | absURL }}" type="audio/ogg">
+    {{ end }}
+  
+    {{ with .Get "mp3" }}
+    <source src="{{ . | absURL }}" type="audio/mpeg">
+    {{ end }}
+  
+    {{ .Get "fallback" }}
+  </audio>
+  
