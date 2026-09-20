@@ -9,17 +9,18 @@ from core.i18n import _
 from game.card.card import Card
 from game.edo import structs
 from ui.base_ui import VerticalMenu
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
 
-@utils.duel_message_handler(23)
+@utils.duel_message_handler(message_constants.MSG_SORT_CARD)
 def msg_sort_card(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
     size = client.read_u32(data)
     cards = []
-    for _ in range(size):
+    for _unused in range(size):
         code = client.read_u32(data)
         controller = client.read_u8(data)
         location = client.read_u8(data)
@@ -42,7 +43,7 @@ def sort_card_step(client, remaining_cards, remaining_indices, selected_order):
     menu = VerticalMenu(_("Sort cards"))
     menu.append_item(_("Select the next card in order ({done}/{total})").format(done=len(selected_order) + 1, total=len(selected_order) + len(remaining_cards)))
     for i, card in enumerate(remaining_cards):
-        menu.append_item(_("{name}").format(name=card.get_name()), function=lambda idx=i: pick_card(client, remaining_cards, remaining_indices, selected_order, idx))
+        menu.append_item(card.get_name(), function=lambda idx=i: pick_card(client, remaining_cards, remaining_indices, selected_order, idx))
     utils.get_ui_stack().push_ui(menu)
 
 

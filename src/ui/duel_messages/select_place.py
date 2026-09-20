@@ -3,22 +3,22 @@ import logging
 
 from core import utils
 from core.i18n import _
-from core import variables
 
 from game.card.location_conversion import LocationConversion
 from game.edo import structs
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
 selected_zones = []
 
-@utils.duel_message_handler(18)
-@utils.duel_message_handler(24)
+@utils.duel_message_handler(message_constants.MSG_SELECT_PLACE)
+@utils.duel_message_handler(message_constants.MSG_SELECT_DISFIELD)
 def msg_select_place(client, data, data_len):
     global selected_zones
     selected_zones = []
     data = io.BytesIO(data)
-    _ = client.read_u8(data)
+    client.read_u8(data)  # duel message id, unused
     player = client.read_u8(data)
     count = client.read_u8(data)
     if count == 0:
@@ -36,9 +36,9 @@ def select_place(client, player, count, flag):
         logger.debug(f"Converted location: {converted_location_from_spec}")
         locations.append(converted_location_from_spec)
     if count == 1:
-        utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("Select place for card, one of %s.") % ", ".join([loc.to_human_readable() for loc in locations])))
+        utils.output(_("Select place for card, one of %s.") % ", ".join([loc.to_human_readable() for loc in locations]))
     else:
-        utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("Select %d places for card, from %s.") % (count, ", ".join([loc.to_human_readable() for loc in locations]))))
+        utils.output(_("Select %d places for card, from %s.") % (count, ", ".join([loc.to_human_readable() for loc in locations])))
     old_handle_enter = client.get_duel_field().handle_enter
     client.get_duel_field().handle_enter = lambda: process_selected_zone(client, player, count, locations, old_handle_enter)
 

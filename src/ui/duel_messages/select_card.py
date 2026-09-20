@@ -13,10 +13,11 @@ from ui.base_ui import VerticalMenu
 
 from core import utils
 from core.i18n import _
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(20)
+@utils.duel_message_handler(message_constants.MSG_SELECT_TRIBUTE)
 def msg_select_tribute(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -36,7 +37,7 @@ def msg_select_tribute(client, data, data_length):
         cards.append(card)
     select_tribute(client, player, cancelable, min, max, cards)
 
-@utils.duel_message_handler(15)
+@utils.duel_message_handler(message_constants.MSG_SELECT_CARD)
 def msg_select_card(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -81,8 +82,8 @@ def select_tribute(client, *args, **kwargs):
 
 def show_menu_with_presentable_cards(client, cards, presentable_cards, min_cards, max_cards, is_tribute, cancelable=False):
     question = _("Select {min} to {max} card(s) as tribute").format(min=min_cards, max=max_cards) if is_tribute else _("Select {min} to {max} card(s)").format(min=min_cards, max=max_cards)
-    select_card_menu = VerticalMenu(_("{question}").format(question=question))
-    select_card_menu.append_item(_("{question}").format(question=question))
+    select_card_menu = VerticalMenu(str(question))
+    select_card_menu.append_item(str(question))
     for card in presentable_cards:
         select_card_menu.append_item(wx.CheckBox, label=card)
     if cancelable:

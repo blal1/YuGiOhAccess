@@ -8,6 +8,7 @@ import wx.adv
 
 from ui import output
 from ui import main_ui
+from core import speech
 from core import utils
 from core import variables
 from core.i18n import _
@@ -193,4 +194,9 @@ class YuGiOhAccessFrame(wx.Frame):
             self.music_audio_manager.decrease_volume()
         elif keycode == wx.WXK_F8:
             self.music_audio_manager.increase_volume()
+        # F9 replays what was said recently, including anything that arrived
+        # while the window was in the background and could not be spoken.
+        elif keycode == wx.WXK_F9:
+            count = speech.DEFAULT_REPLAY_COUNT if not event.ShiftDown() else len(speech.MESSAGE_LOG)
+            utils.replay_recent_messages(count)
         event.Skip()

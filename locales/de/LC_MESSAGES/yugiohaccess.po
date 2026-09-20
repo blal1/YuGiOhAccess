@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: YuGiOhAccess 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-20 18:14+0200\n"
+"POT-Creation-Date: 2026-09-20 22:41+0200\n"
 "PO-Revision-Date: 2026-08-20 11:03+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -19,23 +19,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: src/core/discord_presence.py:27
+#: src/core/discord_presence.py:28
 msgid "Website"
 msgstr ""
 
-#: src/core/discord_presence.py:28
+#: src/core/discord_presence.py:29
 msgid "Discord Server"
 msgstr ""
 
-#: src/core/utils.py:364
+#: src/core/utils.py:203
+msgid ""
+"An error occurred in the current menu. Returning to the previous screen "
+"if possible."
+msgstr ""
+
+#: src/core/utils.py:230
+msgid "An error occurred while handling a server message. Continuing."
+msgstr ""
+
+#: src/core/utils.py:232
+msgid "An error occurred while handling a duel message. Continuing."
+msgstr ""
+
+#: src/core/utils.py:307
+msgid "No messages to replay."
+msgstr ""
+
+#: src/core/utils.py:417
 msgid "alpha"
 msgstr ""
 
-#: src/core/utils.py:364
+#: src/core/utils.py:417
 msgid "beta"
 msgstr ""
 
-#: src/core/utils.py:364
+#: src/core/utils.py:417
 msgid "release candidate"
 msgstr ""
 
@@ -143,11 +161,11 @@ msgstr ""
 msgid "... '{filename}'"
 msgstr ""
 
-#: src/game/client.py:80
+#: src/game/client.py:82
 msgid "Disconnected from server. Returning to main menu."
 msgstr ""
 
-#: src/game/client.py:100
+#: src/game/client.py:102
 #, python-brace-format
 msgid "Received packet {name}, packet_id {id}, which was unhandled."
 msgstr ""
@@ -180,69 +198,69 @@ msgstr ""
 msgid "Local (Offline)"
 msgstr ""
 
-#: src/game/card/card.py:89
+#: src/game/card/card.py:100
 #, python-format
 msgid "Archetype: %s"
 msgstr ""
 
-#: src/game/card/card.py:92
+#: src/game/card/card.py:103
 #, python-format
 msgid "Attack: %d Link rating: %d"
 msgstr ""
 
-#: src/game/card/card.py:94
+#: src/game/card/card.py:105
 #, python-format
 msgid "Attack: %d Defense: %d Rank: %d"
 msgstr ""
 
-#: src/game/card/card.py:96
+#: src/game/card/card.py:107
 #, python-format
 msgid "Attack: %d Defense: %d Level: %d"
 msgstr ""
 
-#: src/game/card/card.py:98
+#: src/game/card/card.py:109
 #, python-format
 msgid "Pendulum scale: %d/%d"
 msgstr ""
 
-#: src/game/card/card.py:100
+#: src/game/card/card.py:111
 #, python-format
 msgid "Link Markers: %s"
 msgstr ""
 
-#: src/game/card/card.py:105
+#: src/game/card/card.py:116
 msgid "attached xyz materials:"
 msgstr ""
 
-#: src/game/card/card.py:109
+#: src/game/card/card.py:120
 msgid "no xyz materials attached"
 msgstr ""
 
-#: src/game/card/card.py:162
+#: src/game/card/card.py:173
 msgid "Activate this card."
 msgstr ""
 
-#: src/game/card/card.py:176
+#: src/game/card/card.py:187
 msgid "face-up attack"
 msgstr ""
 
-#: src/game/card/card.py:178
+#: src/game/card/card.py:189
 msgid "face-down attack"
 msgstr ""
 
-#: src/game/card/card.py:181 src/game/card/card.py:184
+#: src/game/card/card.py:192 src/game/card/card.py:195
 msgid "face-up"
 msgstr ""
 
-#: src/game/card/card.py:182
+#: src/game/card/card.py:193
 msgid "face-up defense"
 msgstr ""
 
-#: src/game/card/card.py:187 src/game/card/card.py:190
+#: src/game/card/card.py:198 src/game/card/card.py:201
 msgid "face down"
 msgstr ""
 
-#: src/game/card/card.py:188
+#: src/game/card/card.py:199
 msgid "face-down defense"
 msgstr ""
 
@@ -347,12 +365,12 @@ msgid "deck"
 msgstr ""
 
 #: src/game/card/location_conversion.py:137
-#: src/ui/duel_messages/shuffle_other.py:29
+#: src/ui/duel_messages/shuffle_other.py:31
 msgid "hand"
 msgstr ""
 
-#: src/game/card/location_conversion.py:139 src/ui/card_search_ui.py:209
-#: src/ui/duel_messages/shuffle_other.py:29
+#: src/game/card/location_conversion.py:139 src/ui/card_search_ui.py:390
+#: src/ui/duel_messages/shuffle_other.py:31
 msgid "extra deck"
 msgstr ""
 
@@ -372,853 +390,1083 @@ msgstr ""
 msgid "No limits"
 msgstr ""
 
-#: src/server/lobby.py:412
+#: src/server/lobby.py:362
+msgid "Cannot start yet: waiting for every player to be ready."
+msgstr ""
+
+#: src/server/lobby.py:366
+msgid "Cannot start yet: waiting for every player deck to be loaded."
+msgstr ""
+
+#: src/server/lobby.py:468
 msgid "Local EDOPro engine is not available. Build or configure ocgcore first."
 msgstr ""
 
-#: src/ui/__init__.py:33 src/ui/duel_menu.py:68
+#: src/ui/__init__.py:36 src/ui/__init__.py:105 src/ui/duel_menu.py:68
 #, python-brace-format
 msgid "{player}: {message}"
 msgstr ""
 
-#: src/ui/__init__.py:46
+#: src/ui/__init__.py:51 src/ui/__init__.py:116
+#, python-brace-format
+msgid "Player {number}"
+msgstr ""
+
+#: src/ui/__init__.py:53 src/ui/__init__.py:118
+msgid "Observer"
+msgstr ""
+
+#: src/ui/__init__.py:55 src/ui/__init__.py:119
+msgid "System"
+msgstr ""
+
+#: src/ui/__init__.py:70
 msgid ""
 "Invalid version. Please update the game, or contact support if the issue "
 "persists."
 msgstr ""
 
-#: src/ui/__init__.py:50 src/ui/base_ui.py:402 src/ui/duel_field.py:335
-#: src/ui/duel_field.py:972 src/ui/duel_messages/attack.py:27
-#: src/ui/duel_messages/attack.py:43 src/ui/duel_messages/become_target.py:35
-#: src/ui/duel_messages/card_hint.py:28 src/ui/duel_messages/card_hint.py:31
-#: src/ui/duel_messages/card_selected.py:19 src/ui/duel_messages/chaining.py:33
-#: src/ui/duel_messages/confirm_cards.py:38
-#: src/ui/duel_messages/damage_step_battle.py:42
-#: src/ui/duel_messages/damage_step_battle.py:44
-#: src/ui/duel_messages/damage_step_damage.py:17
-#: src/ui/duel_messages/damage_step_damage.py:21
-#: src/ui/duel_messages/deck_top.py:42 src/ui/duel_messages/deck_top.py:44
-#: src/ui/duel_messages/field_disabled.py:20 src/ui/duel_messages/hint.py:37
-#: src/ui/duel_messages/hint.py:39 src/ui/duel_messages/move.py:58
-#: src/ui/duel_messages/pay_cost.py:17 src/ui/duel_messages/pay_cost.py:21
-#: src/ui/duel_messages/position_change.py:31
-#: src/ui/duel_messages/random_selected.py:21
-#: src/ui/duel_messages/random_selected.py:23
-#: src/ui/duel_messages/recover.py:17 src/ui/duel_messages/recover.py:21
-#: src/ui/duel_messages/remove_cards.py:23
-#: src/ui/duel_messages/select_option.py:40
-#: src/ui/duel_messages/select_place.py:39
-#: src/ui/duel_messages/select_place.py:41 src/ui/duel_messages/set.py:23
-#: src/ui/duel_messages/set.py:25 src/ui/duel_messages/summoning.py:44
-#: src/ui/duel_messages/summoning.py:46 src/ui/duel_messages/summoning.py:48
-#: src/ui/duel_messages/swap.py:32 src/ui/duel_messages/toss.py:23
-#: src/ui/duel_messages/toss.py:29
-#, python-brace-format
-msgid "{message}"
-msgstr ""
-
-#: src/ui/__init__.py:60
+#: src/ui/__init__.py:84
 msgid "Waiting for opponent to finish side decking."
 msgstr ""
 
-#: src/ui/__init__.py:65
+#: src/ui/__init__.py:89
 msgid "A player left the game."
 msgstr ""
 
-#: src/ui/action_menu.py:16
+#: src/ui/__init__.py:135
+#, python-brace-format
+msgid "{count} spectator(s) watching."
+msgstr ""
+
+#: src/ui/__init__.py:152
+msgid "Catching up with the duel, please wait."
+msgstr ""
+
+#: src/ui/__init__.py:158
+#, python-brace-format
+msgid "Caught up. {count} message(s) were skipped; press F9 to review them."
+msgstr ""
+
+#: src/ui/__init__.py:162
+msgid "Caught up with the duel."
+msgstr ""
+
+#: src/ui/action_menu.py:25 src/ui/duel_field.py:287
+#, python-brace-format
+msgid "No available action for {card}."
+msgstr ""
+
+#: src/ui/action_menu.py:27
 msgid "Action Menu"
 msgstr ""
 
-#: src/ui/action_menu.py:17
+#: src/ui/action_menu.py:28
 #, python-brace-format
 msgid "Actions for {card}"
 msgstr ""
 
-#: src/ui/action_menu.py:19
+#: src/ui/action_menu.py:30
 msgid "Attack"
 msgstr ""
 
-#: src/ui/action_menu.py:30
+#: src/ui/action_menu.py:45
 #, python-brace-format
 msgid "Activate effect: {desc}"
 msgstr ""
 
-#: src/ui/action_menu.py:33
+#: src/ui/action_menu.py:48
 #, python-brace-format
 msgid "Activate effect {n}: {desc}"
 msgstr ""
 
-#: src/ui/action_menu.py:35
+#: src/ui/action_menu.py:50
 msgid "Special summon"
 msgstr ""
 
-#: src/ui/action_menu.py:37
+#: src/ui/action_menu.py:52
 msgid "Summon"
 msgstr ""
 
-#: src/ui/action_menu.py:39 src/ui/action_menu.py:41
+#: src/ui/action_menu.py:54 src/ui/action_menu.py:56
 msgid "Set"
 msgstr ""
 
-#: src/ui/action_menu.py:43
+#: src/ui/action_menu.py:58
 msgid "Reposition"
 msgstr ""
 
-#: src/ui/action_menu.py:44 src/ui/duel_menu.py:30
+#: src/ui/action_menu.py:59 src/ui/duel_menu.py:30
 msgid "Close"
 msgstr ""
 
-#: src/ui/base_ui.py:151
-#, python-brace-format
-msgid "{help_text}"
+#: src/ui/base_ui.py:117
+msgid "Empty item"
 msgstr ""
 
-#: src/ui/base_ui.py:198 src/ui/base_ui.py:208 src/ui/card_list_ui.py:34
-#: src/ui/deck_editor_ui.py:179 src/ui/deck_editor_ui.py:208
-#: src/ui/duel_messages/announce_attrib.py:39
-#: src/ui/duel_messages/announce_attrib.py:46 src/ui/replay_ui.py:52
-#: src/ui/side_deck_ui.py:52 src/ui/side_deck_ui.py:73
-#, python-brace-format
-msgid "{label}"
-msgstr ""
-
-#: src/ui/base_ui.py:374 src/ui/base_ui.py:376
-#, python-brace-format
-msgid "{text}"
-msgstr ""
-
-#: src/ui/base_ui.py:444
+#: src/ui/base_ui.py:464
 msgid "Invalid input"
 msgstr ""
 
-#: src/ui/card_list_ui.py:53 src/ui/card_search_ui.py:224
-#: src/ui/deck_editor_ui.py:252 src/ui/duel_field.py:960
-#: src/ui/duel_field.py:962 src/ui/duel_messages/select_effect_yes_or_no.py:28
-#: src/ui/duel_messages/select_yes_no.py:44
+#: src/ui/card_details_ui.py:78 src/ui/card_details_ui.py:155
+msgid "No details."
+msgstr ""
+
+#: src/ui/card_details_ui.py:90 src/ui/card_search_ui.py:174
+msgid "Card details"
+msgstr ""
+
+#: src/ui/card_details_ui.py:98
 #, python-brace-format
-msgid "{card}"
+msgid "{name} details"
+msgstr ""
+
+#: src/ui/card_details_ui.py:98
+msgid "Card"
+msgstr ""
+
+#: src/ui/card_details_ui.py:99
+msgid "Card detail header"
+msgstr ""
+
+#: src/ui/card_details_ui.py:103
+msgid "Current detail line"
+msgstr ""
+
+#: src/ui/card_details_ui.py:109
+msgid "Card text, line by line"
+msgstr ""
+
+#: src/ui/card_details_ui.py:110
+msgid "Use up and down to read one line at a time."
+msgstr ""
+
+#: src/ui/card_details_ui.py:114
+msgid "Full card text"
+msgstr ""
+
+#: src/ui/card_details_ui.py:115
+msgid ""
+"The complete card text. Read it with your screen reader as usual, or copy"
+" it."
+msgstr ""
+
+#: src/ui/card_details_ui.py:119
+msgid "Previous line"
+msgstr ""
+
+#: src/ui/card_details_ui.py:120
+msgid "Read line"
+msgstr ""
+
+#: src/ui/card_details_ui.py:121
+msgid "Next line"
+msgstr ""
+
+#: src/ui/card_details_ui.py:122
+msgid "Read all"
+msgstr ""
+
+#: src/ui/card_details_ui.py:123
+msgid "Copy card text"
+msgstr ""
+
+#: src/ui/card_details_ui.py:124 src/ui/card_search_ui.py:99
+#: src/ui/card_search_ui.py:182 src/ui/deck_editor_ui.py:53
+#: src/ui/deck_editor_ui.py:81 src/ui/deck_editor_ui.py:175
+#: src/ui/deck_editor_ui.py:224 src/ui/deck_editor_ui.py:251
+#: src/ui/deck_editor_ui.py:342 src/ui/deck_editor_ui.py:382
+#: src/ui/deck_editor_ui.py:441 src/ui/deck_editor_ui.py:464
+#: src/ui/replay_ui.py:53 src/ui/replay_ui.py:71 src/ui/room_ui.py:146
+#: src/ui/room_ui.py:158 src/ui/room_ui.py:285 src/ui/room_ui.py:304
+#: src/ui/room_ui.py:319 src/ui/room_ui.py:328 src/ui/room_ui.py:342
+#: src/ui/room_ui.py:365 src/ui/room_ui.py:377 src/ui/room_ui.py:444
+#: src/ui/room_ui.py:470 src/ui/room_ui.py:519 src/ui/server_ui.py:25
+#: src/ui/server_ui.py:81 src/ui/server_ui.py:220 src/ui/server_ui.py:230
+#: src/ui/side_deck_ui.py:52 src/ui/side_deck_ui.py:73
+#: src/ui/side_deck_ui.py:108
+msgid "Back"
+msgstr ""
+
+#: src/ui/card_details_ui.py:156
+#, python-brace-format
+msgid "{position} of {count}: {line}"
+msgstr ""
+
+#: src/ui/card_details_ui.py:182
+msgid "Could not use the clipboard."
+msgstr ""
+
+#: src/ui/card_details_ui.py:188
+msgid "Card text copied to clipboard."
+msgstr ""
+
+#: src/ui/card_details_ui.py:204
+msgid ""
+"Card details. Up and down read the card one line at a time. Tab reaches "
+"the full text, where your screen reader reads and copies as usual. Space "
+"or Enter reads everything, and Escape goes back."
+msgstr ""
+
+#: src/ui/card_details_ui.py:247
+msgid "No card on this line."
 msgstr ""
 
 #: src/ui/card_list_ui.py:58
 msgid "Not allowed"
 msgstr ""
 
-#: src/ui/card_search_ui.py:91 src/ui/main_ui.py:74
+#: src/ui/card_search_ui.py:94 src/ui/main_ui.py:77
 msgid "Card Search"
 msgstr ""
 
-#: src/ui/card_search_ui.py:92
+#: src/ui/card_search_ui.py:95
 msgid "Search the card database by name, description, type, attribute, or race."
 msgstr ""
 
-#: src/ui/card_search_ui.py:93
+#: src/ui/card_search_ui.py:96
 msgid "Search by name"
 msgstr ""
 
-#: src/ui/card_search_ui.py:94
+#: src/ui/card_search_ui.py:97
 msgid "Search by description"
 msgstr ""
 
-#: src/ui/card_search_ui.py:95
+#: src/ui/card_search_ui.py:98
 msgid "Advanced search"
 msgstr ""
 
-#: src/ui/card_search_ui.py:96 src/ui/card_search_ui.py:155
-#: src/ui/deck_editor_ui.py:34 src/ui/deck_editor_ui.py:62
-#: src/ui/deck_editor_ui.py:114 src/ui/deck_editor_ui.py:124
-#: src/ui/deck_editor_ui.py:180 src/ui/deck_editor_ui.py:209
-#: src/ui/deck_editor_ui.py:264 src/ui/deck_editor_ui.py:286
-#: src/ui/replay_ui.py:53 src/ui/replay_ui.py:71 src/ui/room_ui.py:125
-#: src/ui/room_ui.py:231 src/ui/room_ui.py:246 src/ui/room_ui.py:255
-#: src/ui/room_ui.py:269 src/ui/room_ui.py:292 src/ui/room_ui.py:304
-#: src/ui/room_ui.py:372 src/ui/room_ui.py:398 src/ui/room_ui.py:447
-#: src/ui/server_ui.py:25 src/ui/server_ui.py:81 src/ui/server_ui.py:220
-#: src/ui/server_ui.py:230 src/ui/side_deck_ui.py:53 src/ui/side_deck_ui.py:74
-#: src/ui/side_deck_ui.py:109
-msgid "Back"
-msgstr ""
-
-#: src/ui/card_search_ui.py:102
+#: src/ui/card_search_ui.py:105
 msgid "Card name"
 msgstr ""
 
-#: src/ui/card_search_ui.py:112
+#: src/ui/card_search_ui.py:115
 msgid "Card description text"
 msgstr ""
 
-#: src/ui/card_search_ui.py:122
+#: src/ui/card_search_ui.py:125
 msgid "Card name, or leave empty"
 msgstr ""
 
-#: src/ui/card_search_ui.py:123
+#: src/ui/card_search_ui.py:126
 msgid "Description text, or leave empty"
 msgstr ""
 
-#: src/ui/card_search_ui.py:124
+#: src/ui/card_search_ui.py:127
 msgid "Type, or leave empty"
 msgstr ""
 
-#: src/ui/card_search_ui.py:125
+#: src/ui/card_search_ui.py:128
 msgid "Attribute, or leave empty"
 msgstr ""
 
-#: src/ui/card_search_ui.py:126
+#: src/ui/card_search_ui.py:129
 msgid "Race, or leave empty"
 msgstr ""
 
-#: src/ui/card_search_ui.py:142 src/ui/deck_editor_ui.py:259
-#: src/ui/deck_editor_ui.py:303
-#, python-brace-format
-msgid "{error}"
-msgstr ""
-
-#: src/ui/card_search_ui.py:146
+#: src/ui/card_search_ui.py:149
 msgid "No cards found."
 msgstr ""
 
-#: src/ui/card_search_ui.py:149
+#: src/ui/card_search_ui.py:157
 msgid "Card search results"
 msgstr ""
 
-#: src/ui/card_search_ui.py:150
-#, python-brace-format
-msgid "{count} result(s), showing up to {limit}."
+#: src/ui/card_search_ui.py:165
+msgid "Current result"
 msgstr ""
 
-#: src/ui/card_search_ui.py:154
-#, python-brace-format
-msgid "{name}, {summary}"
+#: src/ui/card_search_ui.py:169
+msgid "Card results"
 msgstr ""
 
-#: src/ui/card_search_ui.py:173
+#: src/ui/card_search_ui.py:170
+msgid ""
+"Use up and down to choose a card. Press Enter to open details, or Space "
+"to read all details."
+msgstr ""
+
+#: src/ui/card_search_ui.py:175
+msgid "Read-only card details for the selected card."
+msgstr ""
+
+#: src/ui/card_search_ui.py:179
+msgid "Previous"
+msgstr ""
+
+#: src/ui/card_search_ui.py:180
+msgid "Open details"
+msgstr ""
+
+#: src/ui/card_search_ui.py:181
+msgid "Next"
+msgstr ""
+
+#: src/ui/card_search_ui.py:217
+#, python-brace-format
+msgid "{position} of {count}: {name}, {summary}"
+msgstr ""
+
+#: src/ui/card_search_ui.py:260
+msgid ""
+"Card results. Use up and down to choose a card, Enter to open details, "
+"Space to read all details, and Escape to go back."
+msgstr ""
+
+#: src/ui/card_search_ui.py:291 src/ui/card_search_ui.py:316
 #, python-brace-format
 msgid "Unknown card type '{value}'"
 msgstr ""
 
-#: src/ui/card_search_ui.py:177
+#: src/ui/card_search_ui.py:295 src/ui/card_search_ui.py:320
 #, python-brace-format
 msgid "Unknown attribute '{value}'"
 msgstr ""
 
-#: src/ui/card_search_ui.py:181
+#: src/ui/card_search_ui.py:299 src/ui/card_search_ui.py:324
 #, python-brace-format
 msgid "Unknown race '{value}'"
 msgstr ""
 
-#: src/ui/card_search_ui.py:204 src/ui/duel_messages/move.py:142
+#: src/ui/card_search_ui.py:368 src/ui/deck_editor_ui.py:234
+#, python-brace-format
+msgid "{name}, {summary}"
+msgstr ""
+
+#: src/ui/card_search_ui.py:385 src/ui/duel_messages/move.py:143
 msgid "unknown card"
 msgstr ""
 
-#: src/ui/card_search_ui.py:207
+#: src/ui/card_search_ui.py:388
 msgid "monster"
 msgstr ""
 
-#: src/ui/card_search_ui.py:211
+#: src/ui/card_search_ui.py:392
 msgid "pendulum"
 msgstr ""
 
-#: src/ui/card_search_ui.py:213
+#: src/ui/card_search_ui.py:394
 msgid "link"
 msgstr ""
 
-#: src/ui/card_search_ui.py:215
+#: src/ui/card_search_ui.py:396
 msgid "spell"
 msgstr ""
 
-#: src/ui/card_search_ui.py:217
+#: src/ui/card_search_ui.py:398
 msgid "trap"
 msgstr ""
 
-#: src/ui/card_search_ui.py:219
+#: src/ui/card_search_ui.py:400
 #, python-brace-format
 msgid "ATK {atk} DEF {defense}"
 msgstr ""
 
-#: src/ui/card_search_ui.py:220
+#: src/ui/card_search_ui.py:401
 msgid "unknown type"
 msgstr ""
 
-#: src/ui/data_updater_ui.py:19
+#: src/ui/data_updater_ui.py:25
 msgid "Loading data"
 msgstr ""
 
-#: src/ui/data_updater_ui.py:20
+#: src/ui/data_updater_ui.py:26
 msgid "Loading data, please wait..."
 msgstr ""
 
-#: src/ui/data_updater_ui.py:66
+#: src/ui/data_updater_ui.py:165
 msgid "Could not update card data. Using cached data which may be outdated."
 msgstr ""
 
-#: src/ui/data_updater_ui.py:73
+#: src/ui/data_updater_ui.py:172
 msgid "Data update failed"
 msgstr ""
 
-#: src/ui/data_updater_ui.py:74
+#: src/ui/data_updater_ui.py:173
 msgid "Data update failed. Please check your internet connection and try again."
 msgstr ""
 
-#: src/ui/data_updater_ui.py:75
+#: src/ui/data_updater_ui.py:174
 msgid "Retry"
 msgstr ""
 
-#: src/ui/data_updater_ui.py:76 src/ui/main_ui.py:81
+#: src/ui/data_updater_ui.py:175 src/ui/main_ui.py:84
 msgid "Exit"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:30 src/ui/main_ui.py:73
+#: src/ui/deck_editor_ui.py:49 src/ui/main_ui.py:76
 msgid "Deck Editor"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:31
+#: src/ui/deck_editor_ui.py:50
 msgid "Create and edit decks. Use arrow keys to navigate."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:32
+#: src/ui/deck_editor_ui.py:51
 msgid "New Deck"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:33
+#: src/ui/deck_editor_ui.py:52
 msgid "Edit Existing Deck"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:40 src/ui/main_ui.py:251 src/ui/main_ui.py:273
-#: src/ui/room_ui.py:395
+#: src/ui/deck_editor_ui.py:59 src/ui/main_ui.py:292 src/ui/main_ui.py:314
+#: src/ui/room_ui.py:467
 msgid "Deck name"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:56 src/ui/room_ui.py:266
+#: src/ui/deck_editor_ui.py:75 src/ui/room_ui.py:339
 msgid "No decks found."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:59
+#: src/ui/deck_editor_ui.py:78
 msgid "Select deck to edit"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:61 src/ui/deck_editor_ui.py:113
-#: src/ui/deck_editor_ui.py:178 src/ui/deck_editor_ui.py:207
-#: src/ui/duel_messages/announce_card.py:37
-#: src/ui/duel_messages/sort_card.py:45 src/ui/replay_ui.py:63
-#: src/ui/room_ui.py:239 src/ui/room_ui.py:245 src/ui/room_ui.py:263
-#: src/ui/room_ui.py:268 src/ui/server_ui.py:24 src/ui/side_deck_ui.py:51
-#: src/ui/side_deck_ui.py:72
-#, python-brace-format
-msgid "{name}"
-msgstr ""
-
-#: src/ui/deck_editor_ui.py:82
+#: src/ui/deck_editor_ui.py:101
 #, python-brace-format
 msgid "Editing: {name}"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:83
+#: src/ui/deck_editor_ui.py:102
+msgid ""
+"Arrow keys to move, Enter to choose. In any card list, Space reads the "
+"card under the cursor."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:103
 #, python-brace-format
 msgid "Main deck: {main} cards, Extra deck: {extra} cards, Side: {side} cards"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:84
+#: src/ui/deck_editor_ui.py:104
+#, python-brace-format
+msgid "Status: {status}"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:105
 msgid "Add card"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:85
+#: src/ui/deck_editor_ui.py:106
 msgid "Remove card from main/extra"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:86
+#: src/ui/deck_editor_ui.py:107
 msgid "Remove card from side"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:87
+#: src/ui/deck_editor_ui.py:108
 msgid "View main deck"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:88
+#: src/ui/deck_editor_ui.py:109
 msgid "View side deck"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:89
+#: src/ui/deck_editor_ui.py:110
+#, python-brace-format
+msgid "Banlist for copy limits: {banlist}"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:111
 msgid "Check against banlist"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:90
+#: src/ui/deck_editor_ui.py:112
 msgid "Export deck string"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:91
+#: src/ui/deck_editor_ui.py:113
 msgid "Save deck"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:92
+#: src/ui/deck_editor_ui.py:114
 msgid "Back without saving"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:98
+#: src/ui/deck_editor_ui.py:123
+msgid "none, three copies allowed"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:156
+#, python-brace-format
+msgid "{name} is forbidden by this banlist."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:158
+#, python-brace-format
+msgid "{name} is limited to one copy."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:159
+#, python-brace-format
+msgid "Already have {limit} copies of {name}."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:164
+msgid "Banlist used for copy limits"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:165
+msgid "No banlist, allow three copies"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:172
+msgid "No banlists are installed."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:182
+#, python-brace-format
+msgid "Copy limits now follow {banlist}."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:184
+msgid "Copy limits back to three per card."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:200
 msgid "Search card by name"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:106
+#: src/ui/deck_editor_ui.py:212
 #, python-brace-format
 msgid "No cards found for '{query}'."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:109
+#: src/ui/deck_editor_ui.py:216
+#, python-brace-format
+msgid "{count} results, showing the first {limit}. Narrow the search for more."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:218
+#, python-brace-format
+msgid "{count} result(s)."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:219
 #, python-brace-format
 msgid "Search results for '{query}'"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:121
+#: src/ui/deck_editor_ui.py:220
+msgid "Enter chooses where to add the card. Space reads the card first."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:223
+msgid "New search"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:233
+#, python-brace-format
+msgid "{name}, {summary}, {copies} already in deck"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:242
 #, python-brace-format
 msgid "Add {name}"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:122
+#: src/ui/deck_editor_ui.py:243
+msgid "Read card details"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:244
 msgid "Add to main or extra deck"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:123
+#: src/ui/deck_editor_ui.py:245
 msgid "Add to side deck"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:134
+#: src/ui/deck_editor_ui.py:248
+#, python-brace-format
+msgid "Add {count} copies to main or extra deck"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:260
 #, python-brace-format
 msgid "Extra deck is full ({max} cards)."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:140
+#: src/ui/deck_editor_ui.py:264
 #, python-brace-format
 msgid "Main deck is full ({max} cards)."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:145 src/ui/deck_editor_ui.py:161
+#: src/ui/deck_editor_ui.py:279
 #, python-brace-format
-msgid "Already have 3 copies of {name}."
+msgid "{name} added. {copies} in deck."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:149
+#: src/ui/deck_editor_ui.py:296
 #, python-brace-format
-msgid "{name} added to deck."
+msgid "{count} copies of {name} added. {copies} in deck."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:157
+#: src/ui/deck_editor_ui.py:307
 #, python-brace-format
 msgid "Side deck is full ({max} cards)."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:164
+#: src/ui/deck_editor_ui.py:312
 #, python-brace-format
-msgid "{name} added to side deck."
+msgid "{name} added to side deck. {copies} in deck."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:172 src/ui/deck_editor_ui.py:196
+#: src/ui/deck_editor_ui.py:332 src/ui/deck_editor_ui.py:368
 #, python-brace-format
 msgid "No cards in {section}."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:175
+#: src/ui/deck_editor_ui.py:336
 #, python-brace-format
 msgid "Remove card from {section}"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:178 src/ui/deck_editor_ui.py:207
-#: src/ui/side_deck_ui.py:51 src/ui/side_deck_ui.py:72
+#: src/ui/deck_editor_ui.py:337
+msgid "Enter removes one copy and keeps you here. Space reads the card."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:340 src/ui/deck_editor_ui.py:380
+#: src/ui/side_deck_ui.py:50 src/ui/side_deck_ui.py:71
 #, python-brace-format
 msgid "{name} x{count}"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:188
+#: src/ui/deck_editor_ui.py:353
+#, python-brace-format
+msgid "{name} removed. {count} left."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:355
 #, python-brace-format
 msgid "{name} removed."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:199
+#: src/ui/deck_editor_ui.py:357
+#, python-brace-format
+msgid "{name} is not in {section}."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:371
 #, python-brace-format
 msgid "{section} ({count} cards)"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:204
+#: src/ui/deck_editor_ui.py:372
+msgid "Enter opens the full card text. Space reads it without leaving the list."
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:377
 #, python-brace-format
 msgid "{section} ({count})"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:215
+#: src/ui/deck_editor_ui.py:388
 msgid "Monsters"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:216
+#: src/ui/deck_editor_ui.py:389
 msgid "Spells"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:217
+#: src/ui/deck_editor_ui.py:390
 msgid "Traps"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:218
+#: src/ui/deck_editor_ui.py:391
 msgid "Extra deck"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:219
+#: src/ui/deck_editor_ui.py:392
 msgid "Other"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:261
+#: src/ui/deck_editor_ui.py:438
 #, python-brace-format
 msgid "Check '{name}' against banlist"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:263
-#, python-brace-format
-msgid "{banlist}"
-msgstr ""
-
-#: src/ui/deck_editor_ui.py:273 src/ui/room_ui.py:279
+#: src/ui/deck_editor_ui.py:450 src/ui/room_ui.py:352
 msgid "Banlist result"
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:275
+#: src/ui/deck_editor_ui.py:452
 #, python-brace-format
 msgid "Deck is legal for {banlist}."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:277
+#: src/ui/deck_editor_ui.py:454
 #, python-brace-format
 msgid "Deck is not legal for {banlist}."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:281 src/ui/room_ui.py:287
+#: src/ui/deck_editor_ui.py:458 src/ui/room_ui.py:360
 #, python-brace-format
 msgid "{card} is limited to {limit} and you have {found}."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:295
+#: src/ui/deck_editor_ui.py:463
+msgid "Use this banlist for copy limits"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:473
 #, python-brace-format
 msgid "Deck string for '{name}' copied to clipboard."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:312
+#: src/ui/deck_editor_ui.py:493
+#, python-brace-format
+msgid "Deck '{name}' saved as a draft. {problem}"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:495
 #, python-brace-format
 msgid "Deck '{name}' saved."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:321
+#: src/ui/deck_editor_ui.py:503
+msgid "ready to play"
+msgstr ""
+
+#: src/ui/deck_editor_ui.py:511
 #, python-brace-format
 msgid "Main deck must contain at least {min} cards."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:323
+#: src/ui/deck_editor_ui.py:513
 #, python-brace-format
 msgid "Main deck cannot contain more than {max} cards."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:325
+#: src/ui/deck_editor_ui.py:515
 #, python-brace-format
 msgid "Extra deck cannot contain more than {max} cards."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:327
+#: src/ui/deck_editor_ui.py:517
 #, python-brace-format
 msgid "Side deck cannot contain more than {max} cards."
 msgstr ""
 
-#: src/ui/deck_editor_ui.py:332
+#: src/ui/deck_editor_ui.py:522
 #, python-brace-format
 msgid "Deck cannot contain more than 3 copies of {name}."
 msgstr ""
 
-#: src/ui/duel_field.py:111
+#: src/ui/duel_field.py:112
 msgid "Duel Field"
 msgstr ""
 
-#: src/ui/duel_field.py:112
+#: src/ui/duel_field.py:113
 msgid ""
 "Arrow keys to navigate field. Enter on a card to open action menu. Space "
-"to read a card. Backspace to open duel menu. M opens chat. C reads chain,"
-" G graveyard, R banished, X extra deck. Escape cancels chaining."
+"reads full card text. N reads name, D description, T stats, L location, A"
+" available actions. Backspace opens duel menu. M opens chat. C reads the "
+"chain, E the effects applying to each player, G graveyard, R banished, X "
+"extra deck. H repeats the last ten messages, and F9 does the same from "
+"anywhere. Escape cancels chaining."
 msgstr ""
 
-#: src/ui/duel_field.py:183 src/ui/duel_field.py:422 src/ui/duel_field.py:443
-#: src/ui/duel_field.py:453 src/ui/duel_field.py:468 src/ui/duel_field.py:483
-#: src/ui/duel_field.py:496
+#: src/ui/duel_field.py:184 src/ui/duel_field.py:225 src/ui/duel_field.py:527
+#: src/ui/duel_field.py:548 src/ui/duel_field.py:558 src/ui/duel_field.py:573
+#: src/ui/duel_field.py:588 src/ui/duel_field.py:601
+#: src/ui/duel_messages/draw.py:77
 msgid "Face down card"
 msgstr ""
 
-#: src/ui/duel_field.py:200
+#: src/ui/duel_field.py:201
 #, python-brace-format
 msgid "Effect: {description}"
 msgstr ""
 
-#: src/ui/duel_field.py:204
+#: src/ui/duel_field.py:205
 #, python-brace-format
 msgid "XYZ materials ({count}): {materials}"
 msgstr ""
 
-#: src/ui/duel_field.py:206
+#: src/ui/duel_field.py:207
 msgid "No XYZ materials attached"
 msgstr ""
 
-#: src/ui/duel_field.py:208
+#: src/ui/duel_field.py:209 src/ui/duel_field.py:257
 #, python-brace-format
 msgid "Pendulum scale: {left}/{right}"
 msgstr ""
 
-#: src/ui/duel_field.py:212
+#: src/ui/duel_field.py:213 src/ui/duel_field.py:264
 #, python-brace-format
 msgid "Link Markers: {markers}"
 msgstr ""
 
-#: src/ui/duel_field.py:218
+#: src/ui/duel_field.py:219 src/ui/duel_field.py:1101 src/ui/duel_field.py:1110
+msgid "No card found"
+msgstr ""
+
+#: src/ui/duel_field.py:243
+msgid "No description available."
+msgstr ""
+
+#: src/ui/duel_field.py:253
+#, python-brace-format
+msgid "Attack: {attack}, Link rating: {rating}"
+msgstr ""
+
+#: src/ui/duel_field.py:255
+#, python-brace-format
+msgid "Attack: {attack}, Defense: {defense}, Level/Rank: {level}"
+msgstr ""
+
+#: src/ui/duel_field.py:260
+#, python-brace-format
+msgid "XYZ materials: {count}"
+msgstr ""
+
+#: src/ui/duel_field.py:266
+msgid "No battle statistics."
+msgstr ""
+
+#: src/ui/duel_field.py:306
 msgid "No chain is currently available."
 msgstr ""
 
-#: src/ui/duel_field.py:219
-msgid "Current chain:"
+#: src/ui/duel_field.py:307
+msgid "You can chain with:"
 msgstr ""
 
-#: src/ui/duel_field.py:223
+#: src/ui/duel_field.py:311
 #, python-brace-format
 msgid "{index}: {name}, {description}"
 msgstr ""
 
-#: src/ui/duel_field.py:225 src/ui/duel_messages/confirm_cards.py:41
+#: src/ui/duel_field.py:313 src/ui/duel_messages/confirm_cards.py:41
 #: src/ui/duel_messages/deck_top.py:52
 #: src/ui/duel_messages/extra_deck_top.py:33
+#: src/ui/duel_messages/reload_field.py:182
 #, python-brace-format
 msgid "{index}: {name}"
 msgstr ""
 
-#: src/ui/duel_field.py:288
+#: src/ui/duel_field.py:376
 msgid "Has activatable effects"
 msgstr ""
 
-#: src/ui/duel_field.py:291 src/ui/duel_messages/select_chain.py:61
+#: src/ui/duel_field.py:379 src/ui/duel_messages/select_chain.py:62
 msgid "Chaining"
 msgstr ""
 
-#: src/ui/duel_field.py:293
+#: src/ui/duel_field.py:381
 msgid "Can attack"
 msgstr ""
 
-#: src/ui/duel_field.py:295
+#: src/ui/duel_field.py:383
 msgid "Summonable"
 msgstr ""
 
-#: src/ui/duel_field.py:297
+#: src/ui/duel_field.py:385
 msgid "Special summonable"
 msgstr ""
 
-#: src/ui/duel_field.py:299
+#: src/ui/duel_field.py:387
 msgid "Repositionable"
 msgstr ""
 
-#: src/ui/duel_field.py:301
+#: src/ui/duel_field.py:389
 msgid "Settable"
 msgstr ""
 
-#: src/ui/duel_field.py:310
+#: src/ui/duel_field.py:398
 msgid "No card selected"
 msgstr ""
 
-#: src/ui/duel_field.py:331
-#, python-brace-format
-msgid "{info}"
-msgstr ""
-
-#: src/ui/duel_field.py:337
-#, python-brace-format
-msgid "{cell}"
-msgstr ""
-
-#: src/ui/duel_field.py:342
+#: src/ui/duel_field.py:430
 #, python-brace-format
 msgid "Empty opponent Spell/Trap {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:343
+#: src/ui/duel_field.py:431
 #, python-brace-format
 msgid "Empty opponent Monster {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:344 src/ui/duel_field.py:721 src/ui/duel_field.py:723
+#: src/ui/duel_field.py:432 src/ui/duel_field.py:841 src/ui/duel_field.py:843
 #, python-brace-format
 msgid "Empty Spell/Trap {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:345 src/ui/duel_field.py:713 src/ui/duel_field.py:718
+#: src/ui/duel_field.py:433 src/ui/duel_field.py:833 src/ui/duel_field.py:838
 #, python-brace-format
 msgid "Empty Monster {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:346
+#: src/ui/duel_field.py:434
 msgid "Empty extra Monster 1"
 msgstr ""
 
-#: src/ui/duel_field.py:347
+#: src/ui/duel_field.py:435
 msgid "Empty extra Monster 2"
 msgstr ""
 
-#: src/ui/duel_field.py:348 src/ui/duel_field.py:726
+#: src/ui/duel_field.py:436 src/ui/duel_field.py:846
 msgid "Empty Field Spell"
 msgstr ""
 
-#: src/ui/duel_field.py:349
+#: src/ui/duel_field.py:437
 msgid "Empty opponent Field Spell"
 msgstr ""
 
-#: src/ui/duel_field.py:350
+#: src/ui/duel_field.py:438
 msgid "Opponent Deck"
 msgstr ""
 
-#: src/ui/duel_field.py:351
+#: src/ui/duel_field.py:439
 msgid "Player Deck"
 msgstr ""
 
-#: src/ui/duel_field.py:352
+#: src/ui/duel_field.py:440
 msgid "Opponent Extra Deck"
 msgstr ""
 
-#: src/ui/duel_field.py:353
+#: src/ui/duel_field.py:441
 msgid "Opponent Graveyard"
 msgstr ""
 
-#: src/ui/duel_field.py:354
+#: src/ui/duel_field.py:442
 msgid "Player Graveyard"
 msgstr ""
 
-#: src/ui/duel_field.py:355
+#: src/ui/duel_field.py:443
 msgid "Opponent Banished"
 msgstr ""
 
-#: src/ui/duel_field.py:356
+#: src/ui/duel_field.py:444
 msgid "Player Banished"
 msgstr ""
 
-#: src/ui/duel_field.py:535 src/ui/duel_field.py:545
+#: src/ui/duel_field.py:640 src/ui/duel_field.py:650
 #, python-brace-format
 msgid "Extra deck {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:551
+#: src/ui/duel_field.py:656
 #, python-brace-format
 msgid "Player graveyard {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:561
+#: src/ui/duel_field.py:666
 #, python-brace-format
 msgid "Opponent graveyard {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:567
+#: src/ui/duel_field.py:672
 #, python-brace-format
 msgid "Player banished {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:577
+#: src/ui/duel_field.py:682
 #, python-brace-format
 msgid "Opponent banished {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:596
+#: src/ui/duel_field.py:701
 msgid "Empty player extra deck"
 msgstr ""
 
-#: src/ui/duel_field.py:601
+#: src/ui/duel_field.py:706
 msgid "Empty opponent extra deck"
 msgstr ""
 
-#: src/ui/duel_field.py:606
+#: src/ui/duel_field.py:711
 msgid "Empty player graveyard"
 msgstr ""
 
-#: src/ui/duel_field.py:611
+#: src/ui/duel_field.py:716
 msgid "Empty opponent graveyard"
 msgstr ""
 
-#: src/ui/duel_field.py:616
+#: src/ui/duel_field.py:721
 msgid "Empty player banished"
 msgstr ""
 
-#: src/ui/duel_field.py:621
+#: src/ui/duel_field.py:726
 msgid "Empty opponent banished"
 msgstr ""
 
-#: src/ui/duel_field.py:711 src/ui/duel_field.py:716
+#: src/ui/duel_field.py:831 src/ui/duel_field.py:836
 #, python-brace-format
 msgid "Empty extra Monster {n}"
 msgstr ""
 
-#: src/ui/duel_field.py:728
+#: src/ui/duel_field.py:848
 msgid "Empty Opponent Field Spell"
 msgstr ""
 
-#: src/ui/duel_field.py:893 src/ui/duel_menu.py:73
-#, python-brace-format
-msgid "{chain}"
-msgstr ""
-
-#: src/ui/duel_field.py:896 src/ui/duel_field.py:1007
+#: src/ui/duel_field.py:1039 src/ui/duel_field.py:1153
 msgid "Your graveyard"
 msgstr ""
 
-#: src/ui/duel_field.py:896 src/ui/duel_field.py:1005
+#: src/ui/duel_field.py:1039 src/ui/duel_field.py:1151
 msgid "No cards in graveyard"
 msgstr ""
 
-#: src/ui/duel_field.py:899 src/ui/duel_field.py:1021
+#: src/ui/duel_field.py:1042 src/ui/duel_field.py:1167
 msgid "Your banished cards"
 msgstr ""
 
-#: src/ui/duel_field.py:899 src/ui/duel_field.py:1019
+#: src/ui/duel_field.py:1042 src/ui/duel_field.py:1165
 msgid "No cards in banished"
 msgstr ""
 
-#: src/ui/duel_field.py:902 src/ui/duel_field.py:997
+#: src/ui/duel_field.py:1045 src/ui/duel_field.py:1143
 msgid "Your extra deck"
 msgstr ""
 
-#: src/ui/duel_field.py:902 src/ui/duel_field.py:995
+#: src/ui/duel_field.py:1045 src/ui/duel_field.py:1141
 msgid "No cards in extra deck"
 msgstr ""
 
-#: src/ui/duel_field.py:911 src/ui/duel_field.py:924
+#: src/ui/duel_field.py:1054 src/ui/duel_field.py:1067
 msgid "No cards in hand"
 msgstr ""
 
-#: src/ui/duel_field.py:955 src/ui/duel_field.py:964
-msgid "No card found"
+#: src/ui/duel_field.py:1087
+msgid "No playable cards are currently available."
 msgstr ""
 
-#: src/ui/duel_field.py:978 src/ui/duel_field.py:1014
+#: src/ui/duel_field.py:1124 src/ui/duel_field.py:1160
 msgid "Opponent graveyard"
 msgstr ""
 
-#: src/ui/duel_field.py:978 src/ui/duel_field.py:1012
+#: src/ui/duel_field.py:1124 src/ui/duel_field.py:1158
 msgid "No cards in opponent graveyard"
 msgstr ""
 
-#: src/ui/duel_field.py:979 src/ui/duel_field.py:1028
+#: src/ui/duel_field.py:1125 src/ui/duel_field.py:1174
 msgid "Opponent banished cards"
 msgstr ""
 
-#: src/ui/duel_field.py:979 src/ui/duel_field.py:1026
+#: src/ui/duel_field.py:1125 src/ui/duel_field.py:1172
 msgid "No cards in opponent banished"
 msgstr ""
 
-#: src/ui/duel_field.py:980 src/ui/duel_field.py:1038
+#: src/ui/duel_field.py:1126 src/ui/duel_field.py:1184
 msgid "Opponent extra deck"
 msgstr ""
 
-#: src/ui/duel_field.py:980 src/ui/duel_field.py:1033
+#: src/ui/duel_field.py:1126 src/ui/duel_field.py:1179
 msgid "No cards in opponent extra deck"
 msgstr ""
 
-#: src/ui/duel_field.py:985
+#: src/ui/duel_field.py:1131
 msgid "No opponent public cards are available."
 msgstr ""
 
-#: src/ui/duel_field.py:1000
+#: src/ui/duel_field.py:1146
 msgid "Player deck"
 msgstr ""
 
-#: src/ui/duel_field.py:1052
+#: src/ui/duel_field.py:1198
 msgid "No cards."
 msgstr ""
 
@@ -1270,13 +1518,13 @@ msgstr ""
 msgid "Are you sure you want to surrender?"
 msgstr ""
 
-#: src/ui/duel_menu.py:38 src/ui/duel_messages/select_effect_yes_or_no.py:29
-#: src/ui/duel_messages/select_yes_no.py:46 src/ui/rematch_ui.py:20
+#: src/ui/duel_menu.py:38 src/ui/duel_messages/select_effect_yes_or_no.py:30
+#: src/ui/duel_messages/select_yes_no.py:47 src/ui/rematch_ui.py:20
 msgid "Yes"
 msgstr ""
 
-#: src/ui/duel_menu.py:39 src/ui/duel_messages/select_effect_yes_or_no.py:30
-#: src/ui/duel_messages/select_yes_no.py:47 src/ui/rematch_ui.py:21
+#: src/ui/duel_menu.py:39 src/ui/duel_messages/select_effect_yes_or_no.py:31
+#: src/ui/duel_messages/select_yes_no.py:48 src/ui/rematch_ui.py:21
 msgid "No"
 msgstr ""
 
@@ -1331,145 +1579,145 @@ msgstr ""
 msgid "Log not available"
 msgstr ""
 
-#: src/ui/frame.py:33
+#: src/ui/frame.py:34
 msgid "&About"
 msgstr ""
 
-#: src/ui/frame.py:33
+#: src/ui/frame.py:34
 msgid "Information about this program"
 msgstr ""
 
-#: src/ui/frame.py:35
+#: src/ui/frame.py:36
 msgid "E&xit"
 msgstr ""
 
-#: src/ui/frame.py:35
+#: src/ui/frame.py:36
 msgid "Terminate the program"
 msgstr ""
 
-#: src/ui/frame.py:37
+#: src/ui/frame.py:38
 msgid "&File"
 msgstr ""
 
-#: src/ui/frame.py:126
+#: src/ui/frame.py:127
 msgid "An accessible client for playing Yu-Gi-Oh! online"
 msgstr ""
 
-#: src/ui/frame.py:127
+#: src/ui/frame.py:128
 msgid "YuGiOhAccess contributors"
 msgstr ""
 
-#: src/ui/frame.py:128
+#: src/ui/frame.py:129
 msgid "YuGiOhAccess Website"
 msgstr ""
 
-#: src/ui/main_ui.py:17
+#: src/ui/main_ui.py:19
 msgid "Welcome to YuGiOhAccess"
 msgstr ""
 
-#: src/ui/main_ui.py:18
+#: src/ui/main_ui.py:20
 msgid ""
 "Welcome to YuGiOhAccess. This menu will contain quick information about "
 "the keys needed to move around. Use the up and down arrow keys to "
 "navigate the menu."
 msgstr ""
 
-#: src/ui/main_ui.py:19
+#: src/ui/main_ui.py:21
 msgid ""
 "In most screens, you can press F1 to get help information. This will give"
 " you information about the keys needed to move around in that specific "
 "screen."
 msgstr ""
 
-#: src/ui/main_ui.py:20
+#: src/ui/main_ui.py:22
 msgid ""
 "When encountering a text field, you can just start typing to enter text "
 "into that field. An example is provided below."
 msgstr ""
 
-#: src/ui/main_ui.py:21
+#: src/ui/main_ui.py:23
 msgid "Type something here"
 msgstr ""
 
-#: src/ui/main_ui.py:22
+#: src/ui/main_ui.py:24
 msgid ""
 "When encountering a slider, use the left and right arrow keys to adjust "
 "the value of the slider. An example is provided below."
 msgstr ""
 
-#: src/ui/main_ui.py:23
+#: src/ui/main_ui.py:25
 msgid "This is a slider"
 msgstr ""
 
-#: src/ui/main_ui.py:26
+#: src/ui/main_ui.py:28
 msgid ""
 "The same goes for combo boxes. Use the left and right arrow keys to "
 "navigate the options. The  option will automatically be selected when you"
 " press enter. An example is provided below."
 msgstr ""
 
-#: src/ui/main_ui.py:27
+#: src/ui/main_ui.py:29
 msgid "This is a combo box"
 msgstr ""
 
-#: src/ui/main_ui.py:27
+#: src/ui/main_ui.py:29
 msgid "Option 1"
 msgstr ""
 
-#: src/ui/main_ui.py:27
+#: src/ui/main_ui.py:29
 msgid "Option 2"
 msgstr ""
 
-#: src/ui/main_ui.py:27
+#: src/ui/main_ui.py:29
 msgid "Option 3"
 msgstr ""
 
-#: src/ui/main_ui.py:29
+#: src/ui/main_ui.py:31
 msgid ""
 "When encountering a checkbox, use the space bar to toggle the checkbox. "
 "An example is provided below."
 msgstr ""
 
-#: src/ui/main_ui.py:30
+#: src/ui/main_ui.py:32
 msgid "This is a checkbox"
 msgstr ""
 
-#: src/ui/main_ui.py:31
+#: src/ui/main_ui.py:33
 msgid "Lastly a little about the duel field"
 msgstr ""
 
-#: src/ui/main_ui.py:32
+#: src/ui/main_ui.py:34
 msgid ""
 "When you are in a duel, the field is layed out in a grid, with your field"
 " being in the bottom half, and the opponent's field being in the top "
 "half. Use the arrow keys to navigate the field."
 msgstr ""
 
-#: src/ui/main_ui.py:33
+#: src/ui/main_ui.py:35
 msgid "Use space to read a card, and enter to open up the actions for that card."
 msgstr ""
 
-#: src/ui/main_ui.py:34
+#: src/ui/main_ui.py:36
 msgid ""
 "Use backspace to open tue duel menu, where you can perform actions like "
 "attacking, ending your turn, and more."
 msgstr ""
 
-#: src/ui/main_ui.py:35
+#: src/ui/main_ui.py:37
 msgid "Use escape to go back to the duel field from the action or duel menu."
 msgstr ""
 
-#: src/ui/main_ui.py:36
+#: src/ui/main_ui.py:38
 msgid ""
 "That's all for now. If you want to see this information again, you can "
 "find it in the help section of the main menu."
 msgstr ""
 
-#: src/ui/main_ui.py:37
+#: src/ui/main_ui.py:39
 msgid "Press enter to continue"
 msgstr ""
 
-#: src/ui/main_ui.py:38
+#: src/ui/main_ui.py:40
 msgid ""
 "Hey it's jessica, the developer of the YuGiOhAccess client, you found "
 "this little message, or maybe you were told it was here. Anyway. Welcome "
@@ -1478,109 +1726,109 @@ msgid ""
 "menu."
 msgstr ""
 
-#: src/ui/main_ui.py:69
+#: src/ui/main_ui.py:72
 msgid "Main Menu"
 msgstr ""
 
-#: src/ui/main_ui.py:70
+#: src/ui/main_ui.py:73
 msgid ""
 "Main menu. Use the up and down arrow keys to navigate the menu, and press"
 " enter to select an option"
 msgstr ""
 
-#: src/ui/main_ui.py:71
+#: src/ui/main_ui.py:74
 #, python-brace-format
 msgid "YuGiOh Access, {version}"
 msgstr ""
 
-#: src/ui/main_ui.py:72
+#: src/ui/main_ui.py:75
 #, python-brace-format
 msgid "Play ({nickname})"
 msgstr ""
 
-#: src/ui/main_ui.py:75 src/ui/replay_ui.py:42
+#: src/ui/main_ui.py:78 src/ui/replay_ui.py:42
 msgid "Replay Viewer"
 msgstr ""
 
-#: src/ui/main_ui.py:76 src/ui/main_ui.py:102
+#: src/ui/main_ui.py:79 src/ui/main_ui.py:113
 msgid "Settings"
 msgstr ""
 
-#: src/ui/main_ui.py:77 src/ui/main_ui.py:241 src/ui/main_ui.py:243
+#: src/ui/main_ui.py:80 src/ui/main_ui.py:282 src/ui/main_ui.py:284
 msgid "Help"
 msgstr ""
 
-#: src/ui/main_ui.py:79
+#: src/ui/main_ui.py:82
 msgid "Make Windbot deck"
 msgstr ""
 
-#: src/ui/main_ui.py:80
+#: src/ui/main_ui.py:83
 msgid "Make deck string from Windbot deck"
 msgstr ""
 
-#: src/ui/main_ui.py:83
+#: src/ui/main_ui.py:86
 msgid "In the main menu"
 msgstr ""
 
-#: src/ui/main_ui.py:84
+#: src/ui/main_ui.py:87
 msgid "Getting ready to duel"
 msgstr ""
 
-#: src/ui/main_ui.py:90
+#: src/ui/main_ui.py:101
 msgid "Change nickname"
 msgstr ""
 
-#: src/ui/main_ui.py:93
+#: src/ui/main_ui.py:104
 msgid "Nickname unchanged"
 msgstr ""
 
-#: src/ui/main_ui.py:96
+#: src/ui/main_ui.py:107
 #, python-brace-format
 msgid "Changed nickname to {name}"
 msgstr ""
 
-#: src/ui/main_ui.py:103
+#: src/ui/main_ui.py:114
 msgid "Music volume"
 msgstr ""
 
-#: src/ui/main_ui.py:109
+#: src/ui/main_ui.py:120
 msgid "Use the left and right arrow keys to adjust the music volume"
 msgstr ""
 
-#: src/ui/main_ui.py:110
+#: src/ui/main_ui.py:121
 msgid "Sound effects volume"
 msgstr ""
 
-#: src/ui/main_ui.py:116
+#: src/ui/main_ui.py:127
 msgid "Use the left and right arrow keys to adjust the sound effects volume"
 msgstr ""
 
-#: src/ui/main_ui.py:117
+#: src/ui/main_ui.py:128
 msgid "Enable hints"
 msgstr ""
 
-#: src/ui/main_ui.py:120
+#: src/ui/main_ui.py:131
 msgid ""
 "When checked, hints like this will be spoken after a short delay. When "
 "unchecked, hints will not be spoken"
 msgstr ""
 
-#: src/ui/main_ui.py:121
+#: src/ui/main_ui.py:132
 msgid "Only output to screenreader when game window is focused"
 msgstr ""
 
-#: src/ui/main_ui.py:124
+#: src/ui/main_ui.py:135
 msgid ""
 "When checked, the screenreader will only output text when the game window"
 " is focused. When unchecked, the screenreader will output text even if "
 "the window is in the background"
 msgstr ""
 
-#: src/ui/main_ui.py:125
+#: src/ui/main_ui.py:136
 msgid "Enable helper zones"
 msgstr ""
 
-#: src/ui/main_ui.py:128
+#: src/ui/main_ui.py:139
 msgid ""
 "When checked, empty zones between and to the left and right of the extra "
 "monster zones will be shown. When unchecked, these zones will not be "
@@ -1588,110 +1836,150 @@ msgid ""
 "newer players"
 msgstr ""
 
-#: src/ui/main_ui.py:129
+#: src/ui/main_ui.py:140
 msgid "Rock paper scissors behavior for the bot"
 msgstr ""
 
-#: src/ui/main_ui.py:129 src/ui/room_ui.py:444
+#: src/ui/main_ui.py:140 src/ui/room_ui.py:516
 msgid "Random"
 msgstr ""
 
-#: src/ui/main_ui.py:129
+#: src/ui/main_ui.py:140
 msgid "Always show rock"
 msgstr ""
 
-#: src/ui/main_ui.py:129
+#: src/ui/main_ui.py:140
 msgid "Always show paper"
 msgstr ""
 
-#: src/ui/main_ui.py:129
+#: src/ui/main_ui.py:140
 msgid "Always show scissors"
 msgstr ""
 
-#: src/ui/main_ui.py:140
+#: src/ui/main_ui.py:151
 msgid ""
 "Select the behavior of the bot in rock paper scissors. Random is the "
 "default, the bot will randomly pick rock, paper or scissors. Always show "
 "rock, paper or scissors will make the bot always pick that option"
 msgstr ""
 
-#: src/ui/main_ui.py:141
+#: src/ui/main_ui.py:152
 msgid "Enable bot chatter during duels"
 msgstr ""
 
-#: src/ui/main_ui.py:144
+#: src/ui/main_ui.py:155
 msgid ""
 "When checked, the bot will say things during duels. When unchecked, the "
 "bot will not say anything"
 msgstr ""
 
-#: src/ui/main_ui.py:149
+#: src/ui/main_ui.py:160
 msgid "UI Language"
 msgstr ""
 
-#: src/ui/main_ui.py:160
+#: src/ui/main_ui.py:171
 #, python-brace-format
 msgid "UI language changed to {language}. Restart for full effect."
 msgstr ""
 
-#: src/ui/main_ui.py:162
+#: src/ui/main_ui.py:173
 msgid ""
 "Select the language for the user interface. Card names use a separate "
 "setting."
 msgstr ""
 
-#: src/ui/main_ui.py:165
+#: src/ui/main_ui.py:178
 msgid "Card catalog language"
 msgstr ""
 
-#: src/ui/main_ui.py:172
+#: src/ui/main_ui.py:185
 msgid ""
 "Select the language used for card names, card descriptions, and duel card"
 " strings."
 msgstr ""
 
-#: src/ui/main_ui.py:174 src/ui/main_ui.py:253 src/ui/main_ui.py:275
+#: src/ui/main_ui.py:187 src/ui/main_ui.py:294 src/ui/main_ui.py:316
 msgid "Done"
 msgstr ""
 
-#: src/ui/main_ui.py:192
+#: src/ui/main_ui.py:204
+msgid "English"
+msgstr ""
+
+#: src/ui/main_ui.py:205
+msgid "German"
+msgstr ""
+
+#: src/ui/main_ui.py:206
+msgid "Japanese"
+msgstr ""
+
+#: src/ui/main_ui.py:207
+msgid "Spanish"
+msgstr ""
+
+#: src/ui/main_ui.py:208
+msgid "Portuguese"
+msgstr ""
+
+#: src/ui/main_ui.py:209
+msgid "Italian"
+msgstr ""
+
+#: src/ui/main_ui.py:210
+msgid "French"
+msgstr ""
+
+#: src/ui/main_ui.py:211
+msgid "Thai"
+msgstr ""
+
+#: src/ui/main_ui.py:212
+msgid "Chinese"
+msgstr ""
+
+#: src/ui/main_ui.py:213
+msgid "Korean"
+msgstr ""
+
+#: src/ui/main_ui.py:228
 #, python-brace-format
 msgid "Card catalog language {language} is not available."
 msgstr ""
 
-#: src/ui/main_ui.py:196
+#: src/ui/main_ui.py:234
 #, python-brace-format
 msgid "Card catalog language changed to {language}."
 msgstr ""
 
-#: src/ui/main_ui.py:242
+#: src/ui/main_ui.py:283
 msgid ""
 "Help menu. Use the up and down arrow keys to navigate the menu, and press"
 " enter to select an option"
 msgstr ""
 
-#: src/ui/main_ui.py:244
+#: src/ui/main_ui.py:285
 msgid "First time information"
 msgstr ""
 
-#: src/ui/main_ui.py:245
+#: src/ui/main_ui.py:286
 msgid "Back to main menu"
 msgstr ""
 
-#: src/ui/main_ui.py:250 src/ui/main_ui.py:272
+#: src/ui/main_ui.py:291 src/ui/main_ui.py:313
 msgid "Windbot deck"
 msgstr ""
 
-#: src/ui/main_ui.py:252
+#: src/ui/main_ui.py:293
 msgid "Deck in YDKE format"
 msgstr ""
 
-#: src/ui/main_ui.py:266 src/ui/main_ui.py:287
+#: src/ui/main_ui.py:307 src/ui/main_ui.py:328
 #, python-brace-format
 msgid "Deck {name} has been saved to the clipboard"
 msgstr ""
 
-#: src/ui/main_ui.py:274
+#: src/ui/main_ui.py:315
 msgid "Deck in Windbot format"
 msgstr ""
 
@@ -1780,410 +2068,458 @@ msgstr ""
 msgid "Replay deleted."
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:28
+#: src/ui/rock_paper_scissors_ui.py:32
+msgid "You will go first."
+msgstr ""
+
+#: src/ui/rock_paper_scissors_ui.py:34
+msgid "Your opponent will go first."
+msgstr ""
+
+#: src/ui/duel_messages/rock_paper_scissors.py:52
+#: src/ui/rock_paper_scissors_ui.py:38
 msgid "Rock Paper Scissors"
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:29
+#: src/ui/duel_messages/rock_paper_scissors.py:53
+#: src/ui/rock_paper_scissors_ui.py:39
 msgid "Rock"
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:30
+#: src/ui/duel_messages/rock_paper_scissors.py:54
+#: src/ui/rock_paper_scissors_ui.py:40
 msgid "Paper"
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:31
+#: src/ui/duel_messages/rock_paper_scissors.py:55
+#: src/ui/rock_paper_scissors_ui.py:41
 msgid "Scissors"
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:40
+#: src/ui/rock_paper_scissors_ui.py:50
 msgid "Waiting for opponent to choose."
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:45
+#: src/ui/duel_messages/rock_paper_scissors.py:38
+#: src/ui/rock_paper_scissors_ui.py:55
 msgid "scissors"
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:45
+#: src/ui/duel_messages/rock_paper_scissors.py:38
+#: src/ui/rock_paper_scissors_ui.py:55
 msgid "rock"
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:45
+#: src/ui/duel_messages/rock_paper_scissors.py:38
+#: src/ui/rock_paper_scissors_ui.py:55
 msgid "paper"
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:47
+#: src/ui/rock_paper_scissors_ui.py:57
 #, python-brace-format
 msgid "It's a tie. Both players chose {choice}."
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:50
+#: src/ui/rock_paper_scissors_ui.py:60
 msgid "You won. You get to choose if you want to go first or second."
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:52
+#: src/ui/rock_paper_scissors_ui.py:62
 msgid ""
 "You lost and have to wait for your opponent to choose if they want to go "
 "first or second."
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:57
+#: src/ui/rock_paper_scissors_ui.py:67
 msgid "Do you want to go first or second?"
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:58
+#: src/ui/rock_paper_scissors_ui.py:68
 msgid "First"
 msgstr ""
 
-#: src/ui/rock_paper_scissors_ui.py:59
+#: src/ui/rock_paper_scissors_ui.py:69
 msgid "Second"
 msgstr ""
 
-#: src/ui/room_ui.py:25
+#: src/ui/room_ui.py:26
 #, python-brace-format
 msgid "Created room with ID {id} and password {password}"
 msgstr ""
 
-#: src/ui/room_ui.py:27
+#: src/ui/room_ui.py:28
 #, python-brace-format
 msgid "Created room with ID {id}"
 msgstr ""
 
-#: src/ui/room_ui.py:31
+#: src/ui/room_ui.py:32
 msgid "Joined game"
 msgstr ""
 
-#: src/ui/room_ui.py:38
+#: src/ui/room_ui.py:39
 #, python-brace-format
 msgid "Deck {name} not found"
 msgstr ""
 
-#: src/ui/room_ui.py:53
+#: src/ui/room_ui.py:57
 #, python-brace-format
 msgid "{player} entered the room at position {pos}"
 msgstr ""
 
-#: src/ui/room_ui.py:66
+#: src/ui/room_ui.py:77
 msgid "spectating"
 msgstr ""
 
-#: src/ui/room_ui.py:68
+#: src/ui/room_ui.py:79
 msgid "ready"
 msgstr ""
 
-#: src/ui/room_ui.py:68
+#: src/ui/room_ui.py:79
 msgid "not ready"
 msgstr ""
 
-#: src/ui/room_ui.py:69 src/ui/room_ui.py:79
+#: src/ui/room_ui.py:80 src/ui/room_ui.py:92
 #, python-brace-format
 msgid "Team {team} is {status}"
 msgstr ""
 
-#: src/ui/room_ui.py:79
+#: src/ui/room_ui.py:92
 msgid "host"
 msgstr ""
 
-#: src/ui/room_ui.py:79
+#: src/ui/room_ui.py:92
 msgid "not host"
 msgstr ""
 
-#: src/ui/room_ui.py:86
+#: src/ui/room_ui.py:101
 msgid "Room Menu"
-msgstr ""
-
-#: src/ui/room_ui.py:87
-#, python-brace-format
-msgid "Room ID: {id}."
-msgstr ""
-
-#: src/ui/room_ui.py:89
-#, python-brace-format
-msgid "Password: {password}."
-msgstr ""
-
-#: src/ui/room_ui.py:91
-msgid "Password: None."
-msgstr ""
-
-#: src/ui/room_ui.py:96
-#, python-brace-format
-msgid "Banlist: {name}."
-msgstr ""
-
-#: src/ui/room_ui.py:100
-#, python-brace-format
-msgid "Duel type: Tag duel {team1} vs {team2}."
-msgstr ""
-
-#: src/ui/room_ui.py:102
-msgid "Duel type: 1 vs 1."
 msgstr ""
 
 #: src/ui/room_ui.py:103
 #, python-brace-format
+msgid "Room ID: {id}."
+msgstr ""
+
+#: src/ui/room_ui.py:103
+msgid "unknown"
+msgstr ""
+
+#: src/ui/room_ui.py:105
+#, python-brace-format
+msgid "Password: {password}."
+msgstr ""
+
+#: src/ui/room_ui.py:107
+msgid "Password: None."
+msgstr ""
+
+#: src/ui/room_ui.py:112 src/ui/room_ui.py:168 src/ui/room_ui.py:350
+msgid "Unknown banlist"
+msgstr ""
+
+#: src/ui/room_ui.py:113
+#, python-brace-format
+msgid "Banlist: {name}."
+msgstr ""
+
+#: src/ui/room_ui.py:117
+#, python-brace-format
+msgid "Duel type: Tag duel {team1} vs {team2}."
+msgstr ""
+
+#: src/ui/room_ui.py:119
+msgid "Duel type: 1 vs 1."
+msgstr ""
+
+#: src/ui/room_ui.py:120
+#, python-brace-format
 msgid "Format: {format}."
 msgstr ""
 
-#: src/ui/room_ui.py:104
+#: src/ui/room_ui.py:121
 msgid "Best of 3 match"
 msgstr ""
 
-#: src/ui/room_ui.py:104
+#: src/ui/room_ui.py:121
 msgid "Single duel"
 msgstr ""
 
-#: src/ui/room_ui.py:106
+#: src/ui/room_ui.py:123
 #, python-brace-format
 msgid "Players: {current}/{capacity}."
 msgstr ""
 
-#: src/ui/room_ui.py:108
+#: src/ui/room_ui.py:125
 msgid "Side decking is available between games."
 msgstr ""
 
-#: src/ui/room_ui.py:110
-#, python-brace-format
-msgid "{information}"
-msgstr ""
-
-#: src/ui/room_ui.py:112
-#, python-brace-format
-msgid "{players}"
-msgstr ""
-
-#: src/ui/room_ui.py:115
+#: src/ui/room_ui.py:132
 msgid "Add a bot opponent"
 msgstr ""
 
-#: src/ui/room_ui.py:117
+#: src/ui/room_ui.py:134
 msgid "Spectating this room"
 msgstr ""
 
-#: src/ui/room_ui.py:119
+#: src/ui/room_ui.py:136
 msgid "Select/import Deck"
 msgstr ""
 
-#: src/ui/room_ui.py:120 src/ui/room_ui.py:252
+#: src/ui/room_ui.py:137 src/ui/room_ui.py:325
 msgid "Check deck against room banlist"
 msgstr ""
 
-#: src/ui/room_ui.py:122
+#: src/ui/room_ui.py:139
 msgid "Start"
 msgstr ""
 
-#: src/ui/room_ui.py:124
+#: src/ui/room_ui.py:141
+msgid "Not ready"
+msgstr ""
+
+#: src/ui/room_ui.py:143
 msgid "Ready"
 msgstr ""
 
-#: src/ui/room_ui.py:127
+#: src/ui/room_ui.py:145 src/ui/room_ui.py:276
+msgid "Remove a player"
+msgstr ""
+
+#: src/ui/room_ui.py:148
 msgid "In a room"
 msgstr ""
 
-#: src/ui/room_ui.py:128
+#: src/ui/room_ui.py:149
 msgid "Waiting for an opponent"
 msgstr ""
 
-#: src/ui/room_ui.py:185
+#: src/ui/room_ui.py:156
+msgid "Room unavailable"
+msgstr ""
+
+#: src/ui/room_ui.py:157
+msgid "Room information could not be loaded."
+msgstr ""
+
+#: src/ui/room_ui.py:223
 #, python-brace-format
 msgid "Team {position}"
 msgstr ""
 
-#: src/ui/room_ui.py:188
+#: src/ui/room_ui.py:226
 #, python-brace-format
 msgid "Team 1 slot {slot}"
 msgstr ""
 
-#: src/ui/room_ui.py:190
+#: src/ui/room_ui.py:228
 #, python-brace-format
 msgid "Team 2 slot {slot}"
 msgstr ""
 
-#: src/ui/room_ui.py:191
+#: src/ui/room_ui.py:229
 msgid "Spectator"
 msgstr ""
 
-#: src/ui/room_ui.py:206
+#: src/ui/room_ui.py:244
 #, python-brace-format
 msgid "Spectator - {name} "
 msgstr ""
 
-#: src/ui/room_ui.py:208
+#: src/ui/room_ui.py:246
 #, python-brace-format
 msgid "{team} - {name} "
 msgstr ""
 
-#: src/ui/room_ui.py:210
+#: src/ui/room_ui.py:248
 msgid "(host) "
 msgstr ""
 
-#: src/ui/room_ui.py:211
+#: src/ui/room_ui.py:249
 msgid "is ready"
 msgstr ""
 
-#: src/ui/room_ui.py:211
+#: src/ui/room_ui.py:249
 msgid "is not ready"
 msgstr ""
 
-#: src/ui/room_ui.py:216
+#: src/ui/room_ui.py:254
 msgid "You must select a deck first"
 msgstr ""
 
-#: src/ui/room_ui.py:226
+#: src/ui/room_ui.py:267
+msgid "You are no longer ready."
+msgstr ""
+
+#: src/ui/room_ui.py:279
+msgid "There is nobody else in the room."
+msgstr ""
+
+#: src/ui/room_ui.py:282
+#, python-brace-format
+msgid "Remove {name}"
+msgstr ""
+
+#: src/ui/room_ui.py:293
+#, python-brace-format
+msgid "Asked the server to remove {name}."
+msgstr ""
+
+#: src/ui/room_ui.py:299
 msgid "Select Deck"
 msgstr ""
 
-#: src/ui/room_ui.py:227 src/ui/room_ui.py:253
+#: src/ui/room_ui.py:300 src/ui/room_ui.py:326
 msgid "Public Decks"
 msgstr ""
 
-#: src/ui/room_ui.py:228 src/ui/room_ui.py:254
+#: src/ui/room_ui.py:301 src/ui/room_ui.py:327
 msgid "My Decks"
 msgstr ""
 
-#: src/ui/room_ui.py:229
+#: src/ui/room_ui.py:302
 msgid "Import deck from deck string"
 msgstr ""
 
-#: src/ui/room_ui.py:230
+#: src/ui/room_ui.py:303
 msgid "Import all decks from YuGiOh MUD"
 msgstr ""
 
-#: src/ui/room_ui.py:281
+#: src/ui/room_ui.py:354
 #, python-brace-format
 msgid "Deck {name} is legal for {banlist}."
 msgstr ""
 
-#: src/ui/room_ui.py:283
+#: src/ui/room_ui.py:356
 #, python-brace-format
 msgid "Deck {name} is not legal for {banlist}."
 msgstr ""
 
-#: src/ui/room_ui.py:297
+#: src/ui/room_ui.py:370
 msgid "Import all decks"
 msgstr ""
 
-#: src/ui/room_ui.py:298
+#: src/ui/room_ui.py:371
 msgid "This will import all the decks you have from the AllInAccess YuGiOh MUD!"
 msgstr ""
 
-#: src/ui/room_ui.py:299
+#: src/ui/room_ui.py:372
 msgid "This will remove all current decks you have!"
 msgstr ""
 
-#: src/ui/room_ui.py:300
+#: src/ui/room_ui.py:373
 msgid "To continue, please put in your MUD username and password"
 msgstr ""
 
-#: src/ui/room_ui.py:301
+#: src/ui/room_ui.py:374
 msgid "Username"
 msgstr ""
 
-#: src/ui/room_ui.py:302
+#: src/ui/room_ui.py:375
 msgid "Password"
 msgstr ""
 
-#: src/ui/room_ui.py:303 src/ui/room_ui.py:397
+#: src/ui/room_ui.py:376 src/ui/room_ui.py:469
 msgid "Import"
 msgstr ""
 
-#: src/ui/room_ui.py:309
+#: src/ui/room_ui.py:382
 msgid "You must provide a username"
 msgstr ""
 
-#: src/ui/room_ui.py:313
+#: src/ui/room_ui.py:386
 msgid "You must provide a password"
 msgstr ""
 
-#: src/ui/room_ui.py:323
+#: src/ui/room_ui.py:396
 #, python-brace-format
 msgid "Unable to import decks: {error}"
 msgstr ""
 
-#: src/ui/room_ui.py:328
+#: src/ui/room_ui.py:401
 msgid "No decks to import"
 msgstr ""
 
-#: src/ui/room_ui.py:345
+#: src/ui/room_ui.py:418
 msgid "Unable to import all decks - only some were imported."
 msgstr ""
 
-#: src/ui/room_ui.py:349
+#: src/ui/room_ui.py:422
 #, python-brace-format
 msgid "{count} decks imported"
 msgstr ""
 
-#: src/ui/room_ui.py:357
+#: src/ui/room_ui.py:430
 #, python-brace-format
 msgid "Loading deck {name}"
 msgstr ""
 
-#: src/ui/room_ui.py:367 src/ui/room_ui.py:368
+#: src/ui/room_ui.py:439 src/ui/room_ui.py:440
 msgid "Deck is not allowed"
 msgstr ""
 
-#: src/ui/room_ui.py:371
+#: src/ui/room_ui.py:443
 #, python-brace-format
 msgid "{card} is limited to {limit} and you have {found} in your deck.\n"
 msgstr ""
 
-#: src/ui/room_ui.py:380
+#: src/ui/room_ui.py:452
 #, python-brace-format
 msgid "Deck {name} loaded"
 msgstr ""
 
-#: src/ui/room_ui.py:394
+#: src/ui/room_ui.py:466
 msgid "Import Deck"
 msgstr ""
 
-#: src/ui/room_ui.py:396
+#: src/ui/room_ui.py:468
 msgid "YDKE Deck string"
 msgstr ""
 
-#: src/ui/room_ui.py:403
+#: src/ui/room_ui.py:475
 msgid "You must provide a name for the deck"
 msgstr ""
 
-#: src/ui/room_ui.py:408
+#: src/ui/room_ui.py:480
 msgid "Deck name can only contain letters and numbers"
 msgstr ""
 
-#: src/ui/room_ui.py:412
+#: src/ui/room_ui.py:484
 msgid "You must provide a deck string"
 msgstr ""
 
-#: src/ui/room_ui.py:416 src/ui/room_ui.py:422
+#: src/ui/room_ui.py:488 src/ui/room_ui.py:494
 msgid "Deck string doesn't seem to be a valid deck string"
 msgstr ""
 
-#: src/ui/room_ui.py:428
+#: src/ui/room_ui.py:500
 #, python-brace-format
 msgid "Deck {name} imported"
 msgstr ""
 
-#: src/ui/room_ui.py:435 src/ui/room_ui.py:461
+#: src/ui/room_ui.py:507 src/ui/room_ui.py:588
 msgid "There are already 2 players in the room"
 msgstr ""
 
-#: src/ui/room_ui.py:440
+#: src/ui/room_ui.py:512
 msgid "No bot decks found."
 msgstr ""
 
-#: src/ui/room_ui.py:443
+#: src/ui/room_ui.py:515
 msgid "Select bot deck"
 msgstr ""
 
-#: src/ui/room_ui.py:446
+#: src/ui/room_ui.py:576
 #, python-brace-format
-msgid "{deck}"
+msgid "{name}, difficulty {difficulty}"
 msgstr ""
 
-#: src/ui/room_ui.py:470
+#: src/ui/room_ui.py:597
 msgid "Bot added to room"
 msgstr ""
 
-#: src/ui/room_ui.py:473
-msgid "Unable to add a bot at this time."
+#: src/ui/room_ui.py:601
+#, python-brace-format
+msgid "Unable to add a bot at this time. {reason}"
 msgstr ""
 
 #: src/ui/server_ui.py:22
@@ -2247,11 +2583,6 @@ msgstr ""
 msgid "Tag duel 2 vs 2"
 msgstr ""
 
-#: src/ui/server_ui.py:91 src/ui/server_ui.py:98
-#, python-brace-format
-msgid "{choice}"
-msgstr ""
-
 #: src/ui/server_ui.py:165
 msgid "Enter room id"
 msgstr ""
@@ -2296,11 +2627,6 @@ msgstr ""
 msgid "spectators: {count}, "
 msgstr ""
 
-#: src/ui/server_ui.py:219
-#, python-brace-format
-msgid "{room}"
-msgstr ""
-
 #: src/ui/server_ui.py:226
 #, python-brace-format
 msgid "Room {id}"
@@ -2338,169 +2664,157 @@ msgstr ""
 msgid "Joined room as spectator"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:19
+#: src/ui/side_deck_ui.py:18
 msgid "No deck loaded. Cannot side deck."
 msgstr ""
 
-#: src/ui/side_deck_ui.py:28
+#: src/ui/side_deck_ui.py:27
 msgid "Side Decking"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:31
+#: src/ui/side_deck_ui.py:30
 msgid "Side decking: swap cards between your main/extra deck and side deck."
 msgstr ""
 
-#: src/ui/side_deck_ui.py:32
+#: src/ui/side_deck_ui.py:31
 #, python-brace-format
 msgid "Swapped: {out} out, {in_} in"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:33
+#: src/ui/side_deck_ui.py:32
 msgid "Move card from main deck to side"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:34
+#: src/ui/side_deck_ui.py:33
 msgid "Move card from side to main deck"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:35
+#: src/ui/side_deck_ui.py:34
 msgid "View current swaps"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:36
+#: src/ui/side_deck_ui.py:35
 msgid "Done — submit deck"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:42
+#: src/ui/side_deck_ui.py:41
 msgid "Select card to move to side deck"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:60
+#: src/ui/side_deck_ui.py:59
 msgid "Side deck is empty."
 msgstr ""
 
-#: src/ui/side_deck_ui.py:63
+#: src/ui/side_deck_ui.py:62
 msgid "Select card to move to main deck"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:84
+#: src/ui/side_deck_ui.py:83
 #, python-brace-format
 msgid "{name} moved to side deck."
 msgstr ""
 
-#: src/ui/side_deck_ui.py:94
+#: src/ui/side_deck_ui.py:93
 #, python-brace-format
 msgid "{name} moved to main deck."
 msgstr ""
 
-#: src/ui/side_deck_ui.py:100
+#: src/ui/side_deck_ui.py:99
 msgid "Current swaps"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:102
+#: src/ui/side_deck_ui.py:101
 msgid "No swaps made yet."
 msgstr ""
 
-#: src/ui/side_deck_ui.py:105
+#: src/ui/side_deck_ui.py:104
 #, python-brace-format
 msgid "{name} → side"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:108
+#: src/ui/side_deck_ui.py:107
 #, python-brace-format
 msgid "{name} → main"
 msgstr ""
 
-#: src/ui/side_deck_ui.py:120
+#: src/ui/side_deck_ui.py:119
 msgid "Side deck submitted. Waiting for next game."
 msgstr ""
 
-#: src/ui/duel_messages/announce_attrib.py:25
+#: src/ui/duel_messages/announce_attrib.py:26
 #, python-brace-format
 msgid "Attribute {number}"
 msgstr ""
 
-#: src/ui/duel_messages/announce_attrib.py:27
+#: src/ui/duel_messages/announce_attrib.py:28
 msgid "Select attribute"
 msgstr ""
 
-#: src/ui/duel_messages/announce_attrib.py:34
+#: src/ui/duel_messages/announce_attrib.py:35
 msgid "No valid options available."
 msgstr ""
 
-#: src/ui/duel_messages/announce_attrib.py:37
-#: src/ui/duel_messages/announce_attrib.py:42
-#, python-brace-format
-msgid "{title}"
-msgstr ""
-
-#: src/ui/duel_messages/announce_attrib.py:44
+#: src/ui/duel_messages/announce_attrib.py:45
 #, python-brace-format
 msgid "Select {count} values"
 msgstr ""
 
-#: src/ui/duel_messages/announce_attrib.py:47
-#: src/ui/duel_messages/select_card.py:91
-#: src/ui/duel_messages/select_counter.py:43
-#: src/ui/duel_messages/select_sum.py:62
-#: src/ui/duel_messages/select_unselect_card.py:68
+#: src/ui/duel_messages/announce_attrib.py:48
+#: src/ui/duel_messages/select_card.py:92
+#: src/ui/duel_messages/select_counter.py:44
+#: src/ui/duel_messages/select_sum.py:63
+#: src/ui/duel_messages/select_unselect_card.py:69
 msgid "Finish"
 msgstr ""
 
-#: src/ui/duel_messages/announce_attrib.py:65
+#: src/ui/duel_messages/announce_attrib.py:66
 #, python-brace-format
 msgid "Unselected {label}."
 msgstr ""
 
-#: src/ui/duel_messages/announce_attrib.py:68
+#: src/ui/duel_messages/announce_attrib.py:69
 #, python-brace-format
 msgid "You already selected {count} values."
 msgstr ""
 
-#: src/ui/duel_messages/announce_attrib.py:71
+#: src/ui/duel_messages/announce_attrib.py:72
 #, python-brace-format
 msgid "Selected {label}."
 msgstr ""
 
-#: src/ui/duel_messages/announce_attrib.py:78
+#: src/ui/duel_messages/announce_attrib.py:79
 #, python-brace-format
 msgid "Select exactly {count} values."
 msgstr ""
 
-#: src/ui/duel_messages/announce_card.py:28
-#: src/ui/duel_messages/announce_card.py:35
+#: src/ui/duel_messages/announce_card.py:29
+#: src/ui/duel_messages/announce_card.py:36
 msgid "Select a card"
 msgstr ""
 
-#: src/ui/duel_messages/announce_card.py:32
+#: src/ui/duel_messages/announce_card.py:33
 msgid "No cards found"
 msgstr ""
 
-#: src/ui/duel_messages/announce_number.py:22
+#: src/ui/duel_messages/announce_number.py:23
 msgid "Select a number"
 msgstr ""
 
-#: src/ui/duel_messages/announce_number.py:24
-#: src/ui/duel_messages/select_option.py:46
-#, python-brace-format
-msgid "{option}"
-msgstr ""
-
-#: src/ui/duel_messages/announce_race.py:23
+#: src/ui/duel_messages/announce_race.py:24
 #, python-brace-format
 msgid "Race {number}"
 msgstr ""
 
-#: src/ui/duel_messages/announce_race.py:25
+#: src/ui/duel_messages/announce_race.py:26
 msgid "Select race"
 msgstr ""
 
-#: src/ui/duel_messages/attack.py:27
+#: src/ui/duel_messages/attack.py:28
 #, python-format
 msgid "%s to attack with %s"
 msgstr ""
 
-#: src/ui/duel_messages/attack.py:43
+#: src/ui/duel_messages/attack.py:44
 #, python-format
 msgid "%s prepares to attack %s with %s"
 msgstr ""
@@ -2509,22 +2823,22 @@ msgstr ""
 msgid "Attack cancelled"
 msgstr ""
 
-#: src/ui/duel_messages/become_target.py:26
+#: src/ui/duel_messages/become_target.py:30
 #, python-format
 msgid "You target %s"
 msgstr ""
 
-#: src/ui/duel_messages/become_target.py:28
+#: src/ui/duel_messages/become_target.py:32
 #, python-format
 msgid "Your opponent targets %s"
 msgstr ""
 
-#: src/ui/duel_messages/become_target.py:34
+#: src/ui/duel_messages/become_target.py:35
 #, python-format
 msgid "%s card"
 msgstr ""
 
-#: src/ui/duel_messages/card_hint.py:28 src/ui/duel_messages/card_hint.py:31
+#: src/ui/duel_messages/card_hint.py:29 src/ui/duel_messages/card_hint.py:32
 #, python-brace-format
 msgid "{spec} ({name}) selected {value}."
 msgstr ""
@@ -2533,20 +2847,94 @@ msgstr ""
 msgid "The following locations were selected:"
 msgstr ""
 
-#: src/ui/duel_messages/card_selected.py:21
-#: src/ui/duel_messages/random_selected.py:25
-#, python-brace-format
-msgid "{location}"
-msgstr ""
-
-#: src/ui/duel_messages/card_targetting.py:26
+#: src/ui/duel_messages/card_targetting.py:28
 #, python-brace-format
 msgid "{card} targets {target}."
 msgstr ""
 
-#: src/ui/duel_messages/card_targetting.py:29
+#: src/ui/duel_messages/card_targetting.py:31
 #, python-brace-format
 msgid "{card} cancels targeting {target}."
+msgstr ""
+
+#: src/ui/duel_messages/chained.py:86
+#, python-brace-format
+msgid "Resolving chain link {link}, {name}."
+msgstr ""
+
+#: src/ui/duel_messages/chained.py:87
+#, python-brace-format
+msgid "Resolving chain link {link}."
+msgstr ""
+
+#: src/ui/duel_messages/chained.py:101
+#, python-brace-format
+msgid "Chain link {link}, {name}, was negated."
+msgstr ""
+
+#: src/ui/duel_messages/chained.py:102
+#, python-brace-format
+msgid "Chain link {link} was negated."
+msgstr ""
+
+#: src/ui/duel_messages/chained.py:112
+#, python-brace-format
+msgid "The effect of chain link {link}, {name}, was disabled."
+msgstr ""
+
+#: src/ui/duel_messages/chained.py:113
+#, python-brace-format
+msgid "The effect of chain link {link} was disabled."
+msgstr ""
+
+#: src/ui/duel_messages/chained.py:129
+#, python-brace-format
+msgid "Chain of {depth} finished resolving."
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:50
+msgid "You activate"
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:52
+msgid "Your opponent activates"
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:54
+#, python-brace-format
+msgid "Chain link {link}: {who} {name}."
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:60
+#, python-brace-format
+msgid "Responding to {name}."
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:87
+msgid "No chain is currently building."
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:88
+#, python-brace-format
+msgid "Chain of {depth}:"
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:90
+msgid "you"
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:90
+msgid "your opponent"
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:94
+#, python-brace-format
+msgid "{index}: {name} by {owner}, {description}"
+msgstr ""
+
+#: src/ui/duel_messages/chaining.py:100
+#, python-brace-format
+msgid "{index}: {name} by {owner}"
 msgstr ""
 
 #: src/ui/duel_messages/confirm_cards.py:38
@@ -2554,38 +2942,18 @@ msgstr ""
 msgid "{player} shows {opponent} {count} cards."
 msgstr ""
 
-#: src/ui/duel_messages/confirm_decktop.py:26
-#, python-brace-format
-msgid "Top of your deck: {cards}"
-msgstr ""
-
-#: src/ui/duel_messages/confirm_decktop.py:28
-#, python-brace-format
-msgid "Your opponent checked the top {count} card(s) of their deck."
-msgstr ""
-
-#: src/ui/duel_messages/counters.py:24
+#: src/ui/duel_messages/counters.py:25
 msgid "Unknown card"
 msgstr ""
 
-#: src/ui/duel_messages/counters.py:28
+#: src/ui/duel_messages/counters.py:29
 #, python-brace-format
 msgid "{count} {type} added to {card}"
 msgstr ""
 
-#: src/ui/duel_messages/counters.py:30
+#: src/ui/duel_messages/counters.py:31
 #, python-brace-format
 msgid "{count} {type} removed from {card}"
-msgstr ""
-
-#: src/ui/duel_messages/damage.py:17
-#, python-brace-format
-msgid "You took {amount} damage."
-msgstr ""
-
-#: src/ui/duel_messages/damage.py:20
-#, python-brace-format
-msgid "Your opponent took {amount} damage."
 msgstr ""
 
 #: src/ui/duel_messages/damage_step_battle.py:42
@@ -2598,12 +2966,12 @@ msgstr ""
 msgid "%s (%s) attacks"
 msgstr ""
 
-#: src/ui/duel_messages/damage_step_damage.py:17
+#: src/ui/duel_messages/damage_step_damage.py:18
 #, python-format
 msgid "Your lp decreased by %d, now %d"
 msgstr ""
 
-#: src/ui/duel_messages/damage_step_damage.py:21
+#: src/ui/duel_messages/damage_step_damage.py:22
 #, python-format
 msgid "Your opponent's lp decreased by %d, now %d"
 msgstr ""
@@ -2634,30 +3002,30 @@ msgstr ""
 msgid "Your opponent reveals the following cards from their deck:"
 msgstr ""
 
-#: src/ui/duel_messages/draw.py:34
+#: src/ui/duel_messages/draw.py:37
 msgid "You"
 msgstr ""
 
-#: src/ui/duel_messages/draw.py:34
+#: src/ui/duel_messages/draw.py:37
 msgid "Your opponent"
 msgstr ""
 
-#: src/ui/duel_messages/draw.py:35
+#: src/ui/duel_messages/draw.py:38
 #, python-brace-format
 msgid "{player} drew {count} cards"
 msgstr ""
 
-#: src/ui/duel_messages/draw.py:46
+#: src/ui/duel_messages/draw.py:49
 #, python-brace-format
 msgid "{n}: {name}."
 msgstr ""
 
-#: src/ui/duel_messages/draw.py:48
+#: src/ui/duel_messages/draw.py:51
 #, python-brace-format
 msgid "{n}: face down."
 msgstr ""
 
-#: src/ui/duel_messages/equip.py:18
+#: src/ui/duel_messages/equip.py:19
 msgid "Card equipped to target."
 msgstr ""
 
@@ -2674,178 +3042,211 @@ msgstr ""
 msgid "Field locations %s are disabled."
 msgstr ""
 
-#: src/ui/duel_messages/flip_summoning.py:29
+#: src/ui/duel_messages/flip_summoning.py:30
 #, python-brace-format
 msgid "{location} Was flip summoned."
 msgstr ""
 
-#: src/ui/duel_messages/flip_summoning.py:32
+#: src/ui/duel_messages/flip_summoning.py:33
 #, python-brace-format
 msgid "You flip summon {card}"
 msgstr ""
 
-#: src/ui/duel_messages/flip_summoning.py:34
+#: src/ui/duel_messages/flip_summoning.py:35
 #, python-brace-format
 msgid "Your opponent flip summons {card}"
 msgstr ""
 
-#: src/ui/duel_messages/move.py:77
+#: src/ui/duel_messages/legacy_messages.py:29
+msgid "A card"
+msgstr ""
+
+#: src/ui/duel_messages/legacy_messages.py:30
 #, python-brace-format
-msgid "Your card {name} destroyed."
+msgid "{name} is no longer equipped."
+msgstr ""
+
+#: src/ui/duel_messages/legacy_messages.py:40
+msgid "One of your cards became a chain target."
+msgstr ""
+
+#: src/ui/duel_messages/match_kill.py:32
+#, python-brace-format
+msgid "{name} ended the entire match."
+msgstr ""
+
+#: src/ui/duel_messages/missed_effect.py:41
+#, python-brace-format
+msgid "Your {name} missed its timing."
+msgstr ""
+
+#: src/ui/duel_messages/missed_effect.py:43
+#, python-brace-format
+msgid "Your opponent's {name} missed its timing."
+msgstr ""
+
+#: src/ui/duel_messages/missed_effect.py:46
+#, python-brace-format
+msgid "{message} ({location})"
 msgstr ""
 
 #: src/ui/duel_messages/move.py:78
 #, python-brace-format
+msgid "Your card {name} destroyed."
+msgstr ""
+
+#: src/ui/duel_messages/move.py:79
+#, python-brace-format
 msgid "Your opponent's card {name} destroyed."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:83
+#: src/ui/duel_messages/move.py:84
 #, python-brace-format
 msgid ""
 "Your card {name} switched control to your opponent, and is now located at"
 " {location}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:84
+#: src/ui/duel_messages/move.py:85
 #, python-brace-format
 msgid ""
 "Your opponent's card {name} switched control to you, and is now located "
 "at {location}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:87
+#: src/ui/duel_messages/move.py:88
 #, python-brace-format
 msgid "Your card {name} changed column to {location}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:88
+#: src/ui/duel_messages/move.py:89
 #, python-brace-format
 msgid "Your opponent's card {name} changed column to {location}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:92
+#: src/ui/duel_messages/move.py:93
 #, python-brace-format
 msgid "You discarded {name}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:93
+#: src/ui/duel_messages/move.py:94
 #, python-brace-format
 msgid "Your opponent discarded {name}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:96
+#: src/ui/duel_messages/move.py:97
 #, python-brace-format
 msgid "Your banished card {name} returns to the field at {location}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:97
+#: src/ui/duel_messages/move.py:98
 #, python-brace-format
 msgid "Your opponent's banished card {name} returns to the field at {location}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:100
+#: src/ui/duel_messages/move.py:101
 #, python-brace-format
 msgid "Your card {name} returns from the graveyard to the field at {location}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:101
+#: src/ui/duel_messages/move.py:102
 #, python-brace-format
 msgid ""
 "Your opponent's card {name} returns from the graveyard to the field at "
 "{location}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:105
+#: src/ui/duel_messages/move.py:106
 #, python-brace-format
 msgid "{name} returned to your hand."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:106
+#: src/ui/duel_messages/move.py:107
 #, python-brace-format
 msgid "{name} returned to your opponent's hand."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:110
+#: src/ui/duel_messages/move.py:111
 #, python-brace-format
 msgid "You tributed {name}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:111
+#: src/ui/duel_messages/move.py:112
 #, python-brace-format
 msgid "Your opponent tributed {name}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:115
+#: src/ui/duel_messages/move.py:116
 #, python-brace-format
 msgid "You used overlay unit {name}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:116
+#: src/ui/duel_messages/move.py:117
 #, python-brace-format
 msgid "Your opponent used overlay unit {name}."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:120
+#: src/ui/duel_messages/move.py:121
 #, python-brace-format
 msgid "Your {name} was sent to the graveyard."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:121
+#: src/ui/duel_messages/move.py:122
 #, python-brace-format
 msgid "Your opponent's {name} was sent to the graveyard."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:124
+#: src/ui/duel_messages/move.py:125
 #, python-brace-format
 msgid "Your {name} was banished."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:125
+#: src/ui/duel_messages/move.py:126
 #, python-brace-format
 msgid "Your opponent's {name} was banished."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:129
+#: src/ui/duel_messages/move.py:130
 #, python-brace-format
 msgid "Your {name} returned to your deck."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:130
+#: src/ui/duel_messages/move.py:131
 #, python-brace-format
 msgid "Your opponent's {name} returned to their deck."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:134
+#: src/ui/duel_messages/move.py:135
 #, python-brace-format
 msgid "Your {name} returned to your extra deck."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:135
+#: src/ui/duel_messages/move.py:136
 #, python-brace-format
 msgid "Your opponent's {name} returned to their extra deck."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:138
+#: src/ui/duel_messages/move.py:139
 #, python-brace-format
 msgid "You activate {name} from your deck."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:139
+#: src/ui/duel_messages/move.py:140
 #, python-brace-format
 msgid "Your opponent activates {name} from their deck."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:144
+#: src/ui/duel_messages/move.py:145
 #, python-brace-format
 msgid "Your card {name} was attached to {target} as XYZ material."
 msgstr ""
 
-#: src/ui/duel_messages/move.py:145
+#: src/ui/duel_messages/move.py:146
 #, python-brace-format
 msgid "Your opponent's card {name} was attached to {target} as XYZ material."
 msgstr ""
 
-#: src/ui/duel_messages/new_turn.py:10
+#: src/ui/duel_messages/new_turn.py:12
 #, python-brace-format
 msgid "New turn for player {player}."
 msgstr ""
@@ -2860,26 +3261,58 @@ msgstr ""
 msgid "Your opponent paid %d LP, now %d"
 msgstr ""
 
-#: src/ui/duel_messages/phase.py:18
+#: src/ui/duel_messages/phase.py:20
 #, python-brace-format
 msgid "Entering {phase}"
 msgstr ""
 
-#: src/ui/duel_messages/phase.py:28
+#: src/ui/duel_messages/phase.py:30
 msgid "My"
 msgstr ""
 
-#: src/ui/duel_messages/phase.py:28
+#: src/ui/duel_messages/phase.py:30
 msgid "My opponents"
 msgstr ""
 
-#: src/ui/duel_messages/phase.py:30
+#: src/ui/duel_messages/phase.py:32
 msgid "In a duel"
 msgstr ""
 
-#: src/ui/duel_messages/phase.py:31
+#: src/ui/duel_messages/phase.py:33
 #, python-brace-format
 msgid "{prefix} {phase} - {lp} / {opp_lp} LP"
+msgstr ""
+
+#: src/ui/duel_messages/player_hint.py:67
+#, python-brace-format
+msgid "New effect on you: {effect}"
+msgstr ""
+
+#: src/ui/duel_messages/player_hint.py:67
+#, python-brace-format
+msgid "New effect on your opponent: {effect}"
+msgstr ""
+
+#: src/ui/duel_messages/player_hint.py:71
+#, python-brace-format
+msgid "Effect on you ended: {effect}"
+msgstr ""
+
+#: src/ui/duel_messages/player_hint.py:71
+#, python-brace-format
+msgid "Effect on your opponent ended: {effect}"
+msgstr ""
+
+#: src/ui/duel_messages/player_hint.py:98
+msgid "No effects are currently applying to either player."
+msgstr ""
+
+#: src/ui/duel_messages/player_hint.py:101
+msgid "Applying to you:"
+msgstr ""
+
+#: src/ui/duel_messages/player_hint.py:104
+msgid "Applying to your opponent:"
 msgstr ""
 
 #: src/ui/duel_messages/position_change.py:31
@@ -2905,12 +3338,37 @@ msgstr ""
 msgid "Your opponents lp increased by %d, now %d"
 msgstr ""
 
+#: src/ui/duel_messages/reload_field.py:146
+msgid "Field resynchronised."
+msgstr ""
+
+#: src/ui/duel_messages/reload_field.py:149
+#, python-brace-format
+msgid ""
+"You: {lp} life points, {hand} in hand, {monsters} monsters, {spells} "
+"spells or traps, {deck} in deck, {grave} in graveyard, {banished} "
+"banished, {extra} in extra deck."
+msgstr ""
+
+#: src/ui/duel_messages/reload_field.py:165
+#, python-brace-format
+msgid ""
+"Opponent: {lp} life points, {hand} in hand, {monsters} monsters, {spells}"
+" spells or traps, {deck} in deck, {grave} in graveyard, {banished} "
+"banished, {extra} in extra deck."
+msgstr ""
+
+#: src/ui/duel_messages/reload_field.py:180
+#, python-brace-format
+msgid "Chain of {depth} still resolving."
+msgstr ""
+
 #: src/ui/duel_messages/remove_cards.py:23
 #, python-format
 msgid "%s removed."
 msgstr ""
 
-#: src/ui/duel_messages/retry.py:12
+#: src/ui/duel_messages/retry.py:14
 msgid "Invalid response. Please try again."
 msgstr ""
 
@@ -2918,108 +3376,124 @@ msgstr ""
 msgid "all decks are now reversed."
 msgstr ""
 
-#: src/ui/duel_messages/select_card.py:71
+#: src/ui/duel_messages/rock_paper_scissors.py:38
+msgid "nothing"
+msgstr ""
+
+#: src/ui/duel_messages/rock_paper_scissors.py:50
+msgid "Your opponent is choosing rock, paper or scissors."
+msgstr ""
+
+#: src/ui/duel_messages/rock_paper_scissors.py:75
+#, python-brace-format
+msgid "You chose {yours}, your opponent chose {theirs}."
+msgstr ""
+
+#: src/ui/duel_messages/rock_paper_scissors.py:79
+msgid "It's a tie."
+msgstr ""
+
+#: src/ui/duel_messages/rock_paper_scissors.py:81
+msgid "You won."
+msgstr ""
+
+#: src/ui/duel_messages/rock_paper_scissors.py:83
+msgid "You lost."
+msgstr ""
+
+#: src/ui/duel_messages/select_card.py:72
 #, python-brace-format
 msgid "{name} in {location}"
 msgstr ""
 
-#: src/ui/duel_messages/select_card.py:73
+#: src/ui/duel_messages/select_card.py:74
 #, python-brace-format
 msgid "Face down card in {location}"
 msgstr ""
 
-#: src/ui/duel_messages/select_card.py:83
+#: src/ui/duel_messages/select_card.py:84
 #, python-brace-format
 msgid "Select {min} to {max} card(s) as tribute"
 msgstr ""
 
-#: src/ui/duel_messages/select_card.py:83
+#: src/ui/duel_messages/select_card.py:84
 #, python-brace-format
 msgid "Select {min} to {max} card(s)"
 msgstr ""
 
-#: src/ui/duel_messages/select_card.py:84
-#: src/ui/duel_messages/select_card.py:85
-#: src/ui/duel_messages/select_effect_yes_or_no.py:28
-#: src/ui/duel_messages/select_yes_no.py:43
-#: src/ui/duel_messages/select_yes_no.py:44
-#, python-brace-format
-msgid "{question}"
-msgstr ""
-
-#: src/ui/duel_messages/select_card.py:89
-#: src/ui/duel_messages/select_unselect_card.py:66
+#: src/ui/duel_messages/select_card.py:90
+#: src/ui/duel_messages/select_unselect_card.py:67
 msgid "Cancel"
 msgstr ""
 
-#: src/ui/duel_messages/select_card.py:90
+#: src/ui/duel_messages/select_card.py:91
 msgid "Press Escape to cancel selection"
 msgstr ""
 
-#: src/ui/duel_messages/select_chain.py:47
+#: src/ui/duel_messages/select_chain.py:48
 msgid "Opponent is selecting chain"
 msgstr ""
 
-#: src/ui/duel_messages/select_chain.py:57
+#: src/ui/duel_messages/select_chain.py:58
 msgid "Press escape to cancel chaining"
 msgstr ""
 
-#: src/ui/duel_messages/select_chain.py:59
+#: src/ui/duel_messages/select_chain.py:60
 #, python-brace-format
 msgid "Chaining, {message}"
 msgstr ""
 
-#: src/ui/duel_messages/select_counter.py:37
+#: src/ui/duel_messages/select_counter.py:38
 msgid "Select counters"
 msgstr ""
 
-#: src/ui/duel_messages/select_counter.py:38
+#: src/ui/duel_messages/select_counter.py:39
 #, python-brace-format
 msgid "Remove {quantity} counter(s)"
 msgstr ""
 
-#: src/ui/duel_messages/select_counter.py:40
+#: src/ui/duel_messages/select_counter.py:41
 #, python-brace-format
 msgid "{name} ({count} counters)"
 msgstr ""
 
-#: src/ui/duel_messages/select_counter.py:53
+#: src/ui/duel_messages/select_counter.py:54
 #, python-brace-format
 msgid ""
 "You must select exactly {quantity} counter(s). Currently selected: "
 "{current}"
 msgstr ""
 
-#: src/ui/duel_messages/select_effect_yes_or_no.py:23
+#: src/ui/duel_messages/select_effect_yes_or_no.py:24
 msgid "Activate effect"
 msgstr ""
 
-#: src/ui/duel_messages/select_effect_yes_or_no.py:24
+#: src/ui/duel_messages/select_effect_yes_or_no.py:25
 #, python-brace-format
 msgid "Do you want to use {name}'s effect?"
 msgstr ""
 
-#: src/ui/duel_messages/select_option.py:40
+#: src/ui/duel_messages/select_option.py:41
 msgid "Select option:"
 msgstr ""
 
-#: src/ui/duel_messages/select_option.py:42
+#: src/ui/duel_messages/select_option.py:43
 msgid "Select option"
 msgstr ""
 
-#: src/ui/duel_messages/select_option.py:44
+#: src/ui/duel_messages/select_option.py:45
 #, python-brace-format
 msgid "Select option for {name}"
 msgstr ""
 
-#: src/ui/duel_messages/select_option.py:57
+#: src/ui/duel_messages/select_option.py:58
 #, python-brace-format
 msgid "Selected option {option}"
 msgstr ""
 
-#: src/ui/duel_messages/select_option.py:63
-#: src/ui/duel_messages/select_option.py:71
-#: src/ui/duel_messages/select_yes_no.py:34
+#: src/ui/duel_messages/select_option.py:64
+#: src/ui/duel_messages/select_option.py:72
+#: src/ui/duel_messages/select_yes_no.py:35
 #, python-format
 msgid "Unknown option %d"
 msgstr ""
@@ -3039,85 +3513,85 @@ msgstr ""
 msgid "Invalid zone selected."
 msgstr ""
 
-#: src/ui/duel_messages/select_position.py:22
+#: src/ui/duel_messages/select_position.py:23
 #, python-brace-format
 msgid "Select position for {card}:"
 msgstr ""
 
-#: src/ui/duel_messages/select_position.py:24
+#: src/ui/duel_messages/select_position.py:25
 msgid "Face-up attack"
 msgstr ""
 
-#: src/ui/duel_messages/select_position.py:26
+#: src/ui/duel_messages/select_position.py:27
 msgid "Face-down attack"
 msgstr ""
 
-#: src/ui/duel_messages/select_position.py:28
+#: src/ui/duel_messages/select_position.py:29
 msgid "Face-up defense"
 msgstr ""
 
-#: src/ui/duel_messages/select_position.py:30
+#: src/ui/duel_messages/select_position.py:31
 msgid "Face-down defense"
 msgstr ""
 
-#: src/ui/duel_messages/select_sum.py:50
+#: src/ui/duel_messages/select_sum.py:51
 msgid "Select cards"
 msgstr ""
 
-#: src/ui/duel_messages/select_sum.py:52
+#: src/ui/duel_messages/select_sum.py:53
 #, python-brace-format
 msgid "Select cards with levels/ranks that total exactly {target}"
 msgstr ""
 
-#: src/ui/duel_messages/select_sum.py:54
+#: src/ui/duel_messages/select_sum.py:55
 #, python-brace-format
 msgid "Select cards with levels/ranks that total at least {target}"
 msgstr ""
 
-#: src/ui/duel_messages/select_sum.py:58
+#: src/ui/duel_messages/select_sum.py:59
 #, python-brace-format
 msgid "{name} (Level {level}) - must select"
 msgstr ""
 
-#: src/ui/duel_messages/select_sum.py:61
+#: src/ui/duel_messages/select_sum.py:62
 #, python-brace-format
 msgid "{name} (Level {level})"
 msgstr ""
 
-#: src/ui/duel_messages/select_sum.py:79
+#: src/ui/duel_messages/select_sum.py:80
 #, python-brace-format
 msgid "Total must be exactly {target}. Current: {current}"
 msgstr ""
 
-#: src/ui/duel_messages/select_sum.py:82
+#: src/ui/duel_messages/select_sum.py:83
 #, python-brace-format
 msgid "Total must be at least {target}. Current: {current}"
 msgstr ""
 
-#: src/ui/duel_messages/select_unselect_card.py:48
+#: src/ui/duel_messages/select_unselect_card.py:49
 #, python-brace-format
 msgid "Select cards ({min}-{max}):"
 msgstr ""
 
-#: src/ui/duel_messages/select_unselect_card.py:53
+#: src/ui/duel_messages/select_unselect_card.py:54
 msgid "Unselected"
 msgstr ""
 
-#: src/ui/duel_messages/select_unselect_card.py:55
+#: src/ui/duel_messages/select_unselect_card.py:56
 msgid "Selected"
 msgstr ""
 
-#: src/ui/duel_messages/select_unselect_card.py:57
+#: src/ui/duel_messages/select_unselect_card.py:58
 #, python-brace-format
 msgid "{index}: {name} in {location} ({state})"
 msgstr ""
 
-#: src/ui/duel_messages/select_yes_no.py:37
+#: src/ui/duel_messages/select_yes_no.py:38
 #, python-format
 msgid "Do you want to use %s's effect?"
 msgstr ""
 
-#: src/ui/duel_messages/select_yes_no.py:41
+#: src/ui/duel_messages/select_yes_no.py:42
 msgid "Select yes or no"
 msgstr ""
 
@@ -3131,54 +3605,54 @@ msgstr ""
 msgid "Your opponent sets %s (%s) in %s position."
 msgstr ""
 
-#: src/ui/duel_messages/shuffle_deck.py:16
-msgid "You shuffled your deck."
+#: src/ui/duel_messages/show_hint.py:35
+#, python-brace-format
+msgid "Hint: {text}"
+msgstr ""
+
+#: src/ui/duel_messages/show_hint.py:46
+#, python-brace-format
+msgid "You are duelling {name}."
 msgstr ""
 
 #: src/ui/duel_messages/shuffle_deck.py:18
+msgid "You shuffled your deck."
+msgstr ""
+
+#: src/ui/duel_messages/shuffle_deck.py:20
 msgid "Opponent shuffled their deck."
-msgstr ""
-
-#: src/ui/duel_messages/shuffle_hand.py:21
-msgid "Your hand was shuffled."
-msgstr ""
-
-#: src/ui/duel_messages/shuffle_hand.py:23
-msgid "Your opponent's hand was shuffled."
-msgstr ""
-
-#: src/ui/duel_messages/shuffle_hand.py:33
-msgid "Your extra deck was shuffled."
-msgstr ""
-
-#: src/ui/duel_messages/shuffle_hand.py:35
-msgid "Your opponent's extra deck was shuffled."
-msgstr ""
-
-#: src/ui/duel_messages/shuffle_other.py:31
-#, python-brace-format
-msgid "You shuffled {count} cards in your {location}."
 msgstr ""
 
 #: src/ui/duel_messages/shuffle_other.py:33
 #, python-brace-format
+msgid "You shuffled {count} cards in your {location}."
+msgstr ""
+
+#: src/ui/duel_messages/shuffle_other.py:35
+#, python-brace-format
 msgid "Opponent shuffled {count} cards in their {location}."
 msgstr ""
 
-#: src/ui/duel_messages/shuffle_set_card.py:16
-msgid "Set cards on the field were shuffled."
+#: src/ui/duel_messages/shuffle_set_card.py:53
+#, python-brace-format
+msgid "{count} set card(s) were shuffled between {zones}."
 msgstr ""
 
-#: src/ui/duel_messages/sort_card.py:42
-msgid "Sort cards"
+#: src/ui/duel_messages/shuffle_set_card.py:57
+#, python-brace-format
+msgid "{count} set card(s) on the field were shuffled."
 msgstr ""
 
 #: src/ui/duel_messages/sort_card.py:43
+msgid "Sort cards"
+msgstr ""
+
+#: src/ui/duel_messages/sort_card.py:44
 #, python-brace-format
 msgid "Select the next card in order ({done}/{total})"
 msgstr ""
 
-#: src/ui/duel_messages/start.py:38
+#: src/ui/duel_messages/start.py:44
 #, python-brace-format
 msgid "Starting lifepoints: {lp0} vs {lp1}"
 msgstr ""
@@ -3205,37 +3679,73 @@ msgid ""
 "{targetspec}."
 msgstr ""
 
-#: src/ui/duel_messages/update_data.py:168
+#: src/ui/duel_messages/swap_grave_deck.py:49
+msgid "Your deck and graveyard were swapped."
+msgstr ""
+
+#: src/ui/duel_messages/swap_grave_deck.py:51
+msgid "Your opponent's deck and graveyard were swapped."
+msgstr ""
+
+#: src/ui/duel_messages/swap_grave_deck.py:53
+#, python-brace-format
+msgid "{message} {count} extra deck monster(s) went back to the extra deck."
+msgstr ""
+
+#: src/ui/duel_messages/tag_swap.py:80
+msgid "Your tag partner takes over."
+msgstr ""
+
+#: src/ui/duel_messages/tag_swap.py:82
+msgid "Your opponent's tag partner takes over."
+msgstr ""
+
+#: src/ui/duel_messages/tag_swap.py:84
+#, python-brace-format
+msgid "{hand} card(s) in hand, {deck} in deck, {extra} in extra deck."
+msgstr ""
+
+#: src/ui/duel_messages/tag_swap.py:89
+#, python-brace-format
+msgid "Your new hand: {cards}"
+msgstr ""
+
+#: src/ui/duel_messages/tag_swap.py:91
+#, python-brace-format
+msgid "Top of deck: {name}"
+msgstr ""
+
+#: src/ui/duel_messages/update_data.py:169
 msgid "You are going first"
 msgstr ""
 
-#: src/ui/duel_messages/update_data.py:168
+#: src/ui/duel_messages/update_data.py:169
 msgid "You are going second"
 msgstr ""
 
-#: src/ui/duel_messages/win.py:21
+#: src/ui/duel_messages/win.py:23
 msgid "You and your opponent ended the duel in a draw."
-msgstr ""
-
-#: src/ui/duel_messages/win.py:29
-#, python-brace-format
-msgid "You win the duel! {reason}"
 msgstr ""
 
 #: src/ui/duel_messages/win.py:31
 #, python-brace-format
+msgid "You win the duel! {reason}"
+msgstr ""
+
+#: src/ui/duel_messages/win.py:33
+#, python-brace-format
 msgid "You lose the duel! {reason}"
 msgstr ""
 
-#: src/ui/duel_messages/win.py:51
+#: src/ui/duel_messages/win.py:53
 msgid "You win the match."
 msgstr ""
 
-#: src/ui/duel_messages/win.py:53
+#: src/ui/duel_messages/win.py:55
 msgid "You lose the match."
 msgstr ""
 
-#: src/ui/duel_messages/win.py:55
+#: src/ui/duel_messages/win.py:57
 msgid "Prepare to side deck for the next game."
 msgstr ""
 
@@ -5292,5 +5802,89 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "You lose the duel! {reason}"
+#~ msgstr ""
+
+#~ msgid "{message}"
+#~ msgstr ""
+
+#~ msgid "{help_text}"
+#~ msgstr ""
+
+#~ msgid "{label}"
+#~ msgstr ""
+
+#~ msgid "{text}"
+#~ msgstr ""
+
+#~ msgid "{card}"
+#~ msgstr ""
+
+#~ msgid "{error}"
+#~ msgstr ""
+
+#~ msgid "{name}"
+#~ msgstr ""
+
+#~ msgid "{banlist}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Arrow keys to navigate field. Enter "
+#~ "on a card to open action menu. "
+#~ "Space to read a card. Backspace to"
+#~ " open duel menu. M opens chat. "
+#~ "C reads chain, G graveyard, R "
+#~ "banished, X extra deck. Escape cancels"
+#~ " chaining."
+#~ msgstr ""
+
+#~ msgid "{info}"
+#~ msgstr ""
+
+#~ msgid "{cell}"
+#~ msgstr ""
+
+#~ msgid "{chain}"
+#~ msgstr ""
+
+#~ msgid "{information}"
+#~ msgstr ""
+
+#~ msgid "{players}"
+#~ msgstr ""
+
+#~ msgid "{deck}"
+#~ msgstr ""
+
+#~ msgid "{choice}"
+#~ msgstr ""
+
+#~ msgid "{room}"
+#~ msgstr ""
+
+#~ msgid "{title}"
+#~ msgstr ""
+
+#~ msgid "{option}"
+#~ msgstr ""
+
+#~ msgid "{location}"
+#~ msgstr ""
+
+#~ msgid "{question}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Use up and down to read one "
+#~ "line at a time. Press Space to "
+#~ "read the full card."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Card details. Use up and down to"
+#~ " read line by line, Home and "
+#~ "End to jump, Space or Enter to "
+#~ "read everything, and Escape to return"
+#~ " to results."
 #~ msgstr ""
 

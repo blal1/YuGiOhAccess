@@ -400,10 +400,6 @@ class TestSelectPlace:
         mock_loc_inst = MagicMock()
         mock_loc_inst.to_human_readable.return_value = "Monster Zone 1"
         mock_loc.from_zone_key.return_value = mock_loc_inst
-        mock_lang = MagicMock()
-        mock_lang._ = lambda s: s
-        mocker.patch("ui.duel_messages.select_place.variables.LANGUAGE_HANDLER", mock_lang)
-
         from ui.duel_messages.select_place import select_place
         client = MagicMock()
         client.flag_to_usable_cardspecs.return_value = ["spec1"]
@@ -418,10 +414,6 @@ class TestSelectPlace:
         mock_loc_inst = MagicMock()
         mock_loc_inst.to_human_readable.return_value = "Zone"
         mock_loc.from_zone_key.return_value = mock_loc_inst
-        mock_lang = MagicMock()
-        mock_lang._ = lambda s: s
-        mocker.patch("ui.duel_messages.select_place.variables.LANGUAGE_HANDLER", mock_lang)
-
         from ui.duel_messages.select_place import select_place
         client = MagicMock()
         client.flag_to_usable_cardspecs.return_value = ["spec1", "spec2"]
@@ -476,10 +468,6 @@ class TestSelectPlace:
         mock_loc_inst = MagicMock()
         mock_loc_inst.to_human_readable.return_value = "Zone"
         mock_loc.from_zone_key.return_value = mock_loc_inst
-        mock_lang = MagicMock()
-        mock_lang._ = lambda s: s
-        mocker.patch("ui.duel_messages.select_place.variables.LANGUAGE_HANDLER", mock_lang)
-
         client = _make_client(mocker, player_id=0)
         client.flag_to_usable_cardspecs = MagicMock(return_value=["spec1"])
         client.get_duel_field = MagicMock()
@@ -797,10 +785,6 @@ class TestConfirmCards:
     def test_confirm_cards_player_shows(self, mocker):
         """When to_player != our player, 'You shows Your opponent'."""
         mocker.patch("core.utils.output")
-        mock_lang = MagicMock()
-        mock_lang._ = lambda s: s
-        mocker.patch("ui.duel_messages.confirm_cards.variables.LANGUAGE_HANDLER", mock_lang)
-
         from ui.duel_messages.confirm_cards import confirm_cards
         client = MagicMock()
         client.what_player_am_i = 0
@@ -813,10 +797,6 @@ class TestConfirmCards:
     def test_confirm_cards_opponent_shows(self, mocker):
         """When to_player == our player, 'Your opponent shows You'."""
         mocker.patch("core.utils.output")
-        mock_lang = MagicMock()
-        mock_lang._ = lambda s: s
-        mocker.patch("ui.duel_messages.confirm_cards.variables.LANGUAGE_HANDLER", mock_lang)
-
         from ui.duel_messages.confirm_cards import confirm_cards
         client = MagicMock()
         client.what_player_am_i = 0
@@ -832,10 +812,6 @@ class TestConfirmCards:
         mock_card = MagicMock()
         mock_card.get_name.return_value = "Test"
         mock_card_cls.return_value = mock_card
-        mock_lang = MagicMock()
-        mock_lang._ = lambda s: s
-        mocker.patch("ui.duel_messages.confirm_cards.variables.LANGUAGE_HANDLER", mock_lang)
-
         client = _make_client(mocker, player_id=0)
         # id(1) + player(1) + size(4) + [code(4) + controller(1) + location(1) + sequence(4)] per card
         data = b'\x1f'  # 31
@@ -939,13 +915,16 @@ class TestIdle:
         client.get_duel_field.return_value.tab_order.set_tabable_items.assert_called_with(["ph2"])
 
 
-def test_chain_solved_clears_chaining_cards():
-    from ui.duel_messages.chained import msg_chain_solved
+def test_chain_end_clears_the_chain():
+    """MSG_CHAIN_END, not MSG_CHAIN_SOLVED, is what ends the chain."""
+    from ui.duel_messages.chained import msg_chain_end
 
     client = _make_client(None, player_id=0)
     client.player = MagicMock()
     client.player.chaining_cards = [MagicMock()]
+    client.player.chain_stack = [MagicMock()]
 
-    msg_chain_solved(client, b"\x49\x02", 2)
+    msg_chain_end(client, b"\x4a", 1)
 
     assert client.player.chaining_cards == []
+    assert client.player.chain_stack == []

@@ -3,13 +3,58 @@ from unittest.mock import MagicMock, patch
 
 
 def test_duel_message_handlers_registered(mocker):
-    """All critical duel message IDs have handlers registered."""
-    from core import utils
+    """Every duel message ocgcore defines has a handler.
 
-    # Critical interactive messages that require response
-    critical_ids = [1, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 140, 141]
-    for msg_id in critical_ids:
-        assert msg_id in utils.duel_message_handlers, f"Missing handler for duel message id {msg_id}"
+    The ids come from game.edo.message_constants, which is generated from
+    ocgcore's ocgapi_constants.h. Listing them by hand here is what let three
+    different, contradictory id tables live in this repo.
+    """
+    import ui  # noqa: F401
+    from core import utils
+    from game.edo import message_constants
+
+    registered = {int(msg_id) for msg_id in utils.duel_message_handlers if msg_id != -1}
+    missing = sorted(message_constants.ALL_MESSAGE_IDS - registered)
+    assert missing == [], [message_constants.MESSAGE_NAMES[i] for i in missing]
+
+
+def test_no_handler_is_registered_on_an_undefined_id(mocker):
+    """A handler on an id the core does not define never runs, or worse, steals
+    another message's buffer and raises struct.error."""
+    import ui  # noqa: F401
+    from core import utils
+    from game.edo import message_constants
+
+    registered = {int(msg_id) for msg_id in utils.duel_message_handlers if msg_id != -1}
+    unknown = sorted(registered - message_constants.ALL_MESSAGE_IDS)
+    assert unknown == []
+
+
+def test_handlers_are_registered_on_the_id_their_name_says(mocker):
+    """Spot check the ids that used to be wrong across the three tables."""
+    import ui  # noqa: F401
+    from core import utils
+    from game.edo import message_constants as mc
+
+    expected = {
+        mc.MSG_SELECT_COUNTER: "msg_select_counter",
+        mc.MSG_SELECT_SUM: "msg_select_sum",
+        mc.MSG_SORT_CARD: "msg_sort_card",
+        mc.MSG_SORT_CHAIN: "msg_sort_chain",
+        mc.MSG_SELECT_UNSELECT_CARD: "msg_select_unselect_card",
+        mc.MSG_CONFIRM_DECKTOP: "msg_confirm_decktop",
+        mc.MSG_CONFIRM_CARDS: "msg_confirm_cards",
+        mc.MSG_SHUFFLE_HAND: "msg_shuffle_hand",
+        mc.MSG_SHUFFLE_SET_CARD: "msg_shuffle_set_card",
+        mc.MSG_SWAP_GRAVE_DECK: "msg_swap_grave_deck",
+        mc.MSG_PLAYER_HINT: "msg_player_hint",
+        mc.MSG_RELOAD_FIELD: "msg_reload_field",
+        mc.MSG_DAMAGE: "msg_damage",
+    }
+    for msg_id, name in expected.items():
+        handler = utils.duel_message_handlers.get(msg_id)
+        assert handler is not None, f"no handler for {msg_id}"
+        assert handler.__name__ == name, f"{msg_id} is handled by {handler.__name__}, expected {name}"
 
 
 def test_packet_handlers_registered(mocker):

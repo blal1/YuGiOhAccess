@@ -8,8 +8,9 @@ from game.edo import structs
 from core import utils
 from core.i18n import _
 from ui.base_ui import VerticalMenu
+from game.edo import message_constants
 
-@utils.duel_message_handler(19)
+@utils.duel_message_handler(message_constants.MSG_SELECT_POSITION)
 def msg_select_position(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)

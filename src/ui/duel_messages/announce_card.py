@@ -9,10 +9,11 @@ from core.i18n import _
 from core import variables
 
 from ui.base_ui import InputUI, VerticalMenu
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(142)
+@utils.duel_message_handler(message_constants.MSG_ANNOUNCE_CARD)
 def msg_announce_card(client, data, length):
     data = io.BytesIO(data[1:])
     # print out the rest of the data
@@ -34,7 +35,7 @@ def announce_card(client, player, options):
     if len(cards_found.keys()) > 1:
         menu = VerticalMenu(_("Select a card"))
         for name in cards_found:
-            menu.append_item(_("{name}").format(name=name), function=lambda code=cards_found[name]: _send_response(client, code, True))
+            menu.append_item(str(name), function=lambda code=cards_found[name]: _send_response(client, code, True))
         utils.get_ui_stack().push_ui(menu)
         return
     code = list(cards_found.values())[0]

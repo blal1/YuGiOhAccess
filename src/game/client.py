@@ -256,7 +256,7 @@ class Client:
             if extra:
                 extra_data = self.read_u8(data) if extra8 else self.read_u64(data)
                 if not extra8:
-                    _ = self.read_u8(data) # client_mode
+                    self.read_u8(data)  # client_mode, unused
             if card is None:
                 try:
                     card = Card(code)
@@ -287,17 +287,20 @@ class Client:
             
 
 
+    # The wire format is little endian and unsigned throughout. Reading u8/u16 as
+    # signed used to turn LOCATION.OVERLAY (0x80) into -128 and any counter above
+    # 0x7fff into a negative number, which the abs() calls below only partly hid.
     def read_u8(self, buf):
-        return struct.unpack('b', buf.read(1))[0]
+        return struct.unpack('<B', buf.read(1))[0]
 
     def read_u16(self, buf):
-        return struct.unpack('h', buf.read(2))[0]
+        return struct.unpack('<H', buf.read(2))[0]
 
     def read_u32(self, buf):
-        return struct.unpack('I', buf.read(4))[0]
-    
+        return struct.unpack('<I', buf.read(4))[0]
+
     def read_u64(self, buf):
-        return struct.unpack('Q', buf.read(8))[0]
+        return struct.unpack('<Q', buf.read(8))[0]
 
     def read_location(self, data):
         controller = self.read_u8(data)

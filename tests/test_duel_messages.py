@@ -1,4 +1,4 @@
-"""Tests for new duel message handlers: retry, shuffle_hand, damage, sort_card, select_counter, select_sum, confirm_decktop, player_hint."""
+"""Tests for duel message handlers: retry, shuffles, damage, sort_card, select_counter, select_sum."""
 import io
 import struct
 from unittest.mock import MagicMock, patch, call
@@ -48,68 +48,76 @@ class TestMsgRetry:
 
 
 class TestMsgShuffleHand:
-    def test_shuffle_own_hand(self, mocker):
+    """MSG_SHUFFLE_HAND is 33 and MSG_SHUFFLE_EXTRA is 39; both live in shuffle_other."""
+
+    @staticmethod
+    def _client(mocker):
         mocker.patch("core.utils.output")
+        mocker.patch("core.utils.get_ui_stack", return_value=MagicMock())
         client = MagicMock()
         client.what_player_am_i = 0
         client.read_u8 = lambda buf: struct.unpack('B', buf.read(1))[0]
         client.read_u32 = lambda buf: struct.unpack('<I', buf.read(4))[0]
-        data = b'\x08' + struct.pack('B', 0) + struct.pack('<I', 2) + struct.pack('<I', 12345) + struct.pack('<I', 67890)
-        from ui.duel_messages.shuffle_hand import msg_shuffle_hand
+        return client
+
+    def test_shuffle_own_hand(self, mocker):
+        client = self._client(mocker)
+        data = b'\x21' + struct.pack('B', 0) + struct.pack('<I', 2) + struct.pack('<I', 12345) + struct.pack('<I', 67890)
+        from ui.duel_messages.shuffle_other import msg_shuffle_hand
         msg_shuffle_hand(client, data, len(data))
         from core import utils
         assert utils.output.called
         assert any("hand" in str(c).lower() for c in utils.output.call_args_list)
 
     def test_shuffle_opponent_hand(self, mocker):
-        mocker.patch("core.utils.output")
-        client = MagicMock()
-        client.what_player_am_i = 0
-        client.read_u8 = lambda buf: struct.unpack('B', buf.read(1))[0]
-        client.read_u32 = lambda buf: struct.unpack('<I', buf.read(4))[0]
-        data = b'\x08' + struct.pack('B', 1) + struct.pack('<I', 2) + struct.pack('<I', 12345) + struct.pack('<I', 67890)
-        from ui.duel_messages.shuffle_hand import msg_shuffle_hand
+        client = self._client(mocker)
+        data = b'\x21' + struct.pack('B', 1) + struct.pack('<I', 2) + struct.pack('<I', 12345) + struct.pack('<I', 67890)
+        from ui.duel_messages.shuffle_other import msg_shuffle_hand
         msg_shuffle_hand(client, data, len(data))
         from core import utils
         assert utils.output.called
         assert any("opponent" in str(c).lower() for c in utils.output.call_args_list)
 
     def test_shuffle_extra(self, mocker):
-        mocker.patch("core.utils.output")
-        client = MagicMock()
-        client.what_player_am_i = 0
-        client.read_u8 = lambda buf: struct.unpack('B', buf.read(1))[0]
-        client.read_u32 = lambda buf: struct.unpack('<I', buf.read(4))[0]
-        data = b'\x09' + struct.pack('B', 0) + struct.pack('<I', 3)
-        from ui.duel_messages.shuffle_hand import msg_shuffle_extra
-        msg_shuffle_extra(client, data, len(data))
+        client = self._client(mocker)
+        data = b'\x27' + struct.pack('B', 0) + struct.pack('<I', 3) + struct.pack('<I', 1) + struct.pack('<I', 2) + struct.pack('<I', 3)
+        from ui.duel_messages.shuffle_other import msg_shuffle_extra_deck
+        msg_shuffle_extra_deck(client, data, len(data))
         from core import utils
         assert utils.output.called
         assert any("extra" in str(c).lower() for c in utils.output.call_args_list)
 
 
 class TestMsgDamage:
-    def test_damage_to_self(self, mocker):
+    """MSG_DAMAGE is 91 and is handled by damage_step_damage, which also updates LP."""
+
+    @staticmethod
+    def _client(mocker):
         mocker.patch("core.utils.output")
-        mock_ui_stack = MagicMock()
-        mocker.patch("core.utils.get_ui_stack", return_value=mock_ui_stack)
+        mocker.patch("core.utils.get_ui_stack", return_value=MagicMock())
         client = _make_client_mock(mocker, player_id=0)
-        data = b'\x5f' + struct.pack('B', 0) + struct.pack('<I', 500)
-        from ui.duel_messages.damage import msg_damage
+        client.player = MagicMock()
+        client.player.lifepoints = 8000
+        client.player.opponent_lifepoints = 8000
+        return client
+
+    def test_damage_to_self(self, mocker):
+        client = self._client(mocker)
+        data = b'\x5b' + struct.pack('B', 0) + struct.pack('<I', 500)
+        from ui.duel_messages.damage_step_damage import msg_damage
         msg_damage(client, data, len(data))
         from core.utils import output
         assert any("500" in str(c) for c in output.call_args_list)
+        client.player.update_lifepoints.assert_called_with(7500)
 
     def test_damage_to_opponent(self, mocker):
-        mocker.patch("core.utils.output")
-        mock_ui_stack = MagicMock()
-        mocker.patch("core.utils.get_ui_stack", return_value=mock_ui_stack)
-        client = _make_client_mock(mocker, player_id=0)
-        data = b'\x5f' + struct.pack('B', 1) + struct.pack('<I', 1000)
-        from ui.duel_messages.damage import msg_damage
+        client = self._client(mocker)
+        data = b'\x5b' + struct.pack('B', 1) + struct.pack('<I', 1000)
+        from ui.duel_messages.damage_step_damage import msg_damage
         msg_damage(client, data, len(data))
         from core.utils import output
         assert any("opponent" in str(c) for c in output.call_args_list)
+        client.player.update_lifepoints.assert_called_with(7000, True)
 
 
 class TestMsgSortCard:

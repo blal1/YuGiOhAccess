@@ -5,9 +5,9 @@ from game.card.location_conversion import LocationConversion
 
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(55)
+@utils.duel_message_handler(message_constants.MSG_SWAP)
 def msg_swap(client, data, data_length):
     data = io.BytesIO(data[1:])
     code1 = client.read_u32(data)
@@ -29,4 +29,4 @@ def swap(client, card1, card2):
         swapped_towards = "you"
     else:
         swapped_towards = "your opponent"
-        utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("card {name} swapped controller to {plname} and is now located at {targetspec}.").format(plname=swapped_towards, targetspec=location_information.to_human_readable(), name=card1.get_name())))
+        utils.output(_("card {name} swapped controller to {plname} and is now located at {targetspec}.").format(plname=swapped_towards, targetspec=location_information.to_human_readable(), name=card1.get_name()))

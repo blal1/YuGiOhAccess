@@ -21,15 +21,30 @@ DOMAIN = "yugiohaccess"
 BABEL_CFG = ROOT / "babel.cfg"
 
 
+def _runnable(cmd):
+    """True if `cmd --help` actually starts (console-script shims can be broken)."""
+    try:
+        return subprocess.run(
+            [*cmd, "--help"], capture_output=True, timeout=30
+        ).returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
 def pybabel_cmd():
+    candidates = []
     found = shutil.which("pybabel")
     if found:
-        return [found]
+        candidates.append([found])
     suffix = ".exe" if sys.platform == "win32" else ""
     local = ROOT / ".venv" / "Scripts" / f"pybabel{suffix}"
     if local.exists():
-        return [str(local)]
-    return [sys.executable, "-m", "babel.messages.frontend"]
+        candidates.append([str(local)])
+    module_cmd = [sys.executable, "-m", "babel.messages.frontend"]
+    for candidate in candidates:
+        if _runnable(candidate):
+            return candidate
+    return module_cmd
 
 
 def run(cmd):
@@ -54,6 +69,7 @@ def main():
         "--copyright-holder", "YuGiOhAccess Contributors",
         "--msgid-bugs-address", "translations@yugiohaccess.com",
         "-k", "_",
+        "-k", "N_",
         "-k", "ngettext:1,2",
         "-k", "pgettext:1c,2",
         "src/",

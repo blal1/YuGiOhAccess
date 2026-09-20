@@ -8,6 +8,7 @@ from core.i18n import _
 from game.card.card import Card
 from game.card import card_constants
 from ui.base_ui import VerticalMenu, InputUI
+from ui.card_details_ui import CardDetailReaderUI, card_detail_text, split_card_detail_lines
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +142,7 @@ def show_search_results(return_to, name_query="", description_query="", type_que
     try:
         rows = _search_cards(name_query, description_query, type_query, attribute_query, race_query)
     except ValueError as exc:
-        utils.output(_("{error}").format(error=str(exc)))
+        utils.output(str(exc))
         card_search_menu(return_to)
         return
     if not rows:
@@ -169,7 +170,7 @@ class CardSearchResultsUI(wx.Panel):
         self.result_list.SetToolTip(_("Use up and down to choose a card. Press Enter to open details, or Space to read all details."))
         sizer.Add(self.result_list, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 6)
 
-        self.details = wx.TextCtrl(self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_DONTWRAP | wx.WANTS_CHARS)
+        self.details = wx.TextCtrl(self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.WANTS_CHARS)
         self.details.SetName(_("Card details"))
         self.details.SetToolTip(_("Read-only card details for the selected card."))
         sizer.Add(self.details, 2, wx.EXPAND | wx.ALL, 6)
@@ -186,7 +187,8 @@ class CardSearchResultsUI(wx.Panel):
 
         self.result_list.Bind(wx.EVT_LISTBOX, self.on_result_selected)
         self.result_list.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
-        self.details.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
+        # Deliberately not bound on self.details: arrow keys, Home, End and
+        # copy belong to the text control and the screen reader.
         self.previous_button.Bind(wx.EVT_BUTTON, lambda event: self.move_selection(-1))
         self.read_button.Bind(wx.EVT_BUTTON, lambda event: self.open_current_detail())
         self.next_button.Bind(wx.EVT_BUTTON, lambda event: self.move_selection(1))
@@ -256,105 +258,6 @@ class CardSearchResultsUI(wx.Panel):
             return
         if key == wx.WXK_F1:
             utils.output(_("Card results. Use up and down to choose a card, Enter to open details, Space to read all details, and Escape to go back."))
-            return
-        event.Skip()
-
-
-class CardDetailReaderUI(wx.Panel):
-    def __init__(self, code, name=None):
-        super().__init__(wx.GetTopLevelWindows()[0], style=wx.WANTS_CHARS, name=_("Card details"))
-        self.code = code
-        self.card_name = name or ""
-        self.detail_text = _get_card_detail_text(code)
-        self.lines = _split_card_detail_lines(self.detail_text)
-        self.current_line = 0
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self.header = wx.StaticText(self, label=_("{name} details").format(name=self.card_name or _("Card")))
-        self.header.SetName(_("Card detail header"))
-        sizer.Add(self.header, 0, wx.EXPAND | wx.ALL, 6)
-
-        self.line_label = wx.StaticText(self, label="")
-        self.line_label.SetName(_("Current detail line"))
-        sizer.Add(self.line_label, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 6)
-
-        self.details = wx.TextCtrl(self, value=self.detail_text, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_DONTWRAP | wx.WANTS_CHARS)
-        self.details.SetName(_("Full card text"))
-        self.details.SetToolTip(_("Use up and down to read one line at a time. Press Space to read the full card."))
-        sizer.Add(self.details, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 6)
-
-        buttons = wx.BoxSizer(wx.HORIZONTAL)
-        self.previous_line_button = wx.Button(self, label=_("Previous line"))
-        self.read_line_button = wx.Button(self, label=_("Read line"))
-        self.next_line_button = wx.Button(self, label=_("Next line"))
-        self.read_all_button = wx.Button(self, label=_("Read all"))
-        self.back_button = wx.Button(self, label=_("Back"))
-        for button in (self.previous_line_button, self.read_line_button, self.next_line_button, self.read_all_button, self.back_button):
-            buttons.Add(button, 0, wx.ALL, 4)
-        sizer.Add(buttons, 0, wx.ALIGN_CENTER)
-        self.SetSizer(sizer)
-
-        self.previous_line_button.Bind(wx.EVT_BUTTON, lambda event: self.move_line(-1))
-        self.read_line_button.Bind(wx.EVT_BUTTON, lambda event: self.read_current_line())
-        self.next_line_button.Bind(wx.EVT_BUTTON, lambda event: self.move_line(1))
-        self.read_all_button.Bind(wx.EVT_BUTTON, lambda event: self.read_all())
-        self.back_button.Bind(wx.EVT_BUTTON, lambda event: self.go_back())
-        self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
-        self.details.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
-
-        self.update_line(announce=True)
-
-    def update_line(self, announce=False):
-        line = self.lines[self.current_line] if self.lines else _("No details.")
-        label = _("{position} of {count}: {line}").format(
-            position=self.current_line + 1,
-            count=len(self.lines),
-            line=line,
-        )
-        self.line_label.SetLabel(label)
-        if announce:
-            utils.output(label)
-
-    def move_line(self, delta):
-        if not self.lines:
-            return
-        self.current_line = (self.current_line + delta) % len(self.lines)
-        self.update_line(announce=True)
-        self.details.SetFocus()
-
-    def read_current_line(self):
-        self.update_line(announce=True)
-
-    def read_all(self):
-        utils.output(self.detail_text)
-
-    def go_back(self):
-        utils.get_ui_stack().pop_ui()
-
-    def on_key_down(self, event):
-        key = event.GetKeyCode()
-        if key == wx.WXK_UP:
-            self.move_line(-1)
-            return
-        if key == wx.WXK_DOWN:
-            self.move_line(1)
-            return
-        if key == wx.WXK_HOME:
-            self.current_line = 0
-            self.update_line(announce=True)
-            return
-        if key == wx.WXK_END:
-            self.current_line = len(self.lines) - 1
-            self.update_line(announce=True)
-            return
-        if key in (wx.WXK_RETURN, wx.WXK_SPACE):
-            self.read_all()
-            return
-        if key == wx.WXK_ESCAPE:
-            self.go_back()
-            return
-        if key == wx.WXK_F1:
-            utils.output(_("Card details. Use up and down to read line by line, Home and End to jump, Space or Enter to read everything, and Escape to return to results."))
             return
         event.Skip()
 
@@ -503,13 +406,14 @@ def read_card_detail(code):
 
 
 def _get_card_detail_text(code):
-    return _("{card}").format(card=str(Card(code)))
+    return card_detail_text(code)
 
 
-def _split_card_detail_lines(detail_text):
-    lines = []
-    for raw_line in detail_text.splitlines():
-        line = raw_line.strip()
-        if line:
-            lines.append(line)
-    return lines or [_("No details.")]
+# Public aliases. The deck editor searches through these so that both features
+# share one engine, one translation path and one result limit.
+search_cards = _search_cards
+format_card_summary = _format_card_summary
+get_card_detail_text = _get_card_detail_text
+
+
+_split_card_detail_lines = split_card_detail_lines

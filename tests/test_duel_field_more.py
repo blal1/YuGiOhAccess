@@ -254,8 +254,9 @@ def test_card_accessibility_details_and_chain_stack(mocker):
     assert "Destroy one card." in info
     assert field.get_sound_position_for_zone("pm0") == field.sound_positions[(0, 0)]
 
+    field.client.player.chain_stack = []
     field.client.player.chaining_cards = [card]
-    assert "Current chain" in field.get_chain_stack_text()
+    assert "You can chain with" in field.get_chain_stack_text()
     assert "Destroy one card." in field.get_chain_stack_text()
 
     no_material = FakeCard(4)

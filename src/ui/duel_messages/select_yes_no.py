@@ -9,12 +9,13 @@ from core import utils
 from core.i18n import _
 from core import variables
 from ui.base_ui import VerticalMenu
+from game.edo import message_constants
 
 
 logger = logging.getLogger(__name__)
 
 
-@utils.duel_message_handler(13)
+@utils.duel_message_handler(message_constants.MSG_SELECT_YESNO)
 def msg_select_yesno(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -31,17 +32,17 @@ def select_yes_no(client, player, desc):
     logger.debug(f"Code: {code}")
     logger.debug(f"String id: {stringid}")
     if code == 0:
-        question = variables.LANGUAGE_HANDLER.strings['system'].get(stringid, variables.LANGUAGE_HANDLER._("Unknown option %d" % stringid))
+        question = variables.LANGUAGE_HANDLER.strings['system'].get(stringid, _("Unknown option %d") % stringid)
     else:
         card = Card(code)
-        question = variables.LANGUAGE_HANDLER._("Do you want to use %s's effect?")%(card.get_name())
+        question = _("Do you want to use %s's effect?")%(card.get_name())
         effect_description = card.get_effect_description((code << 4) + stringid, True)
         if effect_description:
             question += "\n" + effect_description
     yes_or_no_menu = VerticalMenu(_("Select yes or no"))
     yes_or_no_menu.append_item(
-        _("{question}").format(question=question),
-        function=lambda: utils.output(_("{card}").format(card=str(card)) if card else _("{question}").format(question=question)),
+        str(question),
+        function=lambda: utils.output(str(card) if card else str(question)),
     )
     yes_or_no_menu.append_item(_("Yes"), function=lambda: yes(client))
     yes_or_no_menu.append_item(_("No"), function=lambda: no(client))

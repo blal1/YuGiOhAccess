@@ -190,11 +190,14 @@ def test_app_and_output_modules(mocker):
     importlib.reload(output)
     assert output.output is auto
 
-    popen = mocker.patch("ui.output2.subprocess.Popen")
-    import ui.output2 as output2
-    mocker.patch("ui.output2.platform.system", return_value="Darwin")
-    output2.OsaScriptSingleton._instance = None
-    singleton = output2.OsaScriptSingleton()
-    singleton.output("hello")
+    # ui/output2.py was a duplicate of this backend and has been folded in.
+    popen = mocker.patch("ui.output.subprocess.Popen")
+    mocker.patch("ui.output.platform.system", return_value="Darwin")
+    output.VoiceOverOutput._instance = None
+    singleton = output.VoiceOverOutput()
+    singleton.output('say "hi"')
     popen.return_value.stdin.write.assert_called()
-    assert output2.OsaScriptSingleton() is singleton
+    written = popen.return_value.stdin.write.call_args.args[0].decode("utf-8")
+    assert '\\"hi\\"' in written
+    assert output.VoiceOverOutput() is singleton
+    output.VoiceOverOutput._instance = None

@@ -1,8 +1,8 @@
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(37)
+@utils.duel_message_handler(message_constants.MSG_REVERSE_DECK)
 def msg_reversedeck(client, data, data_length):
-    utils.output(variables.LANGUAGE_HANDLER._("all decks are now reversed."))
+    utils.output(_("all decks are now reversed."))
 

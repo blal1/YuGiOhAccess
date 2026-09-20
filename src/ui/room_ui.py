@@ -1,3 +1,4 @@
+import json
 import logging
 from pathlib import Path
 import random
@@ -47,7 +48,11 @@ def handle_join_game(client, packet_data, packet_length):
 
 @utils.packet_handler(structs.ServerIdType.PLAYER_ENTER)
 def handle_player_enter(client, packet_data, packet_length):
-    player_name, position = _parse_player_enter_packet(packet_data)
+    try:
+        player_name, position = _parse_player_enter_packet(packet_data)
+    except ValueError:
+        logger.warning("Ignoring malformed PLAYER_ENTER packet with length %s", packet_length)
+        return
     client.memory.users_info.append({"name": player_name, "ready": False, "host": False, "position": position})
     utils.output(_("{player} entered the room at position {pos}").format(player=player_name, pos=position))
 
@@ -119,9 +124,9 @@ def display_room_menu(client):
     if getattr(room, "best_of", 1) == 3:
         basic_room_information += _("Side decking is available between games.") + "\n"
         basic_room_information += match_ui.score_text(client) + "\n"
-    room_menu.append_item(_("{information}").format(information=basic_room_information))
+    room_menu.append_item(str(basic_room_information))
     # show the players in the room.
-    room_menu.append_item(_("{players}").format(players=resolve_players(client)))
+    room_menu.append_item(str(resolve_players(client)))
     #participants.Bind(wx.EVT_SET_FOCUS, lambda e: utils.output(resolve_players(client)))
     if client.memory.is_host and capacity == 2 and len(users) < capacity:
         room_menu.append_item(_("Add a bot opponent"), lambda: handle_add_bot_as_opponent(client))
@@ -132,8 +137,12 @@ def display_room_menu(client):
         room_menu.append_item(_("Check deck against room banlist"), lambda: handle_room_menu_check_deck_against_banlist(client))
         if client.memory.is_host:
             room_menu.append_item(_("Start"), lambda: handle_room_menu_ready_or_start(client))
+        elif getattr(client.memory, "is_ready", False):
+            room_menu.append_item(_("Not ready"), lambda: handle_room_menu_not_ready(client))
         else:
             room_menu.append_item(_("Ready"), lambda: handle_room_menu_ready_or_start(client))
+    if client.memory.is_host and len(users) > 1:
+        room_menu.append_item(_("Remove a player"), lambda: handle_room_menu_kick(client))
     room_menu.append_item(_("Back"), lambda: handle_me_disconnect(client))
     utils.get_discord_presence_manager().update_presence(
         state=_("In a room"),
@@ -246,8 +255,43 @@ def handle_room_menu_ready_or_start(client):
         sm.show()
         return
     client.send(structs.ClientIdType.READY)
+    client.memory.is_ready = True
     if client.memory.is_host:
         client.send(structs.ClientIdType.TRY_START)
+
+
+def handle_room_menu_not_ready(client):
+    """Take the ready flag back so the deck can still be changed."""
+    client.send(structs.ClientIdType.NOT_READY)
+    client.memory.is_ready = False
+    utils.output(_("You are no longer ready."))
+    display_room_menu(client)
+
+
+@utils.ui_function
+def handle_room_menu_kick(client):
+    """Host only: remove a player, which needs CTOS_HS_KICK and a seat number."""
+    users = getattr(client.room, "users", []) or []
+    own_name = variables.config.get("nickname")
+    menu = VerticalMenu(_("Remove a player"))
+    removable = [user for user in users if user.get("name") != own_name]
+    if not removable:
+        menu.append_item(_("There is nobody else in the room."))
+    for user in removable:
+        menu.append_item(
+            _("Remove {name}").format(name=user.get("name", "")),
+            lambda pos=user.get("pos", 0), name=user.get("name", ""): send_kick(client, pos, name),
+        )
+    menu.append_item(_("Back"), lambda: display_room_menu(client))
+    return menu
+
+
+def send_kick(client, position, name):
+    kick = structs.CtosKick()
+    kick.pos = int(position)
+    client.send(structs.ClientIdType.TRY_KICK, kick)
+    utils.output(_("Asked the server to remove {name}.").format(name=name))
+    display_room_menu(client)
 
 @utils.ui_function
 def handle_room_menu_select_deck(client):
@@ -265,13 +309,13 @@ def handle_room_menu_show_deck_menu(client, name, deck_dir):
     if not deck_dir.exists():
         logger.debug(f"Creating deck directory {deck_dir}")
         deck_dir.mkdir(parents=True, exist_ok=True)
-    deck_menu = VerticalMenu(_("{name}").format(name=name))
+    deck_menu = VerticalMenu(str(name))
     # loop through all files found in variables.DECK_DIR
     for deck_file in sorted(deck_dir.iterdir(), key=lambda path: path.stem.lower()):
         if not deck_file.is_file() or deck_file.suffix.lower() not in (".json", ".ydke"):
             continue
         # give full path to the deck file
-        deck_menu.append_item(_("{name}").format(name=deck_file.stem), lambda deck_file=deck_file: handle_deck_menu_select_deck(client, deck_file))
+        deck_menu.append_item(str(deck_file.stem), lambda deck_file=deck_file: handle_deck_menu_select_deck(client, deck_file))
     deck_menu.append_item(_("Back"), lambda: handle_room_menu_select_deck(client))
     return deck_menu
 
@@ -289,12 +333,12 @@ def handle_room_menu_check_deck_against_banlist(client):
 def handle_room_menu_show_banlist_deck_menu(client, name, deck_dir):
     if not deck_dir.exists():
         deck_dir.mkdir(parents=True, exist_ok=True)
-    deck_menu = VerticalMenu(_("{name}").format(name=name))
+    deck_menu = VerticalMenu(str(name))
     deck_files = [path for path in sorted(deck_dir.iterdir(), key=lambda path: path.stem.lower()) if path.is_file() and path.suffix.lower() in (".json", ".ydke")]
     if not deck_files:
         deck_menu.append_item(_("No decks found."), None)
     for deck_file in deck_files:
-        deck_menu.append_item(_("{name}").format(name=deck_file.stem), lambda deck_file=deck_file: show_room_banlist_check_result(client, deck_file))
+        deck_menu.append_item(str(deck_file.stem), lambda deck_file=deck_file: show_room_banlist_check_result(client, deck_file))
     deck_menu.append_item(_("Back"), lambda: handle_room_menu_check_deck_against_banlist(client))
     return deck_menu
 
@@ -470,18 +514,73 @@ def handle_add_bot_as_opponent(client):
         return
     bot_menu = VerticalMenu(_("Select bot deck"))
     bot_menu.append_item(_("Random"), lambda: add_bot_to_room(client, "", available_decks))
-    for deck in available_decks:
-        bot_menu.append_item(_("{deck}").format(deck=deck), lambda deck=deck: add_bot_to_room(client, deck, available_decks))
+    for label, deck in _bot_choices(available_decks):
+        bot_menu.append_item(str(label), lambda deck=deck: add_bot_to_room(client, deck, available_decks))
     bot_menu.append_item(_("Back"), lambda: display_room_menu(client))
     utils.get_ui_stack().push_ui(bot_menu)
 
 
+def _install_root() -> Path:
+    # Resolved per call rather than at import so the location stays overridable.
+    return Path(__file__).parent.parent.parent
+
+
 def _get_available_bot_decks() -> list[str]:
-    """Get list of available bot decks from the local Decks directory."""
-    decks_dir = Path(__file__).parent.parent.parent / "Decks"
+    """The WindBot deck keys this build can actually pilot.
+
+    Reported as keys rather than file names: a deck file with no executor makes
+    WindBot fall back to a random deck, so offering it would be a lie.
+    """
+    from bot import deck_catalogue
+
+    decks_dir = _install_root() / "Decks"
     if not decks_dir.exists():
         return []
-    return [f.stem for f in decks_dir.glob("*.ydk")]
+    available = {path.stem for path in decks_dir.glob("*.ydk")}
+    return sorted(
+        key for key, deck_file in deck_catalogue.KEY_TO_DECK_FILE.items()
+        if deck_file in available
+    )
+
+
+def _load_bot_catalogue() -> list[dict]:
+    """WindBot's own bots.json: the deck names a player would recognise.
+
+    The menu used to read raw file names off disk, so a blind player chose
+    between "AI_BlueEyes" and "AI_Dragun" with no idea how hard either is.
+    WindBot ships the curated names and difficulties in this file.
+    """
+    try:
+        return json.loads((_install_root() / "bots.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        logger.warning("Could not read bots.json; falling back to the deck file names")
+        return []
+
+
+def _bot_choices(available_decks) -> list[tuple[str, str]]:
+    """Pair each playable bot with something worth reading out.
+
+    bots.json holds the names a player recognises and a difficulty; the menu
+    used to read raw file names off disk instead.
+    """
+    playable = [str(deck) for deck in available_decks]
+    catalogue = {}
+    for entry in _load_bot_catalogue():
+        if isinstance(entry, dict) and entry.get("deck"):
+            catalogue.setdefault(str(entry["deck"]), entry)
+
+    choices = []
+    for deck in playable:
+        entry = catalogue.get(deck, {})
+        name = entry.get("name") or deck
+        difficulty = entry.get("difficulty")
+        if isinstance(difficulty, int):
+            label = _("{name}, difficulty {difficulty}").format(name=name, difficulty=difficulty)
+        else:
+            label = str(name)
+        choices.append((label, deck))
+    choices.sort(key=lambda choice: choice[0].lower())
+    return choices
 
 
 def add_bot_to_room(client, deck="", available_decks=[]):

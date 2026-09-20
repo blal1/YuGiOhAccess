@@ -3,8 +3,9 @@ import io
 from game.card.card import Card
 from core import utils
 from ui import playable_cards
+from game.edo import message_constants
 
-@utils.duel_message_handler(10)
+@utils.duel_message_handler(message_constants.MSG_SELECT_BATTLECMD)
 def msg_select_battlecmd(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)

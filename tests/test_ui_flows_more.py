@@ -11,6 +11,7 @@ class FakeMenu:
         self.kwargs = kwargs
         self.items = []
         self.help_text = ""
+        self.codes_by_row = {}
 
     def append_item(self, option, function=None, *args, **kwargs):
         control = MagicMock()
@@ -19,6 +20,12 @@ class FakeMenu:
         control.GetString.return_value = "Banlist"
         control.GetCurrentSelection.return_value = 0
         self.items.append((option, function, args, kwargs, control))
+        return control
+
+    def append_card(self, code, label, function=None):
+        """Stand-in for ui.card_details_ui.CardChoiceMenu.append_card."""
+        control = self.append_item(str(label), function)
+        self.codes_by_row[len(self.items) - 1] = code
         return control
 
     def set_help_text(self, text):

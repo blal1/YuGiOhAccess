@@ -8,8 +8,9 @@ from core import utils
 from core.i18n import _
 
 from ui.base_ui import VerticalMenu
+from game.edo import message_constants
 
-@utils.duel_message_handler(12)
+@utils.duel_message_handler(message_constants.MSG_SELECT_EFFECTYN)
 def msg_select_effectyn(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -25,7 +26,7 @@ def select_effectyn(client, player, card, desc):
     s = card.get_effect_description(desc, True)
     if s:
         question += f"\n{s}"
-    yes_or_no_menu.append_item(_("{question}").format(question=question), function=lambda: utils.output(_("{card}").format(card=str(card))))
+    yes_or_no_menu.append_item(str(question), function=lambda: utils.output(str(card)))
     yes_or_no_menu.append_item(_("Yes"), function=lambda: yes(client))
     yes_or_no_menu.append_item(_("No"), function=lambda: no(client))
     utils.get_ui_stack().push_ui(yes_or_no_menu)

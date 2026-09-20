@@ -134,7 +134,7 @@ def test_show_results_and_read_detail(mocker):
     assert menu == ("browser", return_to, [(10, "Alpha")])
     browser_cls.assert_called_once_with(return_to, [(10, "Alpha")])
 
-    card_cls = mocker.patch("ui.card_search_ui.Card")
+    card_cls = mocker.patch("ui.card_details_ui.Card")
     card_cls.return_value.__str__.return_value = "Card detail"
     card_search_ui.read_card_detail(10)
     card_search_ui.utils.output.assert_called_with("Card detail")
@@ -241,7 +241,7 @@ def test_card_detail_reader_ui_real_wx_keyboard_and_buttons(mocker):
     card_search_ui = _patch_card_search(mocker)
     _app, frame = _wx_frame()
     mocker.patch("ui.card_search_ui.utils.get_ui_stack", return_value=frame)
-    mocker.patch("ui.card_search_ui._get_card_detail_text", return_value="Name\nStats\nEffect")
+    mocker.patch("ui.card_details_ui.card_detail_text", return_value="Name\nStats\nEffect")
 
     ui = card_search_ui.CardDetailReaderUI(10, "Alpha")
     try:
@@ -313,7 +313,7 @@ def test_card_detail_reader_keyboard_shortcuts_and_empty_details(mocker):
     card_search_ui = _patch_card_search(mocker)
     _app, frame = _wx_frame()
     mocker.patch("ui.card_search_ui.utils.get_ui_stack", return_value=frame)
-    mocker.patch("ui.card_search_ui._get_card_detail_text", return_value="\n")
+    mocker.patch("ui.card_details_ui.card_detail_text", return_value="\n")
 
     ui = card_search_ui.CardDetailReaderUI(10, "Alpha")
     try:

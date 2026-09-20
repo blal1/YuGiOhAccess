@@ -10,10 +10,11 @@ from ui.base_ui import VerticalMenu
 from core import utils
 from core.i18n import _
 from core import variables
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(14)
+@utils.duel_message_handler(message_constants.MSG_SELECT_OPTION)
 def msg_select_option(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -37,13 +38,13 @@ def select_option(client, player, options):
         opts.append(string)
         if code != 0:
             card = Card(code)
-    menu = VerticalMenu(_("{message}").format(message=variables.LANGUAGE_HANDLER._("Select option:")))
+    menu = VerticalMenu(_("Select option:"))
     if not card:
         menu.append_item(_("Select option"))
     else:
         menu.append_item(_("Select option for {name}").format(name=card.get_name()))
     for idx, opt in enumerate(opts):
-        menu.append_item(_("{option}").format(option=opt), function=lambda idx=idx: select(client, options, idx))
+        menu.append_item(str(opt), function=lambda idx=idx: select(client, options, idx))
     utils.get_ui_stack().push_ui(menu)
 
 def select(client, options, idx):
@@ -60,7 +61,7 @@ def select(client, options, idx):
 
 def _option_text(code, stringid):
     if code == 0:
-        return variables.LANGUAGE_HANDLER.strings['system'].get(stringid, variables.LANGUAGE_HANDLER._("Unknown option %d" % stringid))
+        return variables.LANGUAGE_HANDLER.strings['system'].get(stringid, _("Unknown option %d") % stringid)
     card = Card(code)
     description = card.get_effect_description((code << 4) + stringid, True)
     if description:
@@ -68,4 +69,4 @@ def _option_text(code, stringid):
     try:
         return card.strings[stringid]
     except IndexError:
-        return variables.LANGUAGE_HANDLER._("Unknown option %d" % stringid)
+        return _("Unknown option %d") % stringid

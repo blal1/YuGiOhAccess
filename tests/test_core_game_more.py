@@ -371,7 +371,6 @@ def test_language_handler_parse_add_primary_and_search(mocker, tmp_path):
     handler.languages["english"]["db"] = db
     assert handler.get_cards_by_partial_name("a") == {"Alpha": 1, "Beta": 2}
     assert handler.get_cards_by_partial_name("zzz") == {}
-    assert handler._("Hello") == "Hello"
 
     handler.languages["french"] = {"short": "fr", "card_translations": {1: {"name": "Dragon Blanc", "desc": "Desc"}}}
     handler.primary_language = "french"

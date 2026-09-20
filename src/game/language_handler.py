@@ -280,10 +280,6 @@ class LanguageHandler:
                 result[card_name] = card_id
         return result
     
-    def _(self, text):
-        from core.i18n import _ as translate
-        return translate(text)
-
     @property
     def primary_database(self):
         return self.get_language(self.primary_language)['db']

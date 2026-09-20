@@ -2,14 +2,17 @@ import io
 import time
 
 
+from core import speech
 from core import utils
 from core.i18n import _
 from game.player import Player
 
 
 from ui import duel_field
+from ui.duel_messages import player_hint
+from game.edo import message_constants
 
-@utils.duel_message_handler(4)
+@utils.duel_message_handler(message_constants.MSG_START)
 def msg_start(client, data, data_len):
     # the first byte is the message id, so we skip it
     # the second byte is empty for this message
@@ -25,6 +28,9 @@ def msg_start(client, data, data_len):
 
 @utils.ui_function
 def start(client, lp0, lp1, t0dz, t0edz, t1dz, t1edz):
+    # A new duel inherits nothing from the previous one.
+    player_hint.reset_player_hints()
+    speech.MESSAGE_LOG.clear()
     utils.get_ui_stack().music_audio_manager.fade_out_all_audio()
     time.sleep(0.050)
     # clear the ui stack

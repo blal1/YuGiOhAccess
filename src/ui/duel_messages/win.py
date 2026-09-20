@@ -1,14 +1,16 @@
 import io
 import logging
 
+from core import speech
 from core import utils
 from core.i18n import _
 from core import variables
 from ui import match_ui
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(5)
+@utils.duel_message_handler(message_constants.MSG_WIN)
 def msg_win(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -18,7 +20,7 @@ def msg_win(client, data, data_length):
 def win(client, player, reason):
     logger.debug("Win: %d %d", player, reason)
     if player == 2:
-        utils.output(_("You and your opponent ended the duel in a draw."))
+        utils.output(_("You and your opponent ended the duel in a draw."), priority=speech.Priority.CRITICAL)
         _announce_match_result(client, player)
         return
 
@@ -26,9 +28,9 @@ def win(client, player, reason):
         return variables.LANGUAGE_HANDLER.strings['victory'][reason]
 
     if player == client.what_player_am_i:
-        utils.output(_("You win the duel! {reason}").format(reason=l_reason()))
+        utils.output(_("You win the duel! {reason}").format(reason=l_reason()), priority=speech.Priority.CRITICAL)
     else:
-        utils.output(_("You lose the duel! {reason}").format(reason=l_reason()))
+        utils.output(_("You lose the duel! {reason}").format(reason=l_reason()), priority=speech.Priority.CRITICAL)
     _announce_match_result(client, player)
 
     # clear out stuff from the client

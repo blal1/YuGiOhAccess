@@ -6,9 +6,10 @@ from core.i18n import _
 from game.card import card_constants
 from game.edo import structs
 from ui.base_ui import VerticalMenu
+from game.edo import message_constants
 
 
-@utils.duel_message_handler(141)
+@utils.duel_message_handler(message_constants.MSG_ANNOUNCE_ATTRIB)
 def msg_announce_attrib(client, data, length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -34,16 +35,16 @@ def show_announce_value_menu(client, title, count, options):
         utils.output(_("No valid options available."))
         return
     if count == 1:
-        menu = VerticalMenu(_("{title}").format(title=title))
+        menu = VerticalMenu(str(title))
         for label, value in options:
-            menu.append_item(_("{label}").format(label=label), function=lambda value=value: _send_response(client, value, True))
+            menu.append_item(str(label), function=lambda value=value: _send_response(client, value, True))
         utils.get_ui_stack().push_ui(menu)
         return
-    menu = VerticalMenu(_("{title}").format(title=title))
+    menu = VerticalMenu(str(title))
     selected = []
     menu.append_item(_("Select {count} values").format(count=count))
     for label, value in options:
-        menu.append_item(_("{label}").format(label=label), function=lambda label=label, value=value: _toggle_value(client, menu, selected, count, label, value))
+        menu.append_item(str(label), function=lambda label=label, value=value: _toggle_value(client, menu, selected, count, label, value))
     menu.append_item(_("Finish"), function=lambda: _finish_multi_select(client, selected, count))
     utils.get_ui_stack().push_ui(menu)
 

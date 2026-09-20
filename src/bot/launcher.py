@@ -1,17 +1,12 @@
 import logging
 import pathlib
 
+from bot import deck_catalogue
 from core import variables
 
 logger = logging.getLogger(__name__)
 
 _engine_ready = False
-_DECK_FILE_TO_WINDBOT_KEY = {
-    "AI_Blackwing": "Blackwing",
-    "AI_BlueEyes": "Blue-Eyes",
-    "AI_DarkMagician": "DarkMagician",
-    "AI_Dragun": "Dragun",
-}
 
 
 def _find_bot_asset_path() -> pathlib.Path:
@@ -74,15 +69,28 @@ def _edo_client_version_to_int(version) -> int:
 
 
 def _deck_file_name_to_windbot_key(deck: str) -> str:
+    """Resolve whatever the UI passed to the key DecksManager looks up.
+
+    Accepts the key itself or the deck file name. The map comes from the
+    executors' own [Deck] attributes; the old four entry table plus an "AI_"
+    strip got most of the catalogue wrong, and a key WindBot cannot resolve
+    makes it load a random deck instead of the chosen one.
+    """
     deck = (deck or "").strip()
     if not deck:
         return ""
-    deck = pathlib.Path(deck).stem
-    if deck in _DECK_FILE_TO_WINDBOT_KEY:
-        return _DECK_FILE_TO_WINDBOT_KEY[deck]
-    if deck.startswith("AI_"):
-        return deck[3:]
-    return deck
+    if deck in deck_catalogue.KEY_TO_DECK_FILE:
+        return deck
+    stem = pathlib.Path(deck).stem
+    if stem in deck_catalogue.KEY_TO_DECK_FILE:
+        return stem
+    resolved = deck_catalogue.DECK_FILE_TO_KEY.get(stem)
+    if resolved:
+        return resolved
+    logger.warning("Unknown bot deck %r; WindBot will pick one at random", deck)
+    if stem.startswith("AI_"):
+        return stem[3:]
+    return stem
 
 
 def launch_bot_for_room(client, deck: str = "", hand: int = 0, chat: bool = True):

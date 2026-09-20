@@ -5,10 +5,11 @@ from game.card import card_constants
 
 from core import utils
 from core.i18n import _
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(6)
+@utils.duel_message_handler(message_constants.MSG_UPDATE_DATA)
 def msg_update_data(client, data, length):
     # the first byte is the message id, so we skip it
     # the second byte is empty for this message
@@ -115,7 +116,7 @@ def parse_queries(client, controller, location, size, data):
             query.target_card_size = client.read_u16(data)
             query.target_card_count = client.read_u32(data)
             query.target_cards = []
-            for _ in range(query.target_card_count):
+            for _unused in range(query.target_card_count):
                 controler = client.read_u8(data)
                 location = client.read_u8(data)
                 sequence = client.read_u32(data)
@@ -125,14 +126,14 @@ def parse_queries(client, controller, location, size, data):
             query.overlay_card_size = client.read_u16(data)
             query.overlay_card_count = client.read_u32(data)
             query.overlay_cards = []
-            for _ in range(query.overlay_card_count):
+            for _unused in range(query.overlay_card_count):
                 card_code = client.read_u32(data)
                 query.overlay_cards.append(card_code)
         if flags & card_constants.QUERY.COUNTERS:
-            _ = client.read_u16(data)
+            client.read_u16(data)  # padding, unused
             query.counters_count = client.read_u32(data)
             query.counters = []
-            for _ in range(query.counters_count):
+            for _unused in range(query.counters_count):
                 counter_data = client.read_u32(data)
                 query.counters.append(counter_data)
         if flags & card_constants.QUERY.OWNER:

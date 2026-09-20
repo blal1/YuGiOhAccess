@@ -1,11 +1,12 @@
 import io
 
 from game.card.card import Card
+from core import speech
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(110)
+@utils.duel_message_handler(message_constants.MSG_ATTACK)
 def msg_attack(client, data, data_length):
     data = io.BytesIO(data[1:])
     attacker_controller, attacker_location, attacker_sequence, attacker_position = client.read_location(data)
@@ -24,7 +25,7 @@ def attack(client, attacker_controller, attacker_location, attacker_sequence, at
             _player = "You prepare"
         else:
             _player = "Your opponent prepares"
-        utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("%s to attack with %s") % (_player, attacking_card.get_name())))
+        utils.output(_("%s to attack with %s") % (_player, attacking_card.get_name()), priority=speech.Priority.CRITICAL)
         return
     target_card = client.get_card(target_controller, target_location, target_sequence)
     if not target_card:
@@ -40,4 +41,4 @@ def attack(client, attacker_controller, attacker_location, attacker_sequence, at
     target_card_name = "Face down card"
     if isinstance(target_card, Card):
         target_card_name = target_card.get_name()
-    utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("%s prepares to attack %s with %s") % (_player, target_card_name, attacking_card_name)))
+    utils.output(_("%s prepares to attack %s with %s") % (_player, target_card_name, attacking_card_name), priority=speech.Priority.CRITICAL)

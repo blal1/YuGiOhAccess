@@ -4,9 +4,10 @@ from core import utils
 from core.i18n import _
 from game.card import card_constants
 from ui.duel_messages.announce_attrib import show_announce_value_menu, _available_values
+from game.edo import message_constants
 
 
-@utils.duel_message_handler(140)
+@utils.duel_message_handler(message_constants.MSG_ANNOUNCE_RACE)
 def msg_announce_race(client, data, length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)

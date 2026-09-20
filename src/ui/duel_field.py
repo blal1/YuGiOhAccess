@@ -110,7 +110,7 @@ class ZONE_KEYS(StrEnum):
 class DuelField(BaseUI):
     def __init__(self, client):
         super(DuelField, self).__init__(8, 60, _("Duel Field"), allow_movement_to_none=False)
-        self.set_help_text(_("Arrow keys to navigate field. Enter on a card to open action menu. Space reads full card text. N reads name, D description, T stats, L location, A available actions. Backspace opens duel menu. M opens chat. C reads chain, G graveyard, R banished, X extra deck. Escape cancels chaining."))
+        self.set_help_text(_("Arrow keys to navigate field. Enter on a card to open action menu. Space reads full card text. N reads name, D description, T stats, L location, A available actions. Backspace opens duel menu. M opens chat. C reads the chain, E the effects applying to each player, G graveyard, R banished, X extra deck. H repeats the last ten messages, and F9 does the same from anywhere. Escape cancels chaining."))
         center_x = int(self.center_x)
         center_y = int(self.center_y)
         self.client = client
@@ -219,7 +219,7 @@ class DuelField(BaseUI):
             utils.output(_("No card found"))
             return None
         if not isinstance(zone.card, Card):
-            utils.output(_("{card}").format(card=str(zone.card)))
+            utils.output(str(zone.card))
             return None
         if zone.card.code == 0:
             utils.output(_("Face down card"))
@@ -230,7 +230,7 @@ class DuelField(BaseUI):
         zone = self.get_current_card_zone()
         if not zone:
             return
-        utils.output(_("{name}").format(name=zone.card.get_name()))
+        utils.output(zone.card.get_name())
 
     def output_current_card_description(self):
         zone = self.get_current_card_zone()
@@ -238,7 +238,7 @@ class DuelField(BaseUI):
             return
         description = getattr(zone.card, "effect_description", "") or zone.card.get_description()
         if description:
-            utils.output(_("{description}").format(description=description))
+            utils.output(str(description))
         else:
             utils.output(_("No description available."))
 
@@ -274,7 +274,7 @@ class DuelField(BaseUI):
         text = location_information.to_human_readable()
         if zone.location & card_constants.LOCATION.ONFIELD:
             text += ", " + card_constants.POSITION(zone.position).name
-        utils.output(_("{location}").format(location=text))
+        utils.output(str(text))
 
     def output_current_card_actions(self):
         zone = self.get_current_card_zone()
@@ -282,15 +282,29 @@ class DuelField(BaseUI):
             return
         actions = self.resolve_labels_for_card(zone.card).strip(", ")
         if actions:
-            utils.output(_("{actions}").format(actions=actions))
+            utils.output(str(actions))
         else:
             utils.output(_("No available action for {card}.").format(card=zone.card.get_name()))
 
     def get_chain_stack_text(self):
-        chain_cards = getattr(self.client.player, "chaining_cards", [])
+        """Describe the chain that is actually building, not the cards you could chain.
+
+        MSG_CHAINING keeps ``player.chain_stack`` up to date link by link. When
+        no chain is building we fall back to the options offered by the current
+        MSG_SELECT_CHAIN prompt, which is what this used to report.
+        """
+        from ui.duel_messages import chaining
+
+        player = getattr(self.client, "player", None)
+        stack = getattr(player, "chain_stack", None)
+        if isinstance(stack, list) and stack:
+            return chaining.chain_stack_text(self.client)
+        chain_cards = getattr(player, "chaining_cards", []) if player else []
+        if not isinstance(chain_cards, list):
+            chain_cards = []
         if not chain_cards:
             return _("No chain is currently available.")
-        lines = [_("Current chain:")]
+        lines = [_("You can chain with:")]
         for index, card in enumerate(chain_cards, start=1):
             description = getattr(card, "effect_description", "")
             if description:
@@ -402,13 +416,13 @@ class DuelField(BaseUI):
         zone = self.get_zone_from_current_position()
         if isinstance(zone, Zone):
             info = self.get_card_information_to_show_when_card_is_selected(zone)
-            utils.output(_("{info}").format(info=info))
+            utils.output(str(info))
         else:
             cell = self.get_cell(new_row, new_col)
             if not cell:
-                utils.output(_("{message}").format(message=""))
+                utils.output("")
             else:
-                utils.output(_("{cell}").format(cell=str(cell)))
+                utils.output(str(cell))
 
     def setup_field(self):
         # set up 5 zones for the player and 5 zones for the opponent
@@ -430,6 +444,23 @@ class DuelField(BaseUI):
         self.set_player_banished_zone(0, _("Player Banished"))
         if variables.config.get("helper_zones"):
             self.create_helper_zones()
+
+    def reset_field(self):
+        """Throw away every card on the field and rebuild the empty skeleton.
+
+        Used by MSG_RELOAD_FIELD: after a resync every remembered position is
+        suspect, so it is safer to start from an empty field and let the
+        MSG_UPDATE_DATA burst that follows repopulate it than to leave stale
+        cards where the player last heard them.
+        """
+        self.zones.clear()
+        for row in range(self.rows):
+            for col in range(self.cols):
+                self.cells[row][col] = None
+                self.cell_functions[row][col] = None
+        self.setup_field()
+        self.tab_order.set_tabable_items([])
+        self.preemtive_key_handler = None
 
     def update_field(self, client, controller, location, queries):
         logger.debug("Updating field")
@@ -994,7 +1025,15 @@ class DuelField(BaseUI):
             duel_menu.open_chat_input(self.client)
             return
         if key == ord("C"):
-            utils.output(_("{chain}").format(chain=self.get_chain_stack_text()))
+            utils.output(str(self.get_chain_stack_text()))
+            return
+        if key == ord("E"):
+            from ui.duel_messages import player_hint
+
+            utils.output(str(player_hint.get_player_hints_text(self.client)))
+            return
+        if key == ord("H"):
+            utils.replay_recent_messages()
             return
         if key == ord("G"):
             self.browse_public_zone("pg", _("Your graveyard"), _("No cards in graveyard"))
@@ -1064,9 +1103,9 @@ class DuelField(BaseUI):
         card = zone.card
         if card:
             if isinstance(card, Card):
-                utils.output(_("{card}").format(card=str(card)))
+                utils.output(str(card))
             else:
-                utils.output(_("{card}").format(card=str(card)))
+                utils.output(str(card))
         else:
             utils.output(_("No card found"))
 
@@ -1076,7 +1115,7 @@ class DuelField(BaseUI):
     def browse_public_zone(self, prefix, title, empty_message):
         zones = self.get_subset_of_zones(prefix)
         if not self._zones_with_visible_cards(zones.values()):
-            utils.output(_("{message}").format(message=empty_message))
+            utils.output(str(empty_message))
             return None
         return self.show_a_card_list(title, zones.values())
 
@@ -1180,10 +1219,14 @@ class DuelField(BaseUI):
 @utils.packet_handler(structs.ServerIdType.TIME_LIMIT)
 def handle_time_limit_announcement(client, packet_data, packet_length):
     time_limit = structs.StocTimeLimit.from_buffer_copy(packet_data)
+    if time_limit.team != client.what_player_am_i:
+        return
+    # The server waits for this before it trusts our clock. EDOPro answers every
+    # TIME_LIMIT addressed to the local player, and a client that stays silent
+    # can be timed out even while it is playing normally.
+    client.send(structs.ClientIdType.TIME_CONFIRM)
     # check if player has been set
     if not client.player:
-        return
-    if time_limit.team != client.what_player_am_i:
         return
     if time_limit.time > 0:
         client.player.turn_timer = time_limit.time

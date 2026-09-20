@@ -1,12 +1,14 @@
 import io
 
+from core import speech
 from core import utils
 from core.i18n import _
 from game.card import card_constants
+from game.edo import message_constants
 
 
 
-@utils.duel_message_handler(41)
+@utils.duel_message_handler(message_constants.MSG_NEW_PHASE)
 def msg_new_phase(client, data, length):
     data = io.BytesIO(data[1:])
     phase_int = client.read_u16(data)
@@ -14,8 +16,8 @@ def msg_new_phase(client, data, length):
 
 def phase(client, phase_int):
     client.current_phase = phase_int
-    phase_str = card_constants.PHASES.get(phase_int, str(phase_int))
-    utils.output(_("Entering {phase}").format(phase=phase_str))
+    phase_str = _(card_constants.PHASES.get(phase_int, str(phase_int)))
+    utils.output(_("Entering {phase}").format(phase=phase_str), priority=speech.Priority.AMBIENT)
     if phase_int == 2:
         utils.get_ui_stack().play_duel_sound_effect("phase/standby")
     elif phase_int == 4:

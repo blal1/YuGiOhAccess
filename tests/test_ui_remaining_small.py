@@ -61,7 +61,7 @@ def test_action_menu_single_activation_and_misc_small_ui_modules(mocker):
     assert save_replay.call_count == 2
 
 
-def test_last_duel_message_edges_and_output2_darwin(mocker):
+def test_last_duel_message_edges_and_voiceover_darwin(mocker):
     from game.card import card_constants
     from ui.duel_messages import become_target
 
@@ -80,17 +80,18 @@ def test_last_duel_message_edges_and_output2_darwin(mocker):
     client.get_card.return_value = card
     become_target.become_target(client, 0, card_constants.LOCATION.MONSTER_ZONE, 0, card_constants.POSITION.FACE_UP_ATTACK)
 
-    sys.modules.pop("ui.output2", None)
+    sys.modules.pop("ui.output", None)
     popen = mocker.patch("subprocess.Popen")
     mocker.patch("platform.system", return_value="Darwin")
-    output2 = importlib.import_module("ui.output2")
-    assert isinstance(output2.output, output2.OsaScriptSingleton)
-    output2.output.output("hello")
+    output = importlib.import_module("ui.output")
+    assert isinstance(output.output, output.VoiceOverOutput)
+    output.output.output("hello")
     popen.return_value.stdin.write.assert_called()
 
-    sys.modules.pop("ui.output2", None)
+    sys.modules.pop("ui.output", None)
+    output.VoiceOverOutput._instance = None
     auto = MagicMock()
     mocker.patch("platform.system", return_value="Windows")
     mocker.patch.dict(sys.modules, {"accessible_output3.outputs.auto": SimpleNamespace(Auto=MagicMock(return_value=auto))})
-    output2 = importlib.import_module("ui.output2")
-    assert output2.output is not None
+    output = importlib.import_module("ui.output")
+    assert output.output is not None

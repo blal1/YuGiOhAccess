@@ -5,10 +5,11 @@ from game.card.location_conversion import LocationConversion
 
 from core import utils
 from core.i18n import _
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(64)
+@utils.duel_message_handler(message_constants.MSG_FLIPSUMMONING)
 def msg_flipsummoning(client, data, data_length):
     data = io.BytesIO(data[1:])
     _code = client.read_u32(data) # card code
@@ -16,7 +17,7 @@ def msg_flipsummoning(client, data, data_length):
     card = client.get_card(controller, location, sequence)
     flipsummoning(client, card, controller, location, sequence, position)
 
-@utils.duel_message_handler(65)
+@utils.duel_message_handler(message_constants.MSG_FLIPSUMMONED)
 def msg_flipsummoned(client, data, data_length):
     data = io.BytesIO(data[1:])
     #don't know if this actually have any data, so let's just log it for now

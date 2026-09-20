@@ -6,8 +6,9 @@ from core import utils
 from core.i18n import _
 
 from ui.base_ui import VerticalMenu
+from game.edo import message_constants
 
-@utils.duel_message_handler(143)
+@utils.duel_message_handler(message_constants.MSG_ANNOUNCE_NUMBER)
 def msg_announce_number(client, data, length):
     data = io.BytesIO(data[1:])
     # print out the rest of the data
@@ -21,7 +22,7 @@ def msg_announce_number(client, data, length):
 def announce_number(client, player, options):
     menu = VerticalMenu(_("Select a number"))
     for i, option in enumerate(options):
-        menu.append_item(_("{option}").format(option=str(option)), function=lambda i=i, options=options: _send_response(client, options, i))
+        menu.append_item(str(option), function=lambda i=i, options=options: _send_response(client, options, i))
     utils.get_ui_stack().push_ui(menu)
 
 def _send_response(client, options, selected_index):

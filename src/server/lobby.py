@@ -382,14 +382,14 @@ class LobbyServer:
 
         conn.deck_main = []
         conn.deck_extra = []
-        for _ in range(main_count):
+        for _unused in range(main_count):
             card_id = struct.unpack_from("<I", payload, offset)[0]
             offset += 4
             # Cards with type including 0x4000 (extra deck types) go to extra
             conn.deck_main.append(card_id)
 
         conn.deck_side = []
-        for _ in range(side_count):
+        for _unused in range(side_count):
             card_id = struct.unpack_from("<I", payload, offset)[0]
             offset += 4
             conn.deck_side.append(card_id)

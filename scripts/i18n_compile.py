@@ -8,23 +8,19 @@ Requires: babel (pip install babel)
 
 import subprocess
 import sys
-import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
+# Support both `python scripts/i18n_compile.py` (as the usage line above and
+# i18n_extract.py's closing message both say) and `python -m scripts.i18n_compile`.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(ROOT))
+
+from scripts.i18n_extract import pybabel_cmd  # noqa: E402
 LOCALE_DIR = ROOT / "locales"
 DOMAIN = "yugiohaccess"
 
-
-def pybabel_cmd():
-    found = shutil.which("pybabel")
-    if found:
-        return [found]
-    suffix = ".exe" if sys.platform == "win32" else ""
-    local = ROOT / ".venv" / "Scripts" / f"pybabel{suffix}"
-    if local.exists():
-        return [str(local)]
-    return [sys.executable, "-m", "babel.messages.frontend"]
+__all__ = ["pybabel_cmd", "main"]
 
 
 def main():

@@ -67,6 +67,9 @@ class Player:
         self.opponent_lifepoints = opponent_starting_lifepoints
         self.handle_potential_music_change(initial=True)
         self._chaining_cards = []
+        # The chain that is actually building, link by link; distinct from
+        # chaining_cards, which holds the options the player may chain with.
+        self.chain_stack = []
         self._summonable = []
         self._special_summonable = []
         self._repositionable = []
@@ -140,6 +143,7 @@ class Player:
 
     def clear_all(self):
         self.chaining_cards = []
+        self.chain_stack = []
         self.summonable = []
         self.special_summonable = []
         self.repositionable = []

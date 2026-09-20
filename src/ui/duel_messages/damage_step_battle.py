@@ -4,9 +4,9 @@ from game.card import card_constants
 
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(111)
+@utils.duel_message_handler(message_constants.MSG_BATTLE)
 def msg_battle(client, data, data_length):
     data = io.BytesIO(data[1:])
     attacker_controller, attacker_location, attacker_sequence, attacker_position = client.read_location(data)
@@ -39,6 +39,6 @@ def damage_step_battle(client, attacker_controller, attacker_location, attacker_
             defender_points = "%d/%d"%(da, dd)
 
     if target:
-        utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("%s (%s) attacks %s (%s)") % (attacking_card.get_name(), attacker_points, target.get_name(), defender_points)))
+        utils.output(_("%s (%s) attacks %s (%s)") % (attacking_card.get_name(), attacker_points, target.get_name(), defender_points))
     else:
-        utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("%s (%s) attacks") % (attacking_card.get_name(), attacker_points)))
+        utils.output(_("%s (%s) attacks") % (attacking_card.get_name(), attacker_points))

@@ -100,9 +100,11 @@ def test_client_packet_wait_send_readers_and_specs(mocker):
     client.send(structs.ClientIdType.RESPONSE, bytearray(b"abc"))
     client.game_socket.send.assert_called_with(structs.ClientIdType.RESPONSE, b"abc")
 
-    buf = io.BytesIO(struct.pack("b", -1) + struct.pack("h", -2) + struct.pack("I", 3) + struct.pack("Q", 4))
-    assert client.read_u8(buf) == -1
-    assert client.read_u16(buf) == -2
+    # The wire format is unsigned little endian; 0xff is LOCATION-sized data,
+    # not -1, and reading it signed used to corrupt LOCATION.OVERLAY (0x80).
+    buf = io.BytesIO(struct.pack("<B", 0xFF) + struct.pack("<H", 0xFFFE) + struct.pack("<I", 3) + struct.pack("<Q", 4))
+    assert client.read_u8(buf) == 0xFF
+    assert client.read_u16(buf) == 0xFFFE
     assert client.read_u32(buf) == 3
     assert client.read_u64(buf) == 4
 

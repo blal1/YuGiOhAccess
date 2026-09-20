@@ -10,10 +10,11 @@ from ui.base_ui import VerticalMenu
 
 from core import utils
 from core.i18n import _
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(26)
+@utils.duel_message_handler(message_constants.MSG_SELECT_UNSELECT_CARD)
 def msg_select_unselect_card(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)

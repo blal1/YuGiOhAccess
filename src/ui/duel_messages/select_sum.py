@@ -9,11 +9,12 @@ from core.i18n import _
 from game.card.card import Card
 from game.edo import structs
 from ui.base_ui import VerticalMenu
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
 
-@utils.duel_message_handler(22)
+@utils.duel_message_handler(message_constants.MSG_SELECT_SUM)
 def msg_select_sum(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -23,7 +24,7 @@ def msg_select_sum(client, data, data_length):
     max_cards = client.read_u32(data)
     must_select_count = client.read_u32(data)
     must_select = []
-    for _ in range(must_select_count):
+    for _unused in range(must_select_count):
         code = client.read_u32(data)
         controller = client.read_u8(data)
         location = client.read_u8(data)
@@ -34,7 +35,7 @@ def msg_select_sum(client, data, data_length):
         must_select.append(card)
     can_select_count = client.read_u32(data)
     can_select = []
-    for _ in range(can_select_count):
+    for _unused in range(can_select_count):
         code = client.read_u32(data)
         controller = client.read_u8(data)
         location = client.read_u8(data)

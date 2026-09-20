@@ -49,7 +49,7 @@ def replay_viewer_menu(return_to=None):
         menu.append_item(_("No saved replays."), None)
     for replay_file in files:
         label = _("{name}, {size} bytes").format(name=replay_file.name, size=replay_file.stat().st_size)
-        menu.append_item(_("{label}").format(label=label), lambda replay_file=replay_file: replay_info_menu(replay_file, return_to))
+        menu.append_item(str(label), lambda replay_file=replay_file: replay_info_menu(replay_file, return_to))
     menu.append_item(_("Back"), return_to)
     return menu
 
@@ -60,7 +60,7 @@ def replay_info_menu(replay_file, return_to=None):
         return_to = replay_viewer_menu
     stat = replay_file.stat()
     modified = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
-    menu = VerticalMenu(_("{name}").format(name=replay_file.name))
+    menu = VerticalMenu(str(replay_file.name))
     menu.append_item(_("Replay file: {path}").format(path=str(replay_file)), None)
     menu.append_item(_("Size: {size} bytes").format(size=stat.st_size), None)
     menu.append_item(_("Saved: {date}").format(date=modified), None)

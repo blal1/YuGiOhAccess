@@ -151,6 +151,20 @@ def remove_tree(path: Path):
     shutil.rmtree(path, onerror=onerror)
 
 
+def regenerate_message_constants(source_dir: Path):
+    """Refresh src/game/edo/message_constants.py from the freshly checked out core."""
+    header = source_dir / "ocgapi_constants.h"
+    if not header.exists():
+        print(f"WARNING: {header} not found; message constants left untouched", file=sys.stderr)
+        return
+    run([
+        sys.executable,
+        str(ROOT / "scripts" / "generate_message_constants.py"),
+        "--header",
+        str(header),
+    ])
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build ocgcore shared library")
     parser.add_argument("--tag", default=DEFAULT_TAG, help="Git tag/branch to checkout")
@@ -186,6 +200,8 @@ def main():
         print("Updating existing source...")
         run(["git", "fetch", "origin", args.tag], cwd=str(source_dir))
         run(["git", "checkout", f"origin/{args.tag}"], cwd=str(source_dir))
+
+    regenerate_message_constants(source_dir)
 
     if platform.system() == "Windows":
         lib_found = build_windows_premake(source_dir, args.arch)

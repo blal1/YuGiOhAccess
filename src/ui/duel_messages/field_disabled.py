@@ -4,9 +4,9 @@ from game.card.location_conversion import LocationConversion
 
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(56)
+@utils.duel_message_handler(message_constants.MSG_FIELD_DISABLED)
 def msg_field_disabled(client, data, data_length):
     data = io.BytesIO(data[1:])
     locations = client.read_u32(data)
@@ -17,4 +17,4 @@ def field_disabled(client, locations):
     locations = []
     for spec in specs:
         locations.append(LocationConversion.from_zone_key(client, spec).to_human_readable())
-    utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("Field locations %s are disabled.") % ", ".join(locations)))
+    utils.output(_("Field locations %s are disabled.") % ", ".join(locations))

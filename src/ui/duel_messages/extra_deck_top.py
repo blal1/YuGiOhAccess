@@ -5,9 +5,9 @@ from game.card import card_constants
 
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(42)
+@utils.duel_message_handler(message_constants.MSG_CONFIRM_EXTRATOP)
 def msg_confirm_extra_decktop(client, data, data_length):
     cards = []
     data = io.BytesIO(data[1:])
@@ -26,8 +26,8 @@ def msg_confirm_extra_decktop(client, data, data_length):
 
 def confirm_extra_decktop(client, player, cards):
     if player == client.what_player_am_i:
-        utils.output(variables.LANGUAGE_HANDLER._("you reveal the following cards from your extra deck:"))
+        utils.output(_("you reveal the following cards from your extra deck:"))
     else:
-        utils.output(variables.LANGUAGE_HANDLER._("Your opponent reveals the following cards from their extra deck:"))
+        utils.output(_("Your opponent reveals the following cards from their extra deck:"))
     for i, c in enumerate(cards):
         utils.output(_("{index}: {name}").format(index=i + 1, name=c.get_name()))

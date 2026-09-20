@@ -272,7 +272,7 @@ def test_start_parser_win_match_branches_and_effect_menu(mocker):
 
 def test_remaining_small_duel_message_branches(mocker):
     from game.card import card_constants
-    from ui.duel_messages import announce_attrib, attack, become_target, card_hint, deck_top, idle, select_card, shuffle_hand, summoning, update_card, update_data, win
+    from ui.duel_messages import announce_attrib, attack, become_target, card_hint, deck_top, idle, select_card, shuffle_other, summoning, update_card, update_data, win
 
     client, stack = _client(mocker)
 
@@ -391,7 +391,7 @@ def test_remaining_small_duel_message_branches(mocker):
     deck_top.msg_decktop(client, deck_payload, len(deck_payload))
     deck_cls.assert_called_with(123)
 
-    shuffle_hand.msg_shuffle_extra(client, b"\x09" + struct.pack("B", 1) + struct.pack("I", 1), 6)
+    shuffle_other.msg_shuffle_extra_deck(client, b"\x27" + struct.pack("B", 1) + struct.pack("I", 1) + struct.pack("I", 7), 10)
 
     summoned = summoning.msg_summoned(client, b"\x3drest", 5)
     assert summoned == b"rest"

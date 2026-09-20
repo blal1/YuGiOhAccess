@@ -2,8 +2,8 @@ import io
 import logging
 from enum import IntFlag
 from core import utils
-from core.i18n import _
 from core import variables
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class HINT(IntFlag):
 
 
 
-@utils.duel_message_handler(2)
+@utils.duel_message_handler(message_constants.MSG_HINT)
 def msg_hint(client, data, length):
     data = io.BytesIO(data[1:])
     htype = client.read_u8(data)
@@ -34,8 +34,8 @@ def msg_hint(client, data, length):
 
 def hint(client, hint_type, player, data):
     if hint_type == HINT.MESSAGE:
-        utils.output(_("{message}").format(message=data))
+        utils.output(str(data))
     elif hint_type == HINT.NUMBER:
-        utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER.strings['system'][1512] % data))
+        utils.output(variables.LANGUAGE_HANDLER.strings['system'][1512] % data)
     else:
         logger.debug(f"Hint type: {hint_type}, player: {player}, data: {data}")

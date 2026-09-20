@@ -21,7 +21,7 @@ def server_selection_menu():
         return
     server_selection_menu = VerticalMenu(_("Server Menu"))
     for server in servers:
-        server_selection_menu.append_item(_("{name}").format(name=server.name), lambda server=server: server_main_menu(server))
+        server_selection_menu.append_item(str(server.name), lambda server=server: server_main_menu(server))
     server_selection_menu.append_item(_("Back"), utils.get_main_menu_function)
     return server_selection_menu
 
@@ -88,14 +88,14 @@ def banlist_change_choice(event, choicer):
         if new_choice < 0:
             new_choice = choicer.GetCount() - 1
         choicer.SetSelection(new_choice)
-        utils.output(_("{choice}").format(choice=choicer.GetString(choicer.GetSelection())))
+        utils.output(str(choicer.GetString(choicer.GetSelection())))
     # if key is right arrow, go to the next choice
     if event.GetKeyCode() == wx.WXK_RIGHT:
         new_choice = choicer.GetSelection() + 1
         if new_choice >= choicer.GetCount():
             new_choice = 0
         choicer.SetSelection(new_choice)
-        utils.output(_("{choice}").format(choice=choicer.GetString(choicer.GetSelection())))
+        utils.output(str(choicer.GetString(choicer.GetSelection())))
     else:
         event.Skip()
 
@@ -216,7 +216,7 @@ def list_rooms(server):
             room_printable += f"Starting hand: {room.start_hand}, "
         if room.draw_count != 1:
             room_printable += f"Draw count: {room.draw_count}, "
-        room_menu.append_item(_("{room}").format(room=room_printable), lambda room=room: room_action_menu(server, room))
+        room_menu.append_item(str(room_printable), lambda room=room: room_action_menu(server, room))
     room_menu.append_item(_("Back"), lambda: server_main_menu(server))
     return room_menu
 

@@ -1,15 +1,19 @@
 import io
+import logging
 
 from game.card import card_constants
 from game.card.location_conversion import LocationConversion
+from core import speech
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(83)
+logger = logging.getLogger(__name__)
+
+@utils.duel_message_handler(message_constants.MSG_BECOME_TARGET)
 def msg_become_target(client, data, data_length):
     data = io.BytesIO(data[1:])
-    _ = client.read_u32(data)
+    client.read_u32(data)  # chain index, unused
     target_controller, target_location, target_sequence, target_position = client.read_location(data)
     become_target(client, target_controller, target_location, target_sequence, target_position)
 
@@ -17,20 +21,17 @@ def msg_become_target(client, data, data_length):
 def become_target(client, target_controller, target_location, target_sequence, target_position):
     card = client.get_card(target_controller, target_location, target_sequence)
     if not card:
-        location_info = LocationConversion(client, target_controller, target_location, target_sequence)
-        raise ValueError(f"Card not found. Tried to get card in location: {location_info.to_zone_key()}\n{client.get_duel_field().zones.keys()}")
+        zone_key = LocationConversion(client, target_controller, target_location, target_sequence).to_zone_key()
+        logger.warning("Ignoring become_target for card missing from zone %s", zone_key)
+        return
     card.position = card_constants.POSITION(target_position)
     location_info = LocationConversion.from_card_location(client, card)
-    _message = ""
     if target_controller == client.what_player_am_i:
-        _message = variables.LANGUAGE_HANDLER._("You target %s")
+        message = _("You target %s")
     else:
-        _message = variables.LANGUAGE_HANDLER._("Your opponent targets %s")
-
-    if not card:
-        return
+        message = _("Your opponent targets %s")
     target_card_name = card.get_name()
     if card.controller != client.what_player_am_i and card.position & card_constants.POSITION.FACE_DOWN:
-        target_card_name = variables.LANGUAGE_HANDLER._("%s card") % location_info.to_human_readable()
-    utils.output(_("{message}").format(message=_message % target_card_name))
+        target_card_name = _("%s card") % location_info.to_human_readable()
+    utils.output(message % target_card_name, priority=speech.Priority.CRITICAL)
     utils.get_ui_stack().play_duel_sound_effect("aim")

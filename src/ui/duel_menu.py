@@ -8,7 +8,7 @@ from core.i18n import _
 from game.card import card_constants
 
 def show_duel_menu(client):
-    phase_str = card_constants.PHASES.get(client.current_phase, str(client.current_phase))
+    phase_str = _(card_constants.PHASES.get(client.current_phase, str(client.current_phase)))
     backspace_menu = VerticalMenu(_("Duel Menu"))
     if client.is_it_my_turn:
         backspace_menu.append_item(_("{phase}, your turn. {lp} / {opp_lp} lifepoints. {time} seconds remaining. Turn {turn}").format(
@@ -70,7 +70,7 @@ def show_chat_history(client):
 
 def read_chain_stack(client):
     duel_field = client.get_duel_field()
-    utils.output(_("{chain}").format(chain=duel_field.get_chain_stack_text()))
+    utils.output(str(duel_field.get_chain_stack_text()))
 
 def send_battle_phase(client):
     utils.get_ui_stack().pop_ui()

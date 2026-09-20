@@ -13,13 +13,15 @@ class ClientIdType(ctypes.c_uint8):
     JOIN_GAME = 0x12
     LEAVE_GAME = 0x13
     SURRENDER = 0x14
-    # TIME_CONFIRM = 0x15
+    # Answers STOC_TIME_LIMIT. The server keeps counting our clock down until
+    # it arrives, so not sending it can lose a duel on time.
+    TIME_CONFIRM = 0x15
     CHAT = 0x16
     TO_DUELIST = 0x20
     TO_OBSERVER = 0x21
     READY = 0x22
-    # NOT_READY = 0x23
-    # TRY_KICK = 0x24
+    NOT_READY = 0x23
+    TRY_KICK = 0x24
     TRY_START = 0x25
     REMATCH = 0xF0
 
@@ -40,6 +42,8 @@ class ServerIdType(ctypes.c_uint8):
     DUEL_END      = 0x16
     REPLAY        = 0x17
     TIME_LIMIT    = 0x18
+    # Chat as older servers send it; newer ones use CHAT_2 (0xF3).
+    CHAT          = 0x19
     PLAYER_ENTER  = 0x20
     PLAYER_CHANGE = 0x21
     WATCH_CHANGE  = 0x22
@@ -68,6 +72,7 @@ server_id_type_to_name = {
     0x18: "TIME_LIMIT",
     0x20: "PLAYER_ENTER",
     0x21: "PLAYER_CHANGE",
+    0x19: "CHAT",
     0x22: "WATCH_CHANGE",
     0x30: "NEW_REPLAY",
     0xF0: "CATCHUP",
@@ -347,3 +352,50 @@ class StocTimeLimit(ctypes.Structure):
 
     def __repr__(self):
         return f"<StocTimeLimit team: {self.team} time: {self.time} seconds>"
+
+class StocWatchChange(ctypes.Structure):
+    """STOC_HS_WATCH_CHANGE: how many spectators are now watching the room."""
+    _pack_ = 1
+    _fields_ = [
+        ('watch_count', ctypes.c_uint16),
+    ]
+
+    def __repr__(self):
+        return f"<StocWatchChange watch_count: {self.watch_count}>"
+
+class StocCatchUp(ctypes.Structure):
+    """STOC_CATCHUP: 1 while the server fast forwards a joiner, 0 once live."""
+    _pack_ = 1
+    _fields_ = [
+        ('catching_up', ctypes.c_uint8),
+    ]
+
+    def __repr__(self):
+        return f"<StocCatchUp catching_up: {bool(self.catching_up)}>"
+
+
+class StocChat(ctypes.Structure):
+    """STOC_CHAT: the pre CHAT_2 chat packet, still sent by older servers.
+
+    ``player`` is a seat index rather than a name; anything at or above the
+    number of duelists is an observer or the server itself.
+    """
+    _pack_ = 1
+    _fields_ = [
+        ('player', ctypes.c_uint16),
+        ('msg', ctypes.c_uint16 * 256),
+    ]
+
+    def __repr__(self):
+        return f"<StocChat player: {self.player}>"
+
+
+class CtosKick(ctypes.Structure):
+    """CTOS_HS_KICK: the host removes whoever sits at this position."""
+    _pack_ = 1
+    _fields_ = [
+        ('pos', ctypes.c_uint8),
+    ]
+
+    def __repr__(self):
+        return f"<CtosKick pos: {self.pos}>"

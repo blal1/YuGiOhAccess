@@ -5,9 +5,9 @@ from game.card import card_constants
 
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(31)
+@utils.duel_message_handler(message_constants.MSG_CONFIRM_CARDS)
 def msg_confirm_cards(client, data, data_length):
 	data = io.BytesIO(data[1:])
 	player = client.read_u8(data)
@@ -35,7 +35,7 @@ def confirm_cards(client, to_player, size, cards):
 	else:
 		_player = "Your opponent"
 		_opponent = "You"
-	utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("{player} shows {opponent} {count} cards.")
-			.format(player=_player, opponent=_opponent, count=len(cards))))
+	utils.output(_("{player} shows {opponent} {count} cards.")
+			.format(player=_player, opponent=_opponent, count=len(cards)))
 	for i, c in enumerate(cards):
 		utils.output(_("{index}: {name}").format(index=i + 1, name=c.get_name()))

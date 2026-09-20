@@ -2,8 +2,9 @@ import io
 
 from core import utils
 from core.i18n import _
+from game.edo import message_constants
 
-@utils.duel_message_handler(93)
+@utils.duel_message_handler(message_constants.MSG_EQUIP)
 def msg_equip(client, data, data_length):
     data = io.BytesIO(data[1:])
     controller, location, sequence, position = client.read_location(data)
@@ -14,7 +15,7 @@ def msg_equip(client, data, data_length):
 
 def equip(client, card, target):
     # todo: fix
-    #utils.output(variables.LANGUAGE_HANDLER._("{card} equipped to {target}.").format(card=card.get_name(), target=target.get_name()))
+    #utils.output(_("{card} equipped to {target}.").format(card=card.get_name(), target=target.get_name()))
     utils.output(_("Card equipped to target."))
 
 

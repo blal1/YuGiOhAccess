@@ -1,6 +1,6 @@
 from enum import IntFlag, unique
 
-from core.i18n import _
+from core.i18n import N_
 
 ATTRIBUTES_OFFSET = 1010
 RACES_OFFSET = 1020
@@ -66,14 +66,14 @@ class POSITION(IntFlag):
 
 
 LINK_MARKERS = {
-    0o0001: _("bottom left"),
-    0o0002: _("bottom"),
-    0o0004: _("bottom right"),
-    0o0010: _("left"),
-    0o0040: _("right"),
-    0o0100: _("top left"),
-    0o0200: _("top"),
-    0o0400: _("top right"),
+    0o0001: N_("bottom left"),
+    0o0002: N_("bottom"),
+    0o0004: N_("bottom right"),
+    0o0010: N_("left"),
+    0o0040: N_("right"),
+    0o0100: N_("top left"),
+    0o0200: N_("top"),
+    0o0400: N_("top right"),
 }
 
 @unique
@@ -111,16 +111,16 @@ class QUERY(IntFlag):
     SEQUENCE = 0x40000000
 
 PHASES = {
-    1: _('draw phase'),
-    2: _('standby phase'),
-    4: _('main1 phase'),
-    8: _('battle start phase'),
-    0x10: _('battle step phase'),
-    0x20: _('damage phase'),
-    0x40: _('damage calculation phase'),
-    0x80: _('battle phase'),
-    0x100: _('main2 phase'),
-    0x200: _('end phase'),
+    1: N_('draw phase'),
+    2: N_('standby phase'),
+    4: N_('main1 phase'),
+    8: N_('battle start phase'),
+    0x10: N_('battle step phase'),
+    0x20: N_('damage phase'),
+    0x40: N_('damage calculation phase'),
+    0x80: N_('battle phase'),
+    0x100: N_('main2 phase'),
+    0x200: N_('end phase'),
 }
 
 

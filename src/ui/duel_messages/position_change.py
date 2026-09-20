@@ -5,9 +5,9 @@ from game.card import card_constants
 
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(53)
+@utils.duel_message_handler(message_constants.MSG_POS_CHANGE)
 def msg_pos_change(client, data, data_length):
     data = io.BytesIO(data[1:])
     code = client.read_u32(data)
@@ -28,7 +28,7 @@ def position_change(client, card, prevpos):
         _player = "your opponent"
     previous_position_str = prevpos.name.replace("_", " ").lower()
     new_position_str = card.position.name.replace("_", " ").lower()
-    utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("%s %s changes position from %s to %s") % (_player, card.get_name(), previous_position_str, new_position_str)))
+    utils.output(_("%s %s changes position from %s to %s") % (_player, card.get_name(), previous_position_str, new_position_str))
     newpos =card.position
     if prevpos == card_constants.POSITION.FACE_DOWN and newpos == card_constants.POSITION.FACE_UP:
         utils.get_ui_stack().play_duel_sound_effect("switch_flip")

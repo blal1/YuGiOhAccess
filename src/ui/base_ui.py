@@ -31,9 +31,9 @@ class BaseUI(wx.Panel):
         self.current_row = 0  # Track the current row
         self.current_col = 0  # Track the current column
         self.return_value = None
-        self.cells = [[None for _ in range(cols)] for _ in range(rows)]
-        self.cell_functions = [[None for _ in range(cols)] for _ in range(rows)]
-        self.cell_extras = [[None for _ in range(cols)] for _ in range(rows)] # extra data for the cells in the case where labels aren't available on the native control
+        self.cells = [[None for _unused in range(cols)] for _unused in range(rows)]
+        self.cell_functions = [[None for _unused in range(cols)] for _unused in range(rows)]
+        self.cell_extras = [[None for _unused in range(cols)] for _unused in range(rows)] # extra data for the cells in the case where labels aren't available on the native control
         self.help_text = ""
         self.Fit()
         self.Bind(wx.EVT_SIZE, self.on_resize)
@@ -146,7 +146,7 @@ class BaseUI(wx.Panel):
             if not cell:
                 return
             cell.SetFocus()                                                                                            
-            utils.output(_("{label}").format(label=self.get_cell_label(self.current_row, self.current_col)))
+            utils.output(str(self.get_cell_label(self.current_row, self.current_col)))
         except (IndexError, AttributeError):                                                                           
             wx.CallLater(100, self.try_set_focus)                                                                      
                                                                                                                        
@@ -174,7 +174,7 @@ class BaseUI(wx.Panel):
         elif keycode == wx.WXK_F1:
             if not self.help_text:
                 return
-            utils.output(_("{help_text}").format(help_text=self.help_text))
+            utils.output(str(self.help_text))
         else:
             wx.GetTopLevelWindows()[0].on_key_down(event)
         #event.Skip()  # Important to allow other key events to be processed
@@ -221,7 +221,7 @@ class BaseUI(wx.Panel):
                 cell = self.cells[self.current_row][self.current_col]
                 if hasattr(cell, "GetLabel"):
                     label = cell.GetLabel()
-                    utils.output(_("{label}").format(label=label))
+                    utils.output(str(label))
         except (IndexError, AttributeError):
             pass
         wx.GetTopLevelWindows()[0].sound_effects_audio_manager.play_audio("click.wav", **self.sound_positions[(self.current_row, self.current_col)])
@@ -229,7 +229,7 @@ class BaseUI(wx.Panel):
         if hasattr(self, "on_cell_change"):
             return self.on_cell_change(old_row, old_col, self.current_row, self.current_col, cell)
         label = self.get_cell_label(self.current_row, self.current_col)
-        utils.output(_("{label}").format(label=label))
+        utils.output(str(label))
  
     def calculate_sound_positions(self):
         sound_positions = {}
@@ -391,9 +391,9 @@ class DynamicVerticalMenu(VerticalMenu):
         text_or_function = self.index_text_or_functions[cell]
         logger.debug(f"Cell change: {text_or_function}")
         if callable(text_or_function):
-            utils.output(_("{text}").format(text=text_or_function()))
+            utils.output(str(text_or_function()))
         else:
-            utils.output(_("{text}").format(text=text_or_function))
+            utils.output(str(text_or_function))
 
 class StatusMessage(BaseUI):
     """A status message that will hide after a certain amount of time (in seconds)."""
@@ -419,7 +419,7 @@ class StatusMessageWithoutTimelimit(VerticalMenu):
     """A status message that will shown, until it's pupped from the ui stack"""
     def __init__(self, message):
         super(StatusMessageWithoutTimelimit, self).__init__(message)
-        self.append_item(_("{message}").format(message=message))
+        self.append_item(str(message))
 
 
 class InputUI(BaseUI):

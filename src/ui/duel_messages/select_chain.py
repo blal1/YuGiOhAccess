@@ -10,10 +10,11 @@ from core.i18n import _
 from game.card.card import Card
 from game.card.location_conversion import LocationConversion
 from game.edo import structs
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(16)
+@utils.duel_message_handler(message_constants.MSG_SELECT_CHAIN)
 def msg_select_chain(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)

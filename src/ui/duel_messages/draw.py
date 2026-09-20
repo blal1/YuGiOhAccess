@@ -10,10 +10,11 @@ from core.i18n import _
 
 from game.card import card_constants
 from game.card.card import Card
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(90)
+@utils.duel_message_handler(message_constants.MSG_DRAW)
 def msg_draw(client, data, length):
     data = io.BytesIO(data[1:])
     # print out the rest of the data

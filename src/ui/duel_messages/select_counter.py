@@ -9,11 +9,12 @@ from core.i18n import _
 from game.card.card import Card
 from game.edo import structs
 from ui.base_ui import VerticalMenu
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
 
-@utils.duel_message_handler(17)
+@utils.duel_message_handler(message_constants.MSG_SELECT_COUNTER)
 def msg_select_counter(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -21,7 +22,7 @@ def msg_select_counter(client, data, data_length):
     quantity = client.read_u16(data)
     size = client.read_u32(data)
     cards = []
-    for _ in range(size):
+    for _unused in range(size):
         code = client.read_u32(data)
         controller = client.read_u8(data)
         location = client.read_u8(data)

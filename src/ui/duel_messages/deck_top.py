@@ -5,9 +5,9 @@ from game.card import card_constants
 
 from core import utils
 from core.i18n import _
-from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(30)
+@utils.duel_message_handler(message_constants.MSG_CONFIRM_DECKTOP)
 def msg_confirm_decktop(client, data, data_length):
     cards = []
     data = io.BytesIO(data[1:])
@@ -24,7 +24,7 @@ def msg_confirm_decktop(client, data, data_length):
         cards.append(card)
     confirm_decktop(client, player, cards)
 
-@utils.duel_message_handler(38)
+@utils.duel_message_handler(message_constants.MSG_DECK_TOP)
 def msg_decktop(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)
@@ -39,14 +39,14 @@ def msg_decktop(client, data, data_length):
 
 def decktop(client, player, card):
     if player == client.what_player_am_i:
-        utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("you reveal your top deck card to be %s")%(card.get_name())))
+        utils.output(_("you reveal your top deck card to be %s")%(card.get_name()))
     else:
-        utils.output(_("{message}").format(message=variables.LANGUAGE_HANDLER._("Your opponent reveals their top deck card to be %s")%(card.get_name())))
+        utils.output(_("Your opponent reveals their top deck card to be %s")%(card.get_name()))
 
 def confirm_decktop(client, player, cards):
     if player == client.what_player_am_i:
-        utils.output(variables.LANGUAGE_HANDLER._("you reveal the following cards from your deck:"))
+        utils.output(_("you reveal the following cards from your deck:"))
     else:
-        utils.output(variables.LANGUAGE_HANDLER._("Your opponent reveals the following cards from their deck:"))
+        utils.output(_("Your opponent reveals the following cards from their deck:"))
     for i, c in enumerate(cards):
         utils.output(_("{index}: {name}").format(index=i + 1, name=c.get_name()))

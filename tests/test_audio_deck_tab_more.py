@@ -138,6 +138,7 @@ def _patch_deck_editor(mocker, tmp_path):
     from ui import deck_editor_ui
 
     mocker.patch("ui.deck_editor_ui.VerticalMenu", FakeMenu)
+    mocker.patch("ui.deck_editor_ui.CardChoiceMenu", FakeMenu)
     mocker.patch("ui.deck_editor_ui.utils.get_ui_stack", return_value=MagicMock())
     mocker.patch("ui.deck_editor_ui.utils.output")
     mocker.patch("ui.deck_editor_ui.wx.GetTopLevelWindows", return_value=[MagicMock()])
@@ -188,7 +189,8 @@ def test_deck_editor_menus_search_and_load(mocker, tmp_path):
     deck_editor_ui.variables.LANGUAGE_HANDLER.primary_database = db
     input_cls.return_value.show.return_value = "alpha"
     menu = deck_editor_ui.search_card_to_add.__wrapped__("Deck", deck_data, return_to)
-    assert any(item[0] == "Alpha" for item in menu.items)
+    # Results now carry what the card is, so a card can be judged before adding.
+    assert any(item[0].startswith("Alpha") for item in menu.items)
     db.execute.return_value.fetchall.return_value = []
     assert deck_editor_ui.search_card_to_add.__wrapped__("Deck", deck_data, return_to) is None
 

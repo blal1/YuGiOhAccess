@@ -98,3 +98,11 @@ def ngettext(singular: str, plural: str, n: int) -> str:
 def pgettext(context: str, message: str) -> str:
     """Translate with context disambiguation."""
     return _current_translation.pgettext(context, message)
+
+def N_(message: str) -> str:
+    """Mark a string for extraction without translating it yet.
+
+    Use for strings defined at import time (module-level tables); translate the
+    value with ``_()`` at the point of use, after ``setup()`` has run.
+    """
+    return message

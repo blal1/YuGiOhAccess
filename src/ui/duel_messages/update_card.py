@@ -1,15 +1,15 @@
 import io
 import logging
 
-from core import exceptions
 from core import utils
 
 from ui.duel_messages import update_data
 from game.card.card import Card
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(7)
+@utils.duel_message_handler(message_constants.MSG_UPDATE_CARD)
 def msg_update_card(client, data, data_length):
     data = io.BytesIO(data[1:])
     controller = client.read_u8(data)
@@ -21,7 +21,13 @@ def msg_update_card(client, data, data_length):
 def update_card(client, controller, location, sequence, query):
     card = client.get_card(controller, location, sequence)
     if not card:
-        raise exceptions.CardNotFoundException("Card not found")
+        # The server can send an update for a card the field has not synced yet
+        # (or has already removed). Dropping the update is harmless; the next
+        # MSG_UPDATE_DATA re-sends the full state.
+        logger.warning(
+            "Ignoring update_card for card missing at %s/%s/%s", controller, location, sequence
+        )
+        return
     for update in query:
         apply_query_to_card(card, update)
 

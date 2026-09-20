@@ -34,6 +34,7 @@ def _client(mocker):
     client.read_u8 = lambda buf: struct.unpack("B", buf.read(1))[0]
     client.read_u16 = lambda buf: struct.unpack("h", buf.read(2))[0]
     client.read_u32 = lambda buf: struct.unpack("I", buf.read(4))[0]
+    client.read_u64 = lambda buf: struct.unpack("Q", buf.read(8))[0]
     client.read_location = lambda buf: (
         client.read_u8(buf),
         client.read_u8(buf),
@@ -171,33 +172,36 @@ def test_position_change_and_summoning(mocker):
 
 
 def test_confirm_decktop_for_player_and_opponent(mocker):
-    from ui.duel_messages import confirm_decktop
+    """MSG_CONFIRM_DECKTOP is 30 and is handled by deck_top."""
+    from ui.duel_messages import deck_top
 
     client, _stack = _client(mocker)
-    card_cls = mocker.patch("ui.duel_messages.confirm_decktop.Card")
-    card_cls.side_effect = [NamedCard("Alpha"), NamedCard("Beta"), NamedCard("Gamma")]
+    card_cls = mocker.patch("ui.duel_messages.deck_top.Card")
+    card_cls.side_effect = [NamedCard("Alpha"), NamedCard("Beta"), NamedCard("Gamma"), NamedCard("Delta")]
 
     own_data = (
-        b"\x19"
+        b"\x1e"
         + struct.pack("B", 0)
         + struct.pack("I", 3)
         + struct.pack("I", 10) + struct.pack("B", 0) + struct.pack("B", 0) + struct.pack("I", 0)
         + struct.pack("I", 0) + struct.pack("B", 0) + struct.pack("B", 0) + struct.pack("I", 1)
         + struct.pack("I", 20) + struct.pack("B", 0) + struct.pack("B", 0) + struct.pack("I", 2)
     )
-    confirm_decktop.msg_confirm_decktop(client, own_data, len(own_data))
+    deck_top.msg_confirm_decktop(client, own_data, len(own_data))
 
     other_data = (
-        b"\x19"
+        b"\x1e"
         + struct.pack("B", 1)
         + struct.pack("I", 1)
         + struct.pack("I", 30) + struct.pack("B", 1) + struct.pack("B", 0) + struct.pack("I", 0)
     )
-    confirm_decktop.msg_confirm_decktop(client, other_data, len(other_data))
+    deck_top.msg_confirm_decktop(client, other_data, len(other_data))
 
     from core import utils
-    assert "Top of your deck: Alpha, Beta" in utils.output.call_args_list[0].args[0]
-    assert "opponent checked" in utils.output.call_args_list[1].args[0]
+    calls = [call.args[0] for call in utils.output.call_args_list]
+    assert "you reveal the following cards from your deck:" in calls[0]
+    assert "1: Alpha" in calls[1]
+    assert any("Your opponent reveals the following cards" in call for call in calls)
 
 
 def test_toss_coin_and_dice_messages(mocker):
@@ -434,14 +438,21 @@ def test_short_duel_message_handlers_do_not_raise(mocker):
     field_disabled.field_disabled(client, 1)
     field_disabled.msg_field_disabled(client, b"\x38" + struct.pack("I", 1), 5)
 
-    player_hint.msg_player_hint(client, b"\x52" + struct.pack("B", 0) + struct.pack("B", 1) + struct.pack("Q", 999), 11)
+    # MSG_PLAYER_HINT is 165, and hint type 6 is PHINT_DESC_ADD.
+    player_hint.msg_player_hint(client, b"\xa5" + struct.pack("B", 0) + struct.pack("B", 6) + struct.pack("Q", 999), 11)
 
     assert shuffle_other.msg_shuffle_hand(client, b"\x21" + struct.pack("B", 0) + struct.pack("I", 2) + struct.pack("I", 10) + struct.pack("I", 20), 14) == b""
     assert shuffle_other.msg_shuffle_extra_deck(client, b"\x27" + struct.pack("B", 1) + struct.pack("I", 1) + struct.pack("I", 30), 10) == b""
     shuffle_other.shuffle_others(client, 0, card_constants.LOCATION.DECK, 1, [40])
     stack.play_duel_sound_effect.assert_any_call("shuffle")
 
-    shuffle_set_card.msg_shuffle_set_card(client, b"\x22" + struct.pack("B", card_constants.LOCATION.SPELL_AND_TRAP_ZONE) + struct.pack("B", 2), 3)
+    # MSG_SHUFFLE_SET_CARD is 36 and carries the old and new zone of every card.
+    set_card_zone = struct.pack("B", 0) + struct.pack("B", card_constants.LOCATION.SPELL_AND_TRAP_ZONE) + struct.pack("I", 0) + struct.pack("I", 0)
+    shuffle_set_card.msg_shuffle_set_card(
+        client,
+        b"\x24" + struct.pack("B", card_constants.LOCATION.SPELL_AND_TRAP_ZONE) + struct.pack("B", 2) + set_card_zone * 4,
+        2 + 40,
+    )
 
     attack_disabled.msg_attack_disabled(client, b"\x70", 1)
     damage_step_start.msg_begin_damage(client, b"\x71", 1)
@@ -452,6 +463,6 @@ def test_short_duel_message_handlers_do_not_raise(mocker):
 
     from core import utils
     assert any("Field locations" in call.args[0] for call in utils.output.call_args_list)
-    assert any("Set cards on the field were shuffled." in call.args[0] for call in utils.output.call_args_list)
+    assert any("set card(s) were shuffled" in call.args[0] for call in utils.output.call_args_list)
     stack.play_duel_sound_effect.assert_any_call("phase/damage")
     stack.play_duel_sound_effect.assert_any_call("phase/damageend")

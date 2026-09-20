@@ -6,8 +6,9 @@ from game.card import card_constants
 from game.edo import structs
 
 from core import utils
+from game.edo import message_constants
 
-@utils.duel_message_handler(21)
+@utils.duel_message_handler(message_constants.MSG_SORT_CHAIN)
 def msg_sort_chain(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)

@@ -5,10 +5,11 @@ from core import utils
 
 from game.card.card import Card
 from ui import playable_cards
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(11)
+@utils.duel_message_handler(message_constants.MSG_SELECT_IDLECMD)
 def msg_idlecmd(client, data, length):
     logger.debug("Idle command")
     data = io.BytesIO(data[1:])

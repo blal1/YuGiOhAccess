@@ -2,6 +2,7 @@ from core import variables
 from core import exceptions
 
 from game.card import card_constants
+from core.i18n import _
 
 class Card:
     def __init__(self, code):
@@ -96,27 +97,27 @@ class Card:
         lst.append("%s (%s)" % (self.get_name(), ", ".join(types)))
         set_names = self.get_set_names()
         if set_names:
-            lst.append(variables.LANGUAGE_HANDLER._("Archetype: %s") % set_names)
+            lst.append(_("Archetype: %s") % set_names)
         if self.type & card_constants.TYPE.MONSTER:
             if self.type & card_constants.TYPE.LINK:
-                lst.append(variables.LANGUAGE_HANDLER._("Attack: %d Link rating: %d")%(self.attack, self.level))
+                lst.append(_("Attack: %d Link rating: %d")%(self.attack, self.level))
             elif self.type & card_constants.TYPE.XYZ:
-                lst.append(variables.LANGUAGE_HANDLER._("Attack: %d Defense: %d Rank: %d") % (self.attack, self.defense, self.level))
+                lst.append(_("Attack: %d Defense: %d Rank: %d") % (self.attack, self.defense, self.level))
             else:
-                lst.append(variables.LANGUAGE_HANDLER._("Attack: %d Defense: %d Level: %d") % (self.attack, self.defense, self.level))
+                lst.append(_("Attack: %d Defense: %d Level: %d") % (self.attack, self.defense, self.level))
         if self.type & card_constants.TYPE.PENDULUM:
-            lst.append(variables.LANGUAGE_HANDLER._("Pendulum scale: %d/%d") % (self.lscale, self.rscale))
+            lst.append(_("Pendulum scale: %d/%d") % (self.lscale, self.rscale))
         elif self.type & card_constants.TYPE.LINK:
-            lst.append(variables.LANGUAGE_HANDLER._("Link Markers: %s")%(self.get_link_markers()))
+            lst.append(_("Link Markers: %s")%(self.get_link_markers()))
         lst.append(self.get_description())
         try:
             if self.type & card_constants.TYPE.XYZ and self.location == card_constants.LOCATION.MONSTER_ZONE:
                 if len(self.xyz_materials) > 0:
-                    lst.append(variables.LANGUAGE_HANDLER._("attached xyz materials:"))
+                    lst.append(_("attached xyz materials:"))
                     for i in range(len(self.xyz_materials)):
                         lst.append(str(i+1)+": "+self.xyz_materials[i].get_name())
                 else:
-                    lst.append(variables.LANGUAGE_HANDLER._("no xyz materials attached"))
+                    lst.append(_("no xyz materials attached"))
         except AttributeError:
             pass
         return "\n".join(lst)
@@ -132,7 +133,7 @@ class Card:
         lst = []
         for m in card_constants.LINK_MARKERS.keys():
             if self.defense & m:
-                lst.append(variables.LANGUAGE_HANDLER._(card_constants.LINK_MARKERS[m]))
+                lst.append(_(card_constants.LINK_MARKERS[m]))
         return ', '.join(lst)
 
     def get_set_names(self):
@@ -169,7 +170,7 @@ class Card:
         lstr = self.get_strings(code)
         try:
             if i == 0 or lstr[i-code*16].strip() == '':
-                s = variables.LANGUAGE_HANDLER._("Activate this card.")
+                s = _("Activate this card.")
             else:
                 s = lstr[i-code*16].strip()
                 e = True
@@ -183,21 +184,21 @@ class Card:
 
     def get_position(self):
         if self.position == card_constants.POSITION.FACE_UP_ATTACK:
-            return variables.LANGUAGE_HANDLER._("face-up attack")
+            return _("face-up attack")
         elif self.position == card_constants.POSITION.FACE_DOWN_ATTACK:
-            return variables.LANGUAGE_HANDLER._("face-down attack")
+            return _("face-down attack")
         elif self.position == card_constants.POSITION.FACE_UP_DEFENSE:
             if self.location & card_constants.LOCATION.EXTRA:
-                return variables.LANGUAGE_HANDLER._("face-up")
-            return variables.LANGUAGE_HANDLER._("face-up defense")
+                return _("face-up")
+            return _("face-up defense")
         elif self.position == card_constants.POSITION.FACE_UP:
-            return variables.LANGUAGE_HANDLER._("face-up")
+            return _("face-up")
         elif self.position == card_constants.POSITION.FACE_DOWN_DEFENSE:
             if self.location & card_constants.LOCATION.EXTRA:
-                return variables.LANGUAGE_HANDLER._("face down")
-            return variables.LANGUAGE_HANDLER._("face-down defense")
+                return _("face down")
+            return _("face-down defense")
         elif self.position == card_constants.POSITION.FACE_DOWN:
-            return variables.LANGUAGE_HANDLER._("face down")
+            return _("face down")
 
     def get_strings(self, code=None):
         row = variables.LANGUAGE_HANDLER.cdb.execute('select * from texts where id = ?', (code or self.code, )).fetchone()

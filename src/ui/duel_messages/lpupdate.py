@@ -1,8 +1,9 @@
 import io
 import wx
 from core import utils
+from game.edo import message_constants
 
-@utils.duel_message_handler(94)
+@utils.duel_message_handler(message_constants.MSG_LPUPDATE)
 def msg_lpupdate(client, data, data_length):
     data = io.BytesIO(data[1:])
     player = client.read_u8(data)

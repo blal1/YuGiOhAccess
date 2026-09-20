@@ -3,8 +3,9 @@ import io
 from core import utils
 from core.i18n import _
 from core import variables
+from game.edo import message_constants
 
-@utils.duel_message_handler(101)
+@utils.duel_message_handler(message_constants.MSG_ADD_COUNTER)
 def msg_add_counter(client, data, data_length, action="add"):
     data = io.BytesIO(data[1:])
     counter_type = client.read_u16(data)
@@ -15,7 +16,7 @@ def msg_add_counter(client, data, data_length, action="add"):
     counter_amount = client.read_u16(data)
     update_counters(action, counter_type, counter_amount, card)
 
-@utils.duel_message_handler(102)
+@utils.duel_message_handler(message_constants.MSG_REMOVE_COUNTER)
 def msg_remove_counter(client, data, data_length):
     return msg_add_counter(client, data, data_length, "remove")
 

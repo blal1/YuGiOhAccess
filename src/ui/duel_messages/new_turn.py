@@ -1,8 +1,9 @@
 from core import utils
 from core.i18n import _
 from game.player import Player
+from game.edo import message_constants
 
-@utils.duel_message_handler(40)
+@utils.duel_message_handler(message_constants.MSG_NEW_TURN)
 def msg_new_turn(client, data, length):
     tp = int(data[1])
     new_turn(client, tp)

@@ -15,6 +15,7 @@ import velopack
 import wx
 
 from core import discord_presence
+from core import speech
 from core import variables
 from core.i18n import _
 
@@ -268,10 +269,48 @@ def get_main_menu_function():
 def refresh_ui():
     get_ui_stack().refresh_ui()
 
-def output(message, interrupt=False):
+def output(message, interrupt=False, priority=speech.Priority.INFO):
+    """Send a message to the screen reader and record it in the replay log.
+
+    Everything is logged, including messages that could not be spoken because
+    the window was not focused; ``replay_recent_messages()`` reads those back.
+    Critical messages interrupt whatever is being read, ambient ones step aside
+    while a critical announcement is still being spoken.
+    """
+    if speech.CATCH_UP.active:
+        # The server is replaying a backlog; log it, do not read hundreds of
+        # lines out loud. The player gets a summary and can replay them.
+        speech.MESSAGE_LOG.add(message, priority, spoken=False)
+        speech.CATCH_UP.note_suppressed()
+        return
+    app = wx.GetApp()
+    active = bool(app and app.IsActive())
+    if active and priority <= speech.Priority.AMBIENT and speech.MESSAGE_LOG.critical_recently_spoken():
+        speech.MESSAGE_LOG.add(message, priority, spoken=False)
+        return
+    speech.MESSAGE_LOG.add(message, priority, spoken=active)
+    if not active:
+        return
+    if priority >= speech.Priority.CRITICAL:
+        interrupt = True
+    wx.GetTopLevelWindows()[0].output(message, interrupt)
+
+
+def replay_recent_messages(count=speech.DEFAULT_REPLAY_COUNT):
+    """Read back the last ``count`` messages, including ones that were missed.
+
+    The replay itself is not added to the log, so repeating it does not push
+    real duel messages out of the buffer.
+    """
+    messages = speech.MESSAGE_LOG.recent(count)
+    if not messages:
+        text = _("No messages to replay.")
+    else:
+        text = "\n".join(messages)
     app = wx.GetApp()
     if app and app.IsActive():
-        wx.GetTopLevelWindows()[0].output(message, interrupt)
+        wx.GetTopLevelWindows()[0].output(text, True)
+    return text
 
 def provide_tooltip(tooltip):
     if variables.config.get("enable_hints"):

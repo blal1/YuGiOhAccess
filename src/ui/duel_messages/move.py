@@ -9,10 +9,11 @@ from core.i18n import _
 from game.card.card import Card
 from game.card.location_conversion import LocationConversion
 from game.card import card_constants
+from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-@utils.duel_message_handler(50)
+@utils.duel_message_handler(message_constants.MSG_MOVE)
 def msg_move(client, data, data_length):
     data = io.BytesIO(data[1:])
     code = client.read_u32(data)
@@ -55,7 +56,7 @@ def move(client, code, old_controller, old_location, old_sequence, old_position,
             client.get_duel_field().append_card_to_opponent_banished(cnew, fake_query)
     message = get_message_to_announce(client, card, cnew, reason)
     if message:
-        utils.output(_("{message}").format(message=message))
+        utils.output(str(message))
     else:
         logger.debug(f"No announce message for: {card.name} moved from {old_location} to {new_location} because of {reason}")
 

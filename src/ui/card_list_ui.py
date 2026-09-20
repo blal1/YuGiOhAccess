@@ -31,7 +31,7 @@ class HorizontalCardList(HorizontalMenu):
             label = f"{label} {card.get_name()}"
             if details:
                 label = f"{label}, {', '.join(details)}"
-            self.append_item(_("{label}").format(label=label), function=lambda i=i: self.finalize(i))
+            self.append_item(str(label), function=lambda i=i: self.finalize(i))
 
     def select_card(self):
         utils.get_ui_stack().push_ui(self)
@@ -50,7 +50,7 @@ class HorizontalCardList(HorizontalMenu):
             # get the current column
             selected_index = self.current_col
             current_card = self.cards[selected_index]
-            utils.output(_("{card}").format(card=str(current_card)))
+            utils.output(str(current_card))
             return
         # escape to go out of the cardl ist
         if key == wx.WXK_ESCAPE:

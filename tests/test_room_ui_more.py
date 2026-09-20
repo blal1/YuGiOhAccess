@@ -347,6 +347,8 @@ def test_get_available_bot_decks_missing_directory(mocker, tmp_path):
 
     decks_dir = tmp_path / "root" / "Decks"
     decks_dir.mkdir()
+    # Only decks a bundled executor can actually pilot are offered now.
+    (decks_dir / "AI_Blackwing.ydk").write_text("deck")
     (decks_dir / "Bot.ydk").write_text("deck")
     (decks_dir / "Nope.txt").write_text("no")
-    assert room_ui._get_available_bot_decks() == ["Bot"]
+    assert room_ui._get_available_bot_decks() == ["Blackwing"]
