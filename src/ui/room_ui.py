@@ -525,6 +525,27 @@ def _install_root() -> Path:
     return Path(__file__).parent.parent.parent
 
 
+def _bot_decks_dir() -> Path | None:
+    """The deck directory WindBot will actually read.
+
+    That is the published asset directory, not the repository: the two are only
+    synchronised when the bot is rebuilt. Listing the repository here is what
+    made the menu offer decks the bot could not load, which the server then
+    reported as "waiting for every player deck to be loaded".
+    """
+    try:
+        from bot import launcher
+
+        decks = launcher.bot_decks_path()
+    except Exception:
+        logger.exception("Could not locate the WindBot asset directory")
+        decks = None
+    if decks is not None:
+        return decks
+    fallback = _install_root() / "Decks"
+    return fallback if fallback.exists() else None
+
+
 def _get_available_bot_decks() -> list[str]:
     """The WindBot deck keys this build can actually pilot.
 
@@ -533,8 +554,8 @@ def _get_available_bot_decks() -> list[str]:
     """
     from bot import deck_catalogue
 
-    decks_dir = _install_root() / "Decks"
-    if not decks_dir.exists():
+    decks_dir = _bot_decks_dir()
+    if decks_dir is None:
         return []
     available = {path.stem for path in decks_dir.glob("*.ydk")}
     return sorted(
@@ -550,11 +571,18 @@ def _load_bot_catalogue() -> list[dict]:
     between "AI_BlueEyes" and "AI_Dragun" with no idea how hard either is.
     WindBot ships the curated names and difficulties in this file.
     """
-    try:
-        return json.loads((_install_root() / "bots.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        logger.warning("Could not read bots.json; falling back to the deck file names")
-        return []
+    decks_dir = _bot_decks_dir()
+    candidates = []
+    if decks_dir is not None:
+        candidates.append(decks_dir.parent / "bots.json")
+    candidates.append(_install_root() / "bots.json")
+    for path in candidates:
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+    logger.warning("Could not read bots.json; falling back to the deck keys")
+    return []
 
 
 def _bot_choices(available_decks) -> list[tuple[str, str]]:

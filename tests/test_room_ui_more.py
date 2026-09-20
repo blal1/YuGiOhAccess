@@ -342,6 +342,9 @@ def test_get_available_bot_decks_missing_directory(mocker, tmp_path):
     fake_file = tmp_path / "root" / "src" / "ui" / "room_ui.py"
     fake_file.parent.mkdir(parents=True)
     mocker.patch.object(room_ui, "__file__", str(fake_file))
+    # Decks come from the published bot assets; fall back to the repository only
+    # when the bot has not been built.
+    mocker.patch("bot.launcher.bot_decks_path", return_value=None)
 
     assert room_ui._get_available_bot_decks() == []
 

@@ -9,8 +9,13 @@ logger = logging.getLogger(__name__)
 _engine_ready = False
 
 
-def _find_bot_asset_path() -> pathlib.Path:
-    """Return the first local WindBot asset directory containing the embedded DLL."""
+def bot_asset_path() -> pathlib.Path | None:
+    """The WindBot asset directory, or None when the bot has not been built.
+
+    WindBot reads its decks, dialogs and bots.json from here (Program.AssetPath),
+    not from the repository. Anything that offers the player a bot deck has to
+    look in this directory, or it will offer decks the bot cannot load.
+    """
     candidates = [
         pathlib.Path(variables.EXECUTABLE_DIR) / "data" / "bot",
         pathlib.Path(variables.EXECUTABLE_DIR).parent / "src" / "data" / "bot",
@@ -22,9 +27,26 @@ def _find_bot_asset_path() -> pathlib.Path:
         path = path.resolve()
         if (path / "WindBot.Desktop.dll").exists():
             return path
-    raise FileNotFoundError(
-        "WindBot.Desktop.dll was not found. Run scripts/build_windbot.py before adding a bot."
-    )
+    return None
+
+
+def bot_decks_path() -> pathlib.Path | None:
+    """Where WindBot looks for .ydk files: <asset path>/Decks (see Game/AI/Deck.cs)."""
+    asset_path = bot_asset_path()
+    if asset_path is None:
+        return None
+    decks = asset_path / "Decks"
+    return decks if decks.exists() else None
+
+
+def _find_bot_asset_path() -> pathlib.Path:
+    """Same as bot_asset_path, but refuses to continue when the bot is missing."""
+    asset_path = bot_asset_path()
+    if asset_path is None:
+        raise FileNotFoundError(
+            "WindBot.Desktop.dll was not found. Run scripts/build_windbot.py before adding a bot."
+        )
+    return asset_path
 
 
 def _ensure_engine():

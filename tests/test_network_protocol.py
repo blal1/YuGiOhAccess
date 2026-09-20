@@ -250,6 +250,7 @@ def test_a_deck_the_catalogue_does_not_mention_is_still_offered(mocker):
 def test_an_unreadable_catalogue_falls_back_to_the_deck_keys(mocker, tmp_path):
     from ui import room_ui
 
+    mocker.patch("bot.launcher.bot_decks_path", return_value=None)
     mocker.patch("ui.room_ui._install_root", return_value=tmp_path)
     assert room_ui._load_bot_catalogue() == []
     assert room_ui._bot_choices(["Dragun"]) == [("Dragun", "Dragun")]
@@ -259,11 +260,12 @@ def test_only_decks_with_an_executor_are_offered(mocker, tmp_path):
     """A deck file WindBot has no executor for makes it load a random deck."""
     from ui import room_ui
 
-    mocker.patch("ui.room_ui._install_root", return_value=tmp_path)
     decks_dir = tmp_path / "Decks"
     decks_dir.mkdir()
     (decks_dir / "AI_BlueEyes.ydk").write_text("deck")
     (decks_dir / "AI_NotAThing.ydk").write_text("deck")
+    mocker.patch("bot.launcher.bot_decks_path", return_value=decks_dir)
+    mocker.patch("ui.room_ui._install_root", return_value=tmp_path)
 
     assert room_ui._get_available_bot_decks() == ["Blue-Eyes"]
 
@@ -308,3 +310,99 @@ def test_every_bots_json_entry_is_playable():
     entries = json.loads((root / "bots.json").read_text(encoding="utf-8"))
     unknown = sorted(e["deck"] for e in entries if e["deck"] not in deck_catalogue.KEY_TO_DECK_FILE)
     assert unknown == []
+
+
+# ------------------------------------- the directory WindBot actually reads
+
+def test_decks_are_listed_from_the_published_assets_not_the_repository(mocker, tmp_path):
+    """The menu must not offer a deck the bot cannot load.
+
+    WindBot reads Program.AssetPath/Decks (Game/AI/Deck.cs); the repository's own
+    Decks/ directory is only copied there when the bot is rebuilt. Listing the
+    repository made the room report "waiting for every player deck to be loaded"
+    because WindBot never found the file and so never sent its deck.
+    """
+    from ui import room_ui
+
+    published = tmp_path / "assets" / "Decks"
+    published.mkdir(parents=True)
+    (published / "AI_BlueEyes.ydk").write_text("deck")
+
+    repository = tmp_path / "repo" / "Decks"
+    repository.mkdir(parents=True)
+    for name in ("AI_BlueEyes", "AI_Salamangreat", "AI_Zoodiac"):
+        (repository / f"{name}.ydk").write_text("deck")
+
+    mocker.patch("bot.launcher.bot_decks_path", return_value=published)
+    mocker.patch("ui.room_ui._install_root", return_value=tmp_path / "repo")
+
+    assert room_ui._get_available_bot_decks() == ["Blue-Eyes"]
+
+
+def test_decks_fall_back_to_the_repository_when_the_bot_is_not_built(mocker, tmp_path):
+    from ui import room_ui
+
+    repository = tmp_path / "Decks"
+    repository.mkdir()
+    (repository / "AI_Blackwing.ydk").write_text("deck")
+
+    mocker.patch("bot.launcher.bot_decks_path", return_value=None)
+    mocker.patch("ui.room_ui._install_root", return_value=tmp_path)
+
+    assert room_ui._get_available_bot_decks() == ["Blackwing"]
+
+
+def test_no_decks_are_offered_when_nothing_is_installed(mocker, tmp_path):
+    from ui import room_ui
+
+    mocker.patch("bot.launcher.bot_decks_path", return_value=None)
+    mocker.patch("ui.room_ui._install_root", return_value=tmp_path)
+
+    assert room_ui._get_available_bot_decks() == []
+
+
+def test_bots_json_is_read_from_the_published_assets_first(mocker, tmp_path):
+    import json
+
+    from ui import room_ui
+
+    assets = tmp_path / "assets"
+    (assets / "Decks").mkdir(parents=True)
+    (assets / "bots.json").write_text(json.dumps([{"name": "Published", "deck": "Blue-Eyes"}]), encoding="utf-8")
+    (tmp_path / "bots.json").write_text(json.dumps([{"name": "Repository", "deck": "Blue-Eyes"}]), encoding="utf-8")
+
+    mocker.patch("bot.launcher.bot_decks_path", return_value=assets / "Decks")
+    mocker.patch("ui.room_ui._install_root", return_value=tmp_path)
+
+    assert room_ui._load_bot_catalogue()[0]["name"] == "Published"
+
+
+def test_bot_asset_path_returns_none_instead_of_raising(mocker, tmp_path):
+    from bot import launcher
+
+    mocker.patch("bot.launcher.variables.EXECUTABLE_DIR", str(tmp_path))
+    mocker.patch("bot.launcher.variables.LOCAL_DATA_DIR", None)
+
+    assert launcher.bot_asset_path() is None
+    assert launcher.bot_decks_path() is None
+    with pytest.raises(FileNotFoundError):
+        launcher._find_bot_asset_path()
+
+
+def test_the_published_bot_assets_are_in_sync():
+    """Every deck the repository ships must be where WindBot will look for it."""
+    import sys
+
+    root = Path(__file__).resolve().parent.parent
+    asset_dir = root / "src" / "data" / "bot"
+    if not asset_dir.exists():
+        pytest.skip("the bot has not been built")
+
+    sys.path.insert(0, str(root / "scripts"))
+    try:
+        import sync_bot_assets
+    finally:
+        sys.path.pop(0)
+
+    stale = [str(source) for source, _target in sync_bot_assets._files_to_copy(asset_dir)]
+    assert stale == [], "run python scripts/sync_bot_assets.py"
