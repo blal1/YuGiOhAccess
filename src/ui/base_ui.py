@@ -320,7 +320,10 @@ class WaitUI(BaseUI):
 
     def hide(self):
         wx.GetTopLevelWindows()[0].pop_ui()
-        self.Destroy()
+        try:
+            self.Destroy()
+        except RuntimeError:
+            logger.debug("InputUI was already destroyed by pop_ui")
 
     @property
     def progress(self):
@@ -469,6 +472,66 @@ class InputUI(BaseUI):
     def hide(self):
         wx.GetTopLevelWindows()[0].pop_ui()
         self.Destroy()
+
+
+class CallbackInputUI(BaseUI):
+    """A text prompt that hands its answer to a callback instead of blocking.
+
+    InputUI.show() spins wx.Yield() until the user answers. That is fine in a
+    menu, but during a duel the server keeps sending messages, their handlers
+    push their own screens onto the same UI stack while that loop runs, and the
+    prompt ends up hidden behind one of them with a loop that never finishes.
+    The duel screen then answers nothing but the menu bar.
+
+    This version owns no loop: it lives on the stack like any other screen and
+    removes itself by identity when it is done.
+    """
+
+    def __init__(self, message, on_done, regex=".*", default_value=""):
+        super(CallbackInputUI, self).__init__(2, 1, message, False)
+        self.on_done = on_done
+        self.regex = regex
+        self.input_box = self.set_cell(0, 0, wx.TextCtrl, None, label=message, style=wx.TE_PROCESS_ENTER)
+        self.input_box.SetValue(default_value)
+        if default_value:
+            self.input_box.SetSelection(-1, -1)
+        self.set_cell(1, 0, _("Cancel"), self.cancel)
+
+    def show(self):
+        wx.GetTopLevelWindows()[0].push_ui(self)
+        self.input_box.SetFocus()
+        return self
+
+    def _finish(self, value):
+        callback = self.on_done
+        self.on_done = None
+        wx.GetTopLevelWindows()[0].remove_ui(self)
+        if callback:
+            callback(value)
+
+    def cancel(self):
+        self._finish(None)
+
+    def submit(self):
+        value = self.input_box.GetValue()
+        if not re.match(self.regex, value):
+            utils.output(_("Invalid input"))
+            self.input_box.SetValue("")
+            return
+        self._finish(value)
+
+    def on_key_down(self, event):
+        keycode = event.GetKeyCode()
+        if keycode == wx.WXK_RETURN:
+            if self.current_row == 1:
+                self.cancel()
+            else:
+                self.submit()
+            return
+        if keycode == wx.WXK_ESCAPE:
+            self.cancel()
+            return
+        super(CallbackInputUI, self).on_key_down(event)
 
 
 class NumberInputUI(InputUI):

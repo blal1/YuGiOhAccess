@@ -1,7 +1,7 @@
 import struct
 
 from game.edo import structs, structs_utils
-from ui.base_ui import InputUI, VerticalMenu
+from ui.base_ui import CallbackInputUI, VerticalMenu
 from core import utils
 from core.i18n import _
 
@@ -47,8 +47,17 @@ def do_surrender(client):
 
 
 def open_chat_input(client):
+    """Ask for a chat message without blocking the duel.
+
+    A blocking prompt here used to strand the duel screen: duel messages arrive
+    while the prompt waits, push their own screen on top of it, and nothing
+    responds afterwards except the menu bar.
+    """
     utils.get_ui_stack().pop_ui()
-    message = InputUI(_("Chat message")).show()
+    CallbackInputUI(_("Chat message"), lambda message: _send_chat(client, message)).show()
+
+
+def _send_chat(client, message):
     if not message:
         return
     chat = structs.Chat()

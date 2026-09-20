@@ -102,6 +102,35 @@ class YuGiOhAccessFrame(wx.Frame):
         self.Layout()
         self.Fit()
 
+    def remove_ui(self, ui):
+        """Remove one screen from the stack, wherever it happens to sit.
+
+        pop_ui only removes the top, which is not good enough during a duel: a
+        duel message can push its own screen while a prompt is open, and popping
+        then discards the wrong one and leaves the prompt stranded.
+        """
+        if ui not in self.ui_stack:
+            return False
+        was_top = self.ui_stack[-1] is ui
+        self.ui_stack.remove(ui)
+        self.main_sizer.Hide(ui)
+        ui.Hide()
+        if was_top:
+            if self.ui_stack:
+                self.ui_stack[-1].Show()
+                self.main_sizer.Show(self.ui_stack[-1])
+                self.ui_stack[-1].SetFocus()
+            else:
+                self.game_area.Show()
+                self.main_sizer.Show(self.game_area)
+        try:
+            ui.Destroy()
+        except RuntimeError:
+            logger.debug("UI %s was already destroyed", ui)
+        self.Layout()
+        self.Fit()
+        return True
+
     def clear_ui_stack(self):
         while len(self.ui_stack) > 0:
             self.pop_ui()
