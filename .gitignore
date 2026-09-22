@@ -162,3 +162,20 @@ build/ocgcore/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# Build output from the bundled WindBot/C# projects. These were committed;
+# they are produced by `dotnet build` and by scripts/build_windbot.py, and
+# nothing in the project reads them.
+/bin/
+/obj/
+/out/
+
+# A copy of the bot's published output, kept for manual checking. Nothing
+# refers to it, and it was adding 34 MB to every packaged build.
+/src/data/bot-publish-test/
+
+# Generated or downloaded, not authored.
+/bot_init_output.txt
+/coverage.json
+/coverage-current.json
+/src/data/databases/babelcdb.zip
