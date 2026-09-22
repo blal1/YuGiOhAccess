@@ -1,6 +1,5 @@
 import logging
 
-import wx
 
 from core import utils
 from core.i18n import _
@@ -49,7 +48,7 @@ def _pick_from_main(client, main_cards, side_cards, moved_to_side, moved_to_main
         card = Card(code)
         label = _("{name} x{count}").format(name=card.get_name(), count=count) if count > 1 else card.get_name()
         menu.append_item(str(label), lambda c=code: _do_move_to_side(client, main_cards, side_cards, moved_to_side, moved_to_main, c))
-    menu.append_item(_("Back"), lambda: _show_side_menu(client, main_cards, side_cards, moved_to_side, moved_to_main))
+    menu.append_cancel_item(_("Back"), lambda: _show_side_menu(client, main_cards, side_cards, moved_to_side, moved_to_main))
     return menu
 
 
@@ -70,7 +69,7 @@ def _pick_from_side(client, main_cards, side_cards, moved_to_side, moved_to_main
         card = Card(code)
         label = _("{name} x{count}").format(name=card.get_name(), count=count) if count > 1 else card.get_name()
         menu.append_item(str(label), lambda c=code: _do_move_to_main(client, main_cards, side_cards, moved_to_side, moved_to_main, c))
-    menu.append_item(_("Back"), lambda: _show_side_menu(client, main_cards, side_cards, moved_to_side, moved_to_main))
+    menu.append_cancel_item(_("Back"), lambda: _show_side_menu(client, main_cards, side_cards, moved_to_side, moved_to_main))
     return menu
 
 
@@ -105,7 +104,7 @@ def _view_swaps(client, main_cards, side_cards, moved_to_side, moved_to_main):
     for code in moved_to_main:
         card = Card(code)
         menu.append_item(_("{name} → main").format(name=card.get_name()))
-    menu.append_item(_("Back"), lambda: _show_side_menu(client, main_cards, side_cards, moved_to_side, moved_to_main))
+    menu.append_cancel_item(_("Back"), lambda: _show_side_menu(client, main_cards, side_cards, moved_to_side, moved_to_main))
     return menu
 
 

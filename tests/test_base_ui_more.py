@@ -91,14 +91,14 @@ def test_base_set_cell_focus_movement_and_key_handling(mocker):
     callback = MagicMock()
     c1 = ui.set_cell(0, 0, "First", callback)
     c2 = ui.set_cell(0, 1, FakeControl, None, label="Second")
-    c3 = ui.set_cell(1, 0, FakeNoLabelControl, None, label="Stored label")
+    ui.set_cell(1, 0, FakeNoLabelControl, None, label="Stored label")
 
     assert c1.GetLabel() == "First"
     assert c2.GetLabel() == "Second"
     assert ui.cell_extras[1][0] == "Stored label"
     assert ui.get_cell(0, 0) is c1
     assert "First" in str(ui)
-    blank = ui.set_cell(1, 1, FakeBlankControl, None)
+    ui.set_cell(1, 1, FakeBlankControl, None)
     assert ui.get_cell_label(1, 1) == "FakeBlankControl"
     assert "()" not in str(ui)
     other = BaseUI.__new__(BaseUI)

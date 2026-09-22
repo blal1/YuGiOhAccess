@@ -34,8 +34,15 @@ class HorizontalCardList(HorizontalMenu):
             self.append_item(str(label), function=lambda i=i: self.finalize(i))
 
     def select_card(self):
+        """Wait for the player to pick a card, and return the index they chose.
+
+        The wait keys on ``return_value is None`` rather than on truthiness.
+        Index 0 is a perfectly good answer -- the first card in the list -- and
+        testing it for truth left this loop spinning forever whenever the
+        player chose the top of their graveyard, banished pile or extra deck.
+        """
         utils.get_ui_stack().push_ui(self)
-        while not self.return_value:
+        while self.return_value is None:
             wx.Yield()
         return self.return_value
 

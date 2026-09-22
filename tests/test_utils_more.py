@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 from unittest.mock import MagicMock
@@ -28,7 +27,9 @@ def test_setup_logging_setup_and_debug_info(mocker, tmp_path):
     utils.setup()
     assert (tmp_path / "data").exists()
     utils.setup()
-    utils.run_velopack.assert_called_once()
+    # Both runs look for an update: a fresh install needs one just as much as
+    # an existing one does.
+    assert utils.run_velopack.call_count == 2
 
     mocker.patch("core.utils.getattr", side_effect=lambda obj, name, default=None: True if name == "frozen" else getattr(obj, name, default))
     mocker.patch.object(sys, "_MEIPASS", "bundle", create=True)
@@ -110,8 +111,9 @@ def test_ui_and_handler_decorators_and_output(mocker):
         return "ui"
 
     wrapped = utils.ui_function(make_ui)
-    assert utils.get_last_ui_function() is make_ui
     assert wrapped() is None
+    # Recorded when the builder runs, not when it is decorated.
+    assert utils.get_last_ui_function() is make_ui
     frame.pop_ui.assert_called()
     frame.push_ui.assert_called_with("ui")
 
@@ -123,7 +125,10 @@ def test_ui_and_handler_decorators_and_output(mocker):
     frame.get_main_ui.return_value = "main"
     assert utils.get_main_menu_function() == "main"
     utils.refresh_ui()
-    frame.refresh_ui.assert_called_once()
+    frame.refresh_ui.assert_called_once_with(None)
+    rebuild = MagicMock()
+    utils.refresh_ui(rebuild)
+    frame.refresh_ui.assert_called_with(rebuild)
     utils.output("hello", interrupt=True)
     frame.output.assert_called_with("hello", True)
 

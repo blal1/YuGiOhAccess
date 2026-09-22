@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from tests.test_ui_flows_more import FakeMenu, FakeStatus
+from tests.test_ui_flows_more import FakeMenu
 
 
 def test_audio_manager_volume_play_stop_and_fade(mocker, tmp_path):

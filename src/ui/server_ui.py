@@ -22,7 +22,7 @@ def server_selection_menu():
     server_selection_menu = VerticalMenu(_("Server Menu"))
     for server in servers:
         server_selection_menu.append_item(str(server.name), lambda server=server: server_main_menu(server))
-    server_selection_menu.append_item(_("Back"), utils.get_main_menu_function)
+    server_selection_menu.append_cancel_item(_("Back"), utils.get_main_menu_function)
     return server_selection_menu
 
 @utils.ui_function
@@ -78,7 +78,7 @@ def create_room(server):
         "best_of": 3 if match_mode.GetValue() else 1,
         "team_count": 2 if tag_duel.GetValue() else 1,
     }))
-    room_menu.append_item(_("Back"), lambda: server_main_menu(server))
+    room_menu.append_cancel_item(_("Back"), lambda: server_main_menu(server))
     return room_menu
 
 def banlist_change_choice(event, choicer):
@@ -217,7 +217,7 @@ def list_rooms(server):
         if room.draw_count != 1:
             room_printable += f"Draw count: {room.draw_count}, "
         room_menu.append_item(str(room_printable), lambda room=room: room_action_menu(server, room))
-    room_menu.append_item(_("Back"), lambda: server_main_menu(server))
+    room_menu.append_cancel_item(_("Back"), lambda: server_main_menu(server))
     return room_menu
 
 
@@ -227,7 +227,7 @@ def room_action_menu(server, room):
     if room.istart == "waiting" and room_user_count(room) < room_capacity(room):
         menu.append_item(_("Join as duelist"), lambda: join_room(server, room.roomid))
     menu.append_item(_("Spectate"), lambda: spectate_room(server, room.roomid))
-    menu.append_item(_("Back"), lambda: list_rooms(server))
+    menu.append_cancel_item(_("Back"), lambda: list_rooms(server))
     return menu
 
 

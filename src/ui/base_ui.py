@@ -35,6 +35,9 @@ class BaseUI(wx.Panel):
         self.cell_functions = [[None for _unused in range(cols)] for _unused in range(rows)]
         self.cell_extras = [[None for _unused in range(cols)] for _unused in range(rows)] # extra data for the cells in the case where labels aren't available on the native control
         self.help_text = ""
+        # What Escape, and Backspace outside a text field, should do on this
+        # screen. The README has always promised both; nothing listened.
+        self.cancel_action = None
         self.Fit()
         self.Bind(wx.EVT_SIZE, self.on_resize)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
@@ -135,6 +138,43 @@ class BaseUI(wx.Panel):
     def set_help_text(self, help_text):
         self.help_text = help_text
 
+    def set_cancel_action(self, function):
+        """Say what leaving this screen without choosing anything means.
+
+        Registered once, and then Escape (and Backspace, where it is not busy
+        editing text) both reach it. Screens that have no way out leave this
+        unset and the key falls through to the frame.
+        """
+        self.cancel_action = function
+        return function
+
+    def append_cancel_item(self, option, function=None, *args, **kwargs):
+        """Append the item that leaves this screen, and bind the keys to it.
+
+        A menu's Back, Cancel or Close entry is the same action the player
+        expects from Escape, so registering it in two places by hand is only
+        an opportunity to forget one.
+        """
+        self.set_cancel_action(function)
+        return self.append_item(option, function, *args, **kwargs)
+
+    @staticmethod
+    def _focus_is_text_entry():
+        """Whether the keyboard focus is somewhere Backspace means "delete"."""
+        try:
+            focused = wx.Window.FindFocus()
+        except Exception:
+            return False
+        return isinstance(focused, (wx.TextCtrl, wx.ComboBox, wx.SpinCtrl))
+
+    def invoke_cancel_action(self):
+        """Run this screen's way out, if it has one. True when it did."""
+        if not self.cancel_action:
+            return False
+        utils.record_action(_("Back"))
+        self.cancel_action()
+        return True
+
     def on_focus(self, event):                                                                                         
         self.try_set_focus()                                                                                           
         event.Skip()                                                                                                   
@@ -154,9 +194,20 @@ class BaseUI(wx.Panel):
 
     def on_key_down(self, event):
         keycode = event.GetKeyCode()
+        if keycode == wx.WXK_ESCAPE and self.invoke_cancel_action():
+            return
+        # Backspace only leaves the screen when it is not already busy
+        # deleting a character somebody typed.
+        if keycode == wx.WXK_BACK and not self._focus_is_text_entry():
+            if self.invoke_cancel_action():
+                return
         if keycode == wx.WXK_RETURN:
             ui = self.cell_functions[self.current_row][self.current_col]
             if ui:
+                # Every choice the player makes passes through here, which is
+                # the one place the duel history can learn what they did
+                # without each menu having to remember to say so.
+                utils.record_action(self.get_cell_label(self.current_row, self.current_col))
                 ui()
             return
         if keycode == wx.WXK_LEFT and (self.cols > 1 or self.repeat_on_boundaries):
@@ -262,7 +313,6 @@ class BaseUI(wx.Panel):
         result = f"UI({self.name})\n"
         for row in range(self.rows):
             for col in range(self.cols):
-                element = self.cells[row][col]
                 label = self.get_cell_label(row, col)
                 result += f"({label}) - {self.cell_functions[row][col]})\t"
             result += "\n"
@@ -431,14 +481,24 @@ class InputUI(BaseUI):
         super(InputUI, self).__init__(2, 1, message, False)
         self.running = True
         self.input_box = self.set_cell(0, 0, wx.TextCtrl, None, label=message, style=wx.TE_PROCESS_ENTER)
-        self.input_box = self.set_cell(0, 0, wx.TextCtrl, None, label=message, style=wx.TE_PROCESS_ENTER)
         self.input_box.SetValue(default_value)
         # if default value is not empty, select all the text
         if default_value:
             self.input_box.SetSelection(-1, -1)
-        self.set_cell(1, 0, "back", self.hide)
+        self.set_cell(1, 0, _("Back"), self.cancel)
+        self.set_cancel_action(self.cancel)
         self.regex = regex
         self.return_value = None
+
+    def cancel(self):
+        """Leave without answering. Escape reaches this too.
+
+        The loop in show() has to be told to stop, or cancelling the prompt
+        leaves it spinning with nothing left on screen to answer it.
+        """
+        self.return_value = None
+        self.running = False
+        self.hide()
 
     def show(self):
         wx.GetTopLevelWindows()[0].push_ui(self)
@@ -454,9 +514,7 @@ class InputUI(BaseUI):
         if keycode == wx.WXK_RETURN:
             # if the thing pressed is back, hide the ui
             if self.current_row == 1: # back
-                self.return_value = None
-                self.running = False
-                self.hide()
+                self.cancel()
                 return
             value = self.input_box.GetValue()
             if re.match(self.regex, value):

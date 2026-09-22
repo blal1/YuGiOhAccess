@@ -4,7 +4,7 @@ from game.card.card import Card
 from game.card import card_constants
 
 from core import utils
-from core.i18n import _
+from core.i18n import _, ngettext
 from game.edo import message_constants
 
 @utils.duel_message_handler(message_constants.MSG_CONFIRM_CARDS)
@@ -27,15 +27,22 @@ def msg_confirm_cards(client, data, data_length):
 	return data.read()
 
 def confirm_cards(client, to_player, size, cards):
-	_player = ""
-	_opponent = ""
+	# One whole sentence per case. Substituting "You" and "Your opponent" into
+	# a shared sentence left both of them in English, and no language that
+	# inflects its verbs can be translated that way anyway.
+	count = len(cards)
 	if to_player != client.what_player_am_i:
-		_player = "You"
-		_opponent = "Your opponent"
+		message = ngettext(
+			"You show your opponent {count} card.",
+			"You show your opponent {count} cards.",
+			count,
+		)
 	else:
-		_player = "Your opponent"
-		_opponent = "You"
-	utils.output(_("{player} shows {opponent} {count} cards.")
-			.format(player=_player, opponent=_opponent, count=len(cards)))
+		message = ngettext(
+			"Your opponent shows you {count} card.",
+			"Your opponent shows you {count} cards.",
+			count,
+		)
+	utils.output(message.format(count=count))
 	for i, c in enumerate(cards):
 		utils.output(_("{index}: {name}").format(index=i + 1, name=c.get_name()))

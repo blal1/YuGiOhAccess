@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
-_DLL_DIRECTORY_HANDLES = []
+_DLL_DIRECTORY_HANDLES: list = []
 
 # --- Constants ---
 
@@ -20,6 +20,9 @@ LOCATION_SZONE = 0x08
 LOCATION_GRAVE = 0x10
 LOCATION_REMOVED = 0x20
 LOCATION_EXTRA = 0x40
+LOCATION_OVERLAY = 0x80
+LOCATION_FZONE = 0x100
+LOCATION_PZONE = 0x200
 
 POS_FACEUP_ATTACK = 0x1
 POS_FACEDOWN_ATTACK = 0x2
@@ -167,6 +170,10 @@ class CardDatabase:
     def get_card(self, code: int) -> dict | None:
         return self._cards.get(code)
 
+    def get_type(self, code: int) -> int:
+        card = self._cards.get(code)
+        return int(card["type"]) if card else 0
+
 
 # --- Core Wrapper ---
 
@@ -242,6 +249,10 @@ class OcgCore:
 
         lib.OCG_DuelQueryField.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint32)]
         lib.OCG_DuelQueryField.restype = ctypes.c_void_p
+
+    def card_type(self, code: int) -> int:
+        """Card type bits, or 0 when the databases do not know the card."""
+        return self._db.get_type(code)
 
     def get_version(self) -> tuple[int, int]:
         major = ctypes.c_int()
@@ -333,6 +344,25 @@ class OcgCore:
         info.overlay_seq = overlay_seq
         length = ctypes.c_uint32()
         ptr = self._lib.OCG_DuelQuery(duel, ctypes.byref(length), ctypes.byref(info))
+        if not ptr or length.value == 0:
+            return b""
+        return ctypes.string_at(ptr, length.value)
+
+    def query_location(self, duel: ctypes.c_void_p, flags: int, controller: int,
+                       location: int) -> bytes:
+        """Query a whole location at once.
+
+        Returns the core's query buffer: one chunk per field, a QUERY_END chunk
+        per card, and a zero length chunk for each empty zone.
+        """
+        info = OCG_QueryInfo()
+        info.flags = flags
+        info.con = controller
+        info.loc = location
+        info.seq = 0
+        info.overlay_seq = 0
+        length = ctypes.c_uint32()
+        ptr = self._lib.OCG_DuelQueryLocation(duel, ctypes.byref(length), ctypes.byref(info))
         if not ptr or length.value == 0:
             return b""
         return ctypes.string_at(ptr, length.value)

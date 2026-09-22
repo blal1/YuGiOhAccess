@@ -16,14 +16,14 @@ def test_replay_and_side_deck_remaining_menu_paths(mocker, tmp_path):
     mocker.patch("ui.replay_ui.wx.TextDataObject", side_effect=lambda value: value)
 
     empty_menu = replay_ui.replay_viewer_menu.__wrapped__()
-    assert empty_menu.items[0][0] == "No saved replays."
+    assert empty_menu.items[0][0] == "No saved duels yet."
 
     replay_file = replay_ui.save_replay_packet(client, b"abc", new=True)
     menu = replay_ui.replay_info_menu.__wrapped__(replay_file)
     assert menu.items[0][0].startswith("Replay file:")
     replay_ui.copy_replay_path(replay_file)
     deleted_menu = replay_ui.delete_replay(replay_file)
-    assert deleted_menu.items[0][0] == "No saved replays."
+    assert deleted_menu.items[0][0] == "No saved duels yet."
 
     mocker.patch("ui.side_deck_ui.VerticalMenu", FakeMenu)
     mocker.patch("ui.side_deck_ui.Card", side_effect=lambda code: NamedCard(f"Card {code}"))

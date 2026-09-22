@@ -66,15 +66,49 @@ def test_launch_bot_for_room_passes_windbot_safe_arguments(mocker):
         room=SimpleNamespace(roomid=12345),
     )
 
-    launcher.launch_bot_for_room(client, deck="AI_BlueEyes.ydk", chat=False)
+    launcher.launch_bot_for_room(client, deck="AI_BlueEyes.ydk")
 
     launch_bot.assert_called_once_with(
         host="127.0.0.1",
         port=7933,
-        room_info=12345,
+        # A string: WindBot reads every launch field as one, and a number
+        # makes it discard the whole payload.
+        room_info="12345",
         deck="Blue-Eyes",
         name="WindBot",
         hand=3,
         chat=True,
         version=720937,
     )
+
+
+def test_launch_bot_for_room_respects_the_chat_setting(mocker):
+    """The setting is the master switch; the caller can only be stricter."""
+    from bot import launcher
+    from game.edo import structs
+
+    mocker.patch("bot.launcher._ensure_engine")
+    launch_bot = mocker.patch("bot.engine.launch_bot")
+    mocker.patch.object(launcher.variables, "edo_client_version", structs.ClientVersion((41, 0), (11, 0)))
+    client = SimpleNamespace(
+        server=SimpleNamespace(address="127.0.0.1", lobby_port=7933),
+        room=SimpleNamespace(roomid=12345),
+    )
+
+    def configure(enable_bot_chat):
+        launcher.variables.config = MagicMock()
+        launcher.variables.config.get.side_effect = lambda key, default=None: {
+            "rock_paper_scissors_bot_behavior": "random",
+            "enable_bot_chat": enable_bot_chat,
+        }.get(key, default)
+
+    # Unticking the setting silences the bot even though the caller defaults
+    # to wanting chat.
+    configure(False)
+    launcher.launch_bot_for_room(client, deck="AI_BlueEyes.ydk")
+    assert launch_bot.call_args.kwargs["chat"] is False
+
+    # And a caller that asks for silence gets it whatever the setting says.
+    configure(True)
+    launcher.launch_bot_for_room(client, deck="AI_BlueEyes.ydk", chat=False)
+    assert launch_bot.call_args.kwargs["chat"] is False

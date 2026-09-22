@@ -10,7 +10,7 @@ from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
 
-selected_zones = []
+selected_zones: list = []
 
 @utils.duel_message_handler(message_constants.MSG_SELECT_PLACE)
 @utils.duel_message_handler(message_constants.MSG_SELECT_DISFIELD)

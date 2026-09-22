@@ -5,7 +5,7 @@ from pathlib import Path
 from appdirs import user_data_dir
 
 from core import dotdict
-from core import config
+from core.config import Config
 from core import version
 
 from game.edo import structs
@@ -30,7 +30,7 @@ UPDATER_CACHE_DIR = Path(APP_DATA_DIR) / "updates"
 DECK_DIR = Path(APP_DATA_DIR) / "decks"
 
 DEV_OPTIONS = None
-config = config.Config({
+config = Config({
     "first_time_run": True,
         "nickname": "Player",
         "language": "english",

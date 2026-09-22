@@ -1,6 +1,5 @@
 """Tests for side decking UI logic."""
-import struct
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 
 def test_do_move_to_side(mocker):

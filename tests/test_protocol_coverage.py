@@ -93,12 +93,16 @@ def test_message_constants_match_the_header_when_it_is_available(tmp_path):
 
 
 def test_server_uses_the_generated_ids():
-    """server/duel.py must not keep its own copy of the id table."""
-    from game.edo import message_constants
+    """The server must not keep its own copy of the id table."""
+    from game.edo import message_constants, message_routing
     from server import duel
 
-    assert duel.MSG_SELECT_COUNTER == message_constants.MSG_SELECT_COUNTER == 22
-    assert duel.MSG_SORT_CARD == message_constants.MSG_SORT_CARD == 25
+    # Per-player routing now lives in message_routing, shared with the client.
+    assert message_constants.MSG_SELECT_COUNTER in message_routing.PROMPT_MESSAGES
+    assert message_constants.MSG_SORT_CARD in message_routing.PROMPT_MESSAGES
+    assert message_constants.MSG_SELECT_COUNTER == 22
+    assert message_constants.MSG_SORT_CARD == 25
+    assert duel.PROMPT_MESSAGES is message_routing.PROMPT_MESSAGES
     assert duel.MSG_SHUFFLE_HAND == message_constants.MSG_SHUFFLE_HAND == 33
     assert duel.MSG_SWAP_GRAVE_DECK == message_constants.MSG_SWAP_GRAVE_DECK == 35
     assert duel.MSG_SHUFFLE_SET_CARD == message_constants.MSG_SHUFFLE_SET_CARD == 36

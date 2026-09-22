@@ -17,7 +17,8 @@ from ui import duel_messages # noqa
 from core import speech
 from core import utils
 
-from game.edo import structs, structs_utils
+from game.edo import structs
+from game.edo import message_routing
 
 logger = logging.getLogger(__name__)
 
@@ -70,8 +71,54 @@ def handle_error(client, message):
         utils.output(_("Invalid version. Please update the game, or contact support if the issue persists."))
     
 def handle_deck_error(client, message):
-    logger.error(str(message))
-    utils.output(str(message))
+    """Say why the server refused the deck, rather than reading out a struct.
+
+    This used to speak the repr of a ctypes structure, which told a player
+    with a 39 card deck approximately nothing.
+    """
+    logger.error("Deck refused by the server: %s", message)
+    utils.output(_deck_error_text(message), priority=speech.Priority.CRITICAL)
+
+
+def _card_name(code):
+    if not code:
+        return ""
+    try:
+        from game.card.card import Card
+
+        return Card(int(code)).get_name()
+    except Exception:
+        logger.debug("Deck error named a card we could not load: %s", code, exc_info=True)
+        return str(code)
+
+
+def _deck_error_text(message):
+    # The reasons as EDOPro numbers them; see server/deck_check.py.
+    error_type = int(getattr(message, "type", 0))
+    count = getattr(message, "count", None)
+    got = int(getattr(count, "got", 0) or 0)
+    minimum = int(getattr(count, "min", 0) or 0)
+    maximum = int(getattr(count, "max", 0) or 0)
+    name = _card_name(getattr(message, "code", 0))
+
+    if error_type == 6:
+        return _("Your main deck has {got} cards. It must have between {min} and {max}.").format(
+            got=got, min=minimum, max=maximum)
+    if error_type == 7:
+        return _("Your extra deck has {got} cards. At most {max} are allowed.").format(
+            got=got, max=maximum)
+    if error_type == 8:
+        return _("Your side deck has {got} cards. At most {max} are allowed.").format(
+            got=got, max=maximum)
+    if error_type == 4:
+        return _("Your deck contains a card this server does not know: {card}.").format(card=name)
+    if error_type == 1:
+        return _("The banlist allows {max} copies of {card}, and your deck has {got}.").format(
+            max=maximum, card=name, got=got)
+    if error_type == 5:
+        return _("Your deck has {got} copies of {card}. At most {max} are allowed.").format(
+            got=got, card=name, max=maximum)
+    return _("The server refused your deck.")
 
 @utils.packet_handler(structs.ServerIdType.CHANGE_SIDE)
 def handle_change_side(client, packet_data, packet_length):
@@ -162,12 +209,55 @@ def handle_catchup(client, packet_data, packet_length):
         utils.output(_("Caught up with the duel."), priority=speech.Priority.CRITICAL)
 
 
+def log_incoming_duel_message(client, packet_data):
+    """One line per duel message, so a duel can be replayed from the log.
+
+    The addressed player is the part worth having: a prompt that names anyone
+    but us means the server is asking us to act for someone else, which is how
+    the bot ended up playing the human's turns.
+    """
+    duel_message_id = int(packet_data[0])
+    name = message_routing.message_name(duel_message_id)
+    target = message_routing.addressed_player(duel_message_id, packet_data)
+    me = getattr(client, "what_player_am_i", -1)
+    if target is None:
+        logger.debug("Duel message %s (%d bytes)", name, len(packet_data))
+        return
+    who = "me" if target == me else f"player {target}"
+    if duel_message_id in message_routing.PROMPT_MESSAGES and target != me:
+        logger.warning(
+            "Prompt %s addressed to player %d, but we are player %d. "
+            "Answering it would act for the other duelist.",
+            name, target, me,
+        )
+    else:
+        logger.debug("Duel message %s for %s (%d bytes)", name, who, len(packet_data))
+
+
+def remember_prompt(client, duel_message_id, packet_data, packet_length):
+    """Keep the last question the duel asked us, so it can be asked again.
+
+    MSG_RETRY means the core rejected our answer and is still waiting for a
+    good one. Without the question in hand there is nothing to put back on
+    screen, so the duel simply stopped: the player was told the answer was
+    invalid and then had nothing left to answer.
+    """
+    if client is None or duel_message_id not in message_routing.PROMPT_MESSAGES:
+        return
+    target = message_routing.addressed_player(duel_message_id, packet_data)
+    if target is not None and target != getattr(client, "what_player_am_i", -1):
+        return
+    client.memory.last_prompt = (duel_message_id, bytes(packet_data), packet_length)
+
+
 @utils.packet_handler(structs.ServerIdType.GAME_MSG)
 def handle_game_msg(client, packet_data, packet_length):
     duel_message_id = int(packet_data[0])
+    log_incoming_duel_message(client, packet_data)
     if duel_message_id not in utils.duel_message_handlers:
         logger.error(f"Unhandled duel message id: {duel_message_id}.\nPacket data:\n{packet_data}")
         return
+    remember_prompt(client, duel_message_id, packet_data, packet_length)
     duel_message_handler = utils.duel_message_handlers[duel_message_id]
     logger.debug(f"Handling duel message id: {duel_message_id}, with handler: {duel_message_handler}")
     wx.CallAfter(duel_message_handler, client, packet_data, packet_length)

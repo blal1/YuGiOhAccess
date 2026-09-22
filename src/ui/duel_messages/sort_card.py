@@ -2,7 +2,6 @@ import io
 import logging
 import struct
 
-import wx
 
 from core import utils
 from core.i18n import _
@@ -26,6 +25,9 @@ def msg_sort_card(client, data, data_length):
         location = client.read_u8(data)
         sequence = client.read_u32(data)
         card = Card(code)
+        # Where the card is was read off the wire and then dropped, which left
+        # two copies of the same card indistinguishable in the sort list.
+        card.set_location_and_position_info(controller, location, sequence, 0)
         cards.append(card)
     sort_card(client, player, cards)
 

@@ -1,121 +1,68 @@
-name: Build EDOPro
-on: [push, pull_request]
-env:
-  DEPLOY_REPO: ${{ secrets.DEPLOY_REPO }}
-  DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-  DEPLOY_BRANCH: ${{ secrets.DEPLOY_BRANCH }}
+# Checks that the bundled WindBot still compiles.
+#
+# This replaces the release pipeline inherited from the upstream WindBot
+# repository, which had stopped working on every count: it ran on the retired
+# windows-2019 image, used actions/checkout@v1 and the archived
+# actions/create-release, built an Android library through Embeddinator that
+# this project does not use, and deployed to a DEPLOY_REPO secret a fork does
+# not have. It failed on every push.
+#
+# What this fork needs from CI here is narrower and actually useful: the bot is
+# built by scripts/build_windbot.py and loaded in-process through pythonnet, so
+# the thing worth catching is WindBot no longer compiling. The old pipeline is
+# in the history if the upstream artifacts are ever wanted again.
+
+name: Build WindBot
+
+on:
+  push:
+    paths:
+      - "**.cs"
+      - "**.csproj"
+      - "**.sln"
+      - "scripts/build_windbot.py"
+      - ".github/workflows/windbot.yml"
+  pull_request:
+    paths:
+      - "**.cs"
+      - "**.csproj"
+      - "**.sln"
+      - "scripts/build_windbot.py"
+      - ".github/workflows/windbot.yml"
+  workflow_dispatch:
+
 jobs:
-  create_release:
-    runs-on: ubuntu-latest
-    outputs:
-      output: ${{steps.create.outputs.id}}
+  build:
+    runs-on: windows-latest
     steps:
-    - name: Create release
-      if: startsWith(github.ref, 'refs/tags/')
-      id: create
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ github.ref }}
-        draft: true
-        prerelease: false
-  Desktop:
-    runs-on: windows-2019
-    needs: create_release
-    env:
-      TRAVIS_OS_NAME: windows
-    steps:
-    - name: Set ARTIFACT env var
-      shell: bash
-      run: |
-        echo "ARTIFACT=WindBotIgnite-Release-$(date +%Y%m%d)-${{ github.sha }}.zip" >> $GITHUB_ENV
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
-    - uses: actions/checkout@v1
-      with:
-        fetch-depth: 1
-        submodules: true
-    - name: Build
-      shell: bash
-      run: |
-        dotnet build WindBot.csproj --configuration=Release
-    - name: Predeploy
-      shell: bash
-      run: |
-        cd bin && mv Release WindBot
-        7z a -tzip "$ARTIFACT" WindBot
-        mv $ARTIFACT .. && cd ..
-        mkdir -p assets
-        cp $ARTIFACT assets
-        cp Dialogs/default.json .
-    - name: Deploy
-      if: ${{ github.event_name == 'push' }}
-      shell: bash
-      run: ./ci/deploy.sh
-    - name: Upload Release Assets
-      if: startsWith(github.ref, 'refs/tags/')
-      id: upload-release-assets
-      uses: dwenegar/upload-release-assets@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        release_id: ${{ needs.create_release.outputs.output }}
-        assets_path: assets
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-  Android:
-    runs-on: windows-2019
-    needs: create_release
-    env:
-      TRAVIS_OS_NAME: android
-    steps:
-    - name: Set ARTIFACT env var
-      shell: bash
-      run: |
-        echo "ARTIFACT=WindBotIgnite-Release-$(date +%Y%m%d)-${{ github.sha }}.zip" >> $GITHUB_ENV
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
-    - uses: actions/checkout@v1
-      with:
-        fetch-depth: 1
-        submodules: true
-# Unspecified dependency for Embeddinator; 64-bit does not work
-    - name: Install mono
-      shell: bash
-      run: |
-        choco install mono --x86 --ignore-checksums
-    - name: Install SDK 24, SDK 25 and NDK 15
-      shell: bash
-      env:
-        VS_PREFIX: "16.0_"
-      run: |
-        ./ci/install-sdk-ndk.sh
-    - name: Build
-      shell: bash
-      run: |
-        msbuild.exe -t:restore WindBot.sln
-        msbuild.exe -m -p:Configuration=Release WindBot.sln
-    - name: Predeploy
-      shell: bash
-      run: |
-        cd bin && mkdir -p WindBot
-        cp -r Release/COPYING Release/LICENSE Release/bots.json Release/Decks/ Release/Dialogs/ WindBot/
-        7z a WindBotIgnite-Resources.7z WindBot && cd ..
-        mkdir -p assets
-        mv output/libWindbot.aar bin/WindBotIgnite-Resources.7z assets
-    - name: Upload Release Assets
-      if: startsWith(github.ref, 'refs/tags/')
-      id: upload-release-assets
-      uses: dwenegar/upload-release-assets@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        release_id: ${{ needs.create_release.outputs.output }}
-        assets_path: assets
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
+      # The same project and output directory scripts/build_windbot.py uses,
+      # so a green run here means that script will work too.
+      - name: Build WindBot.Desktop
+        run: dotnet build WindBot.Desktop.csproj --configuration Release
 
-# assets to upload android
-    # - $ARTIFACT
-    # - libWindbot.aar
-    # - WindBotIgnite-Resources.7z
+      - name: Check the assembly was produced
+        shell: bash
+        run: |
+          set -e
+          dll=$(find . -name "WindBot.Desktop.dll" -path "*Release*" | head -1)
+          if [ -z "$dll" ]; then
+            echo "WindBot.Desktop.dll was not built" >&2
+            exit 1
+          fi
+          echo "Built $dll"
+
+      - name: Upload the assembly
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindBot.Desktop
+          path: "**/Release/**/WindBot.Desktop.dll"
+          if-no-files-found: error
+          retention-days: 7

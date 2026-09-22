@@ -80,9 +80,19 @@ def describe_effect(description):
 
     Values above 10000 pack a card code in the upper bits and an index into that
     card's strings in the lower four; smaller values index the system strings.
+
+    Anything that is not one of those is handed back as it stands: these codes
+    arrive from the wire, and a hint that cannot be resolved is worth saying
+    nothing about rather than taking the handler down.
     """
-    if description > 10000:
-        return Card(description >> 4).get_effect_description(description, True)
+    if not isinstance(description, int):
+        return str(description) if description else ""
+    try:
+        if description > 10000:
+            return Card(description >> 4).get_effect_description(description, True)
+    except Exception:
+        logger.debug("Could not describe effect %s", description, exc_info=True)
+        return ""
     strings = getattr(variables.LANGUAGE_HANDLER, "strings", None)
     if not strings:
         return ""

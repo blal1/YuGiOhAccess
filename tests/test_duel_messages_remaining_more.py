@@ -37,7 +37,6 @@ def test_deck_top_confirm_and_single_reveal(mocker):
 
 
 def test_draw_face_down_and_sound_helper(mocker):
-    from game.card import card_constants
     from ui.duel_messages import draw
 
     client, stack = _client(mocker)
@@ -342,9 +341,23 @@ def test_chaining_target_hint_random_remove_shuffle_swap(mocker):
     card_hint.card_hint(client, NamedCard("Hint"), 4, 1)
     card_hint.card_hint(client, NamedCard("Hint"), 99, 1)
 
-    hint.variables.LANGUAGE_HANDLER.strings = {"system": {1512: "Number %d"}}
-    hint.hint(client, hint.HINT.MESSAGE, 0, "Direct message")
+    # A hint carries a description code off the wire, not a ready made string:
+    # small values index the system strings, large ones pack a card code.
+    hint.variables.LANGUAGE_HANDLER.strings = {"system": {1512: "Number %d", 501: "Direct message"}}
+    mocker.patch("ui.duel_messages.player_hint.variables.LANGUAGE_HANDLER", hint.variables.LANGUAGE_HANDLER)
+    output = mocker.patch("ui.duel_messages.hint.utils.output")
+    hint.hint(client, hint.HINT.MESSAGE, 0, 501)
+    assert output.call_args.args[0] == "Direct message"
     hint.hint(client, hint.HINT.NUMBER, 0, 5)
+    assert output.call_args.args[0] == "Number 5"
+    # The selection hint says what the prompt that follows is for, and only
+    # the player being asked has any use for it.
+    client.what_player_am_i = 0
+    hint.hint(client, hint.HINT.SELECTMSG, 0, 501)
+    assert output.call_args.args[0] == "Direct message"
+    output.reset_mock()
+    hint.hint(client, hint.HINT.SELECTMSG, 1, 501)
+    output.assert_not_called()
     hint.hint(client, hint.HINT.EVENT, 0, 99)
     hint.msg_hint(client, b"\x02" + struct.pack("B", int(hint.HINT.NUMBER)) + struct.pack("B", 0) + struct.pack("Q", 7), 11)
 

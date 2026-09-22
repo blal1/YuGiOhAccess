@@ -42,21 +42,29 @@ def test_config_load_save_get_set(tmp_path):
     assert explicit.exists()
 
 
-def test_i18n_available_setup_and_plural_context(mocker, tmp_path):
+def test_i18n_available_setup_and_plural_context(mocker, tmp_path, write_catalogue):
     import core.i18n as i18n
 
     mocker.patch.object(i18n, "_locale_dir", tmp_path)
     assert i18n.get_locale_dir() == tmp_path
     assert i18n.get_available_languages() == {"en": "English"}
 
-    fr_mo = tmp_path / "fr" / "LC_MESSAGES" / "yugiohaccess.mo"
-    fr_mo.parent.mkdir(parents=True)
-    fr_mo.write_bytes(b"fake")
-    (tmp_path / "unknown" / "LC_MESSAGES").mkdir(parents=True)
-    (tmp_path / "unknown" / "LC_MESSAGES" / "yugiohaccess.mo").write_bytes(b"fake")
+    write_catalogue(tmp_path / "fr" / "LC_MESSAGES" / "yugiohaccess.mo")
+    write_catalogue(tmp_path / "unknown" / "LC_MESSAGES" / "yugiohaccess.mo")
     langs = i18n.get_available_languages()
     assert langs["fr"] == "Français"
     assert langs["unknown"] == "unknown"
+
+    # A catalogue with nothing in it is not a language the player can pick:
+    # choosing it would announce a change and then change nothing.
+    write_catalogue(tmp_path / "de" / "LC_MESSAGES" / "yugiohaccess.mo", translations={})
+    # Neither is a file that is not a catalogue at all.
+    corrupt = tmp_path / "it" / "LC_MESSAGES" / "yugiohaccess.mo"
+    corrupt.parent.mkdir(parents=True)
+    corrupt.write_bytes(b"fake")
+    offered = i18n.get_available_languages()
+    assert "de" not in offered
+    assert "it" not in offered
 
     fake_translation = MagicMock()
     fake_translation.gettext.side_effect = lambda s: f"t:{s}"
@@ -181,8 +189,11 @@ def test_client_room_helpers(mocker):
 def test_client_get_card_and_cardlist(mocker):
     from game.card import card_constants
 
+    from game.card.card import Card
+
     client = _client_without_init()
-    found_card = MagicMock()
+    # Only a real Card counts: an empty zone stores its own label here.
+    found_card = Card(0)
     field = MagicMock()
     field.zones = {"ph1": MagicMock(card=found_card)}
     client.get_duel_field = MagicMock(return_value=field)
@@ -347,7 +358,7 @@ def test_client_join_and_create_room_paths(mocker):
     created_packet = structs.StocCreateGame()
     created_packet.id = 55
     fake_client.wait_for_packet = MagicMock(return_value=(structs.ServerIdType.CREATE_GAME, len(bytes(created_packet)), bytes(created_packet)))
-    game_client_cls = mocker.patch("game.client.Client", side_effect=lambda server_arg: fake_client)
+    mocker.patch("game.client.Client", side_effect=lambda server_arg: fake_client)
     mocker.patch("game.client.variables.DEV_OPTIONS", MagicMock(no_shuffle=True, draw=2))
     created = Client.create_room(server, {"name": "Room", "password": "", "notes": "", "best_of": 3, "team_count": 2})
     assert created.room_id == 55

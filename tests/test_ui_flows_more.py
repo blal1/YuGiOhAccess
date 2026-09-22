@@ -1,8 +1,6 @@
-from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-import pytest
 
 
 class FakeMenu:
@@ -21,6 +19,18 @@ class FakeMenu:
         control.GetCurrentSelection.return_value = 0
         self.items.append((option, function, args, kwargs, control))
         return control
+
+    def append_cancel_item(self, option, function=None, *args, **kwargs):
+        """Stand-in for BaseUI.append_cancel_item.
+
+        The real one appends the item and registers it as what Escape does.
+        """
+        self.cancel_action = function
+        return self.append_item(option, function, *args, **kwargs)
+
+    def set_cancel_action(self, function):
+        self.cancel_action = function
+        return function
 
     def append_card(self, code, label, function=None):
         """Stand-in for ui.card_details_ui.CardChoiceMenu.append_card."""

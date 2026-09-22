@@ -14,6 +14,7 @@ from ui import card_list_ui
 from ui import tab_order
 
 from core import dotdict, utils
+from core import speech
 from core import variables
 from core.i18n import _
 
@@ -110,7 +111,7 @@ class ZONE_KEYS(StrEnum):
 class DuelField(BaseUI):
     def __init__(self, client):
         super(DuelField, self).__init__(8, 60, _("Duel Field"), allow_movement_to_none=False)
-        self.set_help_text(_("Arrow keys to navigate field. Enter on a card to open action menu. Space reads full card text. N reads name, D description, T stats, L location, A available actions. Backspace opens duel menu. M opens chat. C reads the chain, E the effects applying to each player, G graveyard, R banished, X extra deck. H repeats the last ten messages, and F9 does the same from anywhere. Escape cancels chaining."))
+        self.set_help_text(_("Arrow keys to navigate field. Enter on a card to open action menu. Space reads full card text. N reads name, D description, T stats, L location, A available actions. Backspace opens duel menu. M opens chat. C reads the chain, E the effects applying to each player, G graveyard, R banished, X extra deck. H repeats the last ten messages, Shift plus H opens the duel history, and F9 repeats from anywhere. Escape cancels chaining."))
         center_x = int(self.center_x)
         center_y = int(self.center_y)
         self.client = client
@@ -372,6 +373,11 @@ class DuelField(BaseUI):
         
     def resolve_labels_for_card(self, card):
         text_to_show = ""
+        # A won duel clears the player state while this field is still on
+        # screen, so walking the board afterwards used to take the app down.
+        # The cards are still worth reading; only the playable hints are gone.
+        if self.client.player is None:
+            return text_to_show
         if playable_cards.matching_cards(card, self.client.player.activatable):
             text_to_show += _("Has activatable effects") + ", "
         logger.debug(f"{card} in {self.client.player.chaining_cards}")
@@ -401,16 +407,29 @@ class DuelField(BaseUI):
         # if card is not instance of card, it's a string
         if not isinstance(card, Card):
             return False
-        # see if we can find the card in the chain cards
-        for chain_card in self.client.player.chaining_cards:
+        # See if we can find the card among the cards we may chain with. The
+        # answer has to come from a card the duel actually offered: chaining
+        # with anything else is a response the core throws straight back.
+        chaining_cards = self.client.player.chaining_cards
+        for chain_card in chaining_cards:
             logger.debug(f"Selected card {card.name}, current chain card: {chain_card.name}")
             if chain_card == card:
                 self.tab_order.set_tabable_items([])
                 logger.debug(f"Chaining card: {chain_card.name}, with chain index {chain_card.chain_index}")
                 self.client.send(structs.ClientIdType.RESPONSE, struct.pack('I', chain_card.chain_index))
                 self.preemtive_key_handler = None
-            return True
-        return False
+                return True
+        if not chaining_cards:
+            # No chain prompt is open, so this key is not ours to answer.
+            return False
+        # A chain prompt is open and the duel is blocked on it. Say why nothing
+        # happened and keep the key, rather than falling through to the action
+        # menu and answering a question nobody asked.
+        utils.output(
+            _("{card} cannot be chained right now.").format(card=card.get_name()),
+            priority=speech.Priority.CRITICAL,
+        )
+        return True
 
     def on_cell_change(self,  old_row, old_col, new_row, new_col, cell):
         zone = self.get_zone_from_current_position()
@@ -487,6 +506,20 @@ class DuelField(BaseUI):
                 self.handle_player_spell_and_trap_zone(queries)
             else:
                 self.handle_opponent_spell_and_trap_zone(queries)
+        elif location_enum == card_constants.LOCATION.GRAVE:
+            # The piles are numbered by their position in this list, and cards
+            # leave the middle of it. Rebuilding from the duel's own view is
+            # what keeps "the third card in your graveyard" meaning the same
+            # thing here as it does to the duel.
+            if controller == client.what_player_am_i:
+                self.handle_player_graveyard(queries)
+            else:
+                self.handle_opponent_graveyard(queries)
+        elif location_enum == card_constants.LOCATION.REMOVED:
+            if controller == client.what_player_am_i:
+                self.handle_player_banished(queries)
+            else:
+                self.handle_opponent_banished(queries)
         else:
             logger.warning(f"Unhandled location: {location_enum.name}, player: {_player}, queries: {queries}")
 
@@ -526,6 +559,34 @@ class DuelField(BaseUI):
             else:
                 card = _("Face down card")
             self.append_card_to_opponent_hand(card, query)
+
+    def handle_player_graveyard(self, queries):
+        self.clear_player_graveyard()
+        for query in queries:
+            if query.onfield_skipped:
+                continue
+            self.append_card_to_player_graveyard(self._card_from_query(query))
+
+    def handle_opponent_graveyard(self, queries):
+        self.clear_opponent_graveyard()
+        for query in queries:
+            if query.onfield_skipped:
+                continue
+            self.append_card_to_opponent_graveyard(self._card_from_query(query), query)
+
+    def handle_player_banished(self, queries):
+        self.clear_player_banished()
+        for query in queries:
+            if query.onfield_skipped:
+                continue
+            self.append_card_to_player_banished(self._card_from_query(query))
+
+    def handle_opponent_banished(self, queries):
+        self.clear_opponent_banished()
+        for query in queries:
+            if query.onfield_skipped:
+                continue
+            self.append_card_to_opponent_banished(self._card_from_query(query), query)
 
     def handle_player_extra_deck(self, queries):
         # clear the extra deck
@@ -1033,7 +1094,13 @@ class DuelField(BaseUI):
             utils.output(str(player_hint.get_player_hints_text(self.client)))
             return
         if key == ord("H"):
-            utils.replay_recent_messages()
+            # H reads the last few aloud; Shift+H opens the whole duel to browse.
+            if event.ShiftDown():
+                from ui import duel_history_ui
+
+                duel_history_ui.show_duel_history(self.client)
+            else:
+                utils.replay_recent_messages()
             return
         if key == ord("G"):
             self.browse_public_zone("pg", _("Your graveyard"), _("No cards in graveyard"))

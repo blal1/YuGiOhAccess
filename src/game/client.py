@@ -21,6 +21,11 @@ from game.card.location_conversion import LocationConversion
 
 logger = logging.getLogger(__name__)
 
+# How long the packet listener waits between checks while there is still no
+# socket to read from.
+IDLE_POLL_SECONDS = 0.05
+
+
 class Client:
     def __init__(self, server):
         self.server = server
@@ -57,11 +62,18 @@ class Client:
         self.game_socket.connect(self.server.address, self.server.lobby_port)
 
     def disconnect(self):
+        if self.game_socket is None:
+            logger.debug("Asked to disconnect a client that never connected")
+            return
         self.game_socket.disconnect()
 
     def packet_listener(self):
         while True:
             if self.game_socket is None:
+                # The thread starts before the socket exists, and the player
+                # may sit on the menus for minutes. Spinning on `continue`
+                # here pinned a whole core for all of that time.
+                time.sleep(IDLE_POLL_SECONDS)
                 continue
             try:
                 packet_id, packet_length, packet_data = self.game_socket.recv()
@@ -120,10 +132,18 @@ class Client:
             raise TimeoutError("Timed out waiting for packet.")
 
     def send(self, id, data=None):
+        payload = b"" if data is None else bytes(data)
+        if id == structs.ClientIdType.RESPONSE:
+            # Responses are the only packets that change the duel state, so they
+            # are worth a line each when reconstructing what a duel did.
+            logger.info(
+                "Sending duel response as player %s: %s",
+                self.what_player_am_i, payload.hex() or "(empty)",
+            )
         if data is None:
             self.game_socket.send(id)
         else:
-            self.game_socket.send(id, bytes(data))
+            self.game_socket.send(id, payload)
 
 
     @staticmethod
@@ -275,14 +295,28 @@ class Client:
 
 
     def get_card(self, player, location, sequence, max_retries=5, base_delay=0.1):
+        """The card in a zone, or None.
+
+        An empty zone holds its own label where a card would be, so a truthiness
+        check used to hand back a string. Callers then set attributes on it or
+        asked it for a name, which is how a targeting message could take down
+        the whole duel message handler.
+        """
+        resolved_zone_key = None
         for i in range(max_retries):
+            duel_field = self.get_duel_field()
+            if duel_field is None:
+                # The duel is over, or has not started. Nothing to look up.
+                logger.debug("Asked for a card with no duel field in play")
+                return None
             resolved_zone_key = LocationConversion(self, player, location, sequence).to_zone_key()
-            zone = self.get_duel_field().zones.get(resolved_zone_key, None)
-            if zone:
-                if zone.card:
-                    return zone.card
+            zone = duel_field.zones.get(resolved_zone_key, None)
+            if zone is not None and isinstance(zone.card, Card):
+                return zone.card
             time.sleep(base_delay * i)
-        logger.warning(f"Zone {resolved_zone_key} not found.\nZones: {self.get_duel_field().zones.keys()}")
+        duel_field = self.get_duel_field()
+        known = list(duel_field.zones.keys()) if duel_field else []
+        logger.warning(f"No card in zone {resolved_zone_key}.\nZones: {known}")
         return None
             
 

@@ -34,15 +34,22 @@ def msg_summoning_special(client, data, data_length):
 def summoning(client, card, controller, location, sequence, position, special=False):
     card.set_location_and_position_info(controller, location, sequence, card_constants.POSITION(position))
     logger.debug(f"Summoning position: {card.position}")
-    _player = ""
-    if card.controller == client.what_player_am_i:
-        _player = "You"
+    mine = card.controller == client.what_player_am_i
+    # A link monster has no defense to read out. Numbers are safe to build a
+    # string from; words are not, so only the numbers are assembled here.
+    if card.type & card_constants.TYPE.LINK:
+        stats = f"{card.attack}"
     else:
-        _player = "Your opponent"
-    if special:
-        if card.type & card_constants.TYPE.LINK:
-             utils.output(_("%s special summoning %s (%d) in %s position.") % (_player, card.get_name(), card.attack, card.position.name.replace("_", " ")))
-        else:
-            utils.output(_("%s special summoning %s (%d/%d) in %s position.") % (_player, card.get_name(), card.attack, card.defense, card.position.name.replace("_", " ")))
+        stats = f"{card.attack}/{card.defense}"
+    # The position came straight off the enum, so the player heard
+    # "FACE UP ATTACK" in English whatever language they had chosen.
+    position_name = card.get_position()
+    if special and mine:
+        message = _("You are special summoning {card} ({stats}) in {position} position.")
+    elif special:
+        message = _("Your opponent is special summoning {card} ({stats}) in {position} position.")
+    elif mine:
+        message = _("You are summoning {card} ({stats}) in {position} position.")
     else:
-        utils.output(_("%s summoning %s (%d/%d) in %s position.") % (_player, card.get_name(), card.attack, card.defense, card.position.name.replace("_", " ")))
+        message = _("Your opponent is summoning {card} ({stats}) in {position} position.")
+    utils.output(message.format(card=card.get_name(), stats=stats, position=position_name))

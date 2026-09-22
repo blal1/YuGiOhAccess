@@ -12,8 +12,6 @@ from core.exceptions import LanguageException
 logger = logging.getLogger(__name__)
 
 class LanguageHandler:
-    languages = dict()
-    primary_language = ''
     DEFAULT_LANGUAGES = {
         "english": "en",
         "german": "de",
@@ -39,6 +37,11 @@ class LanguageHandler:
     }
 
     def __init__(self):
+        # Per instance, not per class: as class attributes these were shared
+        # by every handler ever made, so one handler's loaded databases and
+        # primary language leaked into the next one's.
+        self.languages = dict()
+        self.primary_language = ''
         self.strings_path = Path(Path(variables.LOCAL_DATA_DIR) / "locales")
         self.card_database_dir = Path(Path(variables.APP_DATA_DIR) / "sync" / "databases2" / "content")
         self.multilingual_data_dir = Path(variables.APP_DATA_DIR) / "sync" / "languages" / "content"

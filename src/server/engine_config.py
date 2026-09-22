@@ -69,7 +69,7 @@ def resolve_engine_paths(
 def _ocgcore_candidates(root: Path) -> list[Path]:
     system = platform.system()
     if system == "Windows":
-        names = ("ocgcore.dll", "ocgcore64.dll", "ygopro-core.dll")
+        names: tuple[str, ...] = ("ocgcore.dll", "ocgcore64.dll", "ygopro-core.dll")
     elif system == "Darwin":
         names = ("libocgcore.dylib", "ocgcore.dylib")
     else:

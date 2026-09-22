@@ -39,8 +39,17 @@ jobs:
         if: steps.cached-uv-dependencies.outputs.cache-hit != 'true'
       - name: Lint with ruff
         run: uv run ruff check
+      - name: Check types with mypy
+        run: uv run mypy
+      - name: Check nothing generated got committed
+        run: uv run python scripts/check_repo_hygiene.py
       - name: Run tests
-        run: uv run pytest
+        # With coverage, so the floor in pyproject.toml is actually enforced.
+        run: uv run pytest --cov=src --cov-report=term
+      - name: Compile UI translations
+        # The .mo files are build output and are not committed, so they have
+        # to be produced here or the packaged build ships without them.
+        run: uv run python scripts/i18n_compile.py
       - name: Build application
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then

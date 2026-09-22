@@ -18,8 +18,10 @@ solo duels.
 - In-duel shortcuts for reading card name, text, stats, location, and available
   actions.
 - Local offline server for creating rooms and dueling without an external
-  server.
+  server, including best-of-three matches with side decking between games.
 - WindBot integration for adding a bot opponent from the room menu.
+- Every duel is saved as a duel log: the whole duel in words, reviewable line
+  by line afterwards in the replay viewer.
 - Public deck selection plus deck import from YDKE/deck strings.
 - Banlist validation before starting a duel.
 - Card database synchronization from Project Ignis data sources.
@@ -52,8 +54,8 @@ start to finish:
 | --- | --- |
 | Up / Down | Move through menu items |
 | Enter | Activate selected item |
-| Backspace | Go back when available |
-| Escape | Cancel the current prompt when available |
+| Backspace | Go back, wherever the screen has a Back, Cancel or Close entry (still deletes text while typing) |
+| Escape | The same, and cancels a duel prompt that may be cancelled |
 
 ### Duel Field
 
@@ -122,10 +124,20 @@ Install development dependencies:
 uv sync --dev
 ```
 
-Run tests:
+Run the checks CI runs:
 
 ```powershell
-uv run pytest
+uv run ruff check                      # lint
+uv run mypy                            # types
+uv run python scripts/check_repo_hygiene.py   # nothing generated got committed
+uv run pytest --cov=src --cov-report=term     # tests, with the coverage floor
+```
+
+Or have them run before each commit:
+
+```powershell
+uv run pre-commit install
+uv run pre-commit run --all-files
 ```
 
 Run a focused test file:
@@ -136,6 +148,38 @@ uv run pytest tests/test_duel_field_more.py
 
 The current test suite covers packet handling, local server flow, WindBot
 launching, duel messages, card selection, duel field behavior, and UI helpers.
+
+### Translations
+
+UI strings live in `locales/<lang>/LC_MESSAGES/yugiohaccess.po`. The `.pot`
+template and the compiled `.mo` files are build output and are not committed.
+
+```powershell
+uv run python scripts/i18n_extract.py   # refresh the template and every .po
+uv run python scripts/i18n_compile.py   # compile, and report coverage per language
+```
+
+A language is offered in Settings only when its catalogue actually contains
+translations, so a `.po` that nobody has filled in yet is never shown as a
+choice that does nothing. Compiling prints how far along each language is.
+Contributions go in the `.po` files; `scripts/i18n_extract.py` keeps them in
+step with the source, and the test suite fails if the template falls behind.
+
+### Duel sound effects
+
+Every sound the duel asks for is checked by the test suite, so an effect that
+is referenced but not shipped fails the build instead of going silently
+missing. To see the state of the set, or to rebuild it:
+
+```powershell
+uv run python scripts/build_sound_effects.py --check
+uv run python scripts/build_sound_effects.py --soundpack <path to a clone of https://github.com/Lahrenheit/EDOPRO-Soundpack>
+```
+
+Provenance and licensing for each file is recorded in
+`src/data/sounds/duel/ATTRIBUTION.md`. The effects are either synthesised by
+that script or built from CC0 recordings; nothing is taken from a source whose
+terms do not allow it.
 
 ## Project Layout
 
@@ -184,7 +228,8 @@ Before opening a pull request:
   is expected outside an installed packaged build and does not prevent local
   development.
 - Discord presence warnings are harmless when Discord is not running.
-- Missing optional sound effects are logged as warnings and do not block duels.
+- A sound effect with no file is logged once as a warning and does not block
+  duels. The set is complete, and a test keeps it that way.
 - This project includes and integrates WindBot-derived components for offline
   bot duels.
 

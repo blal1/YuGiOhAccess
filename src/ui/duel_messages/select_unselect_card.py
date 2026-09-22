@@ -64,7 +64,7 @@ def select_unselect_card(client, player, finishable, cancelable, min, max, selec
             function=lambda i=i: select_unselect_specific_card(client, i),
         )
     if cancelable and not finishable:
-        selection_menu.append_item(_("Cancel"), function=lambda: select_unselect_specific_card(client, -1))
+        selection_menu.append_cancel_item(_("Cancel"), function=lambda: select_unselect_specific_card(client, -1))
     if finishable:
         selection_menu.append_item(_("Finish"), function=lambda: select_unselect_specific_card(client, -1))
     utils.get_ui_stack().push_ui(selection_menu)

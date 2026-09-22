@@ -9,6 +9,7 @@ from core.i18n import _
 from game.card.card import Card
 from game.edo import structs
 from ui.base_ui import VerticalMenu
+from ui.selection_limit import SelectionLimiter
 from game.edo import message_constants
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,9 @@ def msg_select_sum(client, data, data_length):
         sequence = client.read_u32(data)
         param = client.read_u32(data)
         card = Card(code)
+        # Where the card is was read off the wire and then dropped, which left
+        # two copies of the same card indistinguishable in the menu.
+        card.set_location_and_position_info(controller, location, sequence, 0)
         card.param = param
         must_select.append(card)
     can_select_count = client.read_u32(data)
@@ -42,12 +46,16 @@ def msg_select_sum(client, data, data_length):
         sequence = client.read_u32(data)
         param = client.read_u32(data)
         card = Card(code)
+        card.set_location_and_position_info(controller, location, sequence, 0)
         card.param = param
         can_select.append(card)
     select_sum(client, player, select_mode, target_sum, min_cards, max_cards, must_select, can_select)
 
 
 def select_sum(client, player, select_mode, target_sum, min_cards, max_cards, must_select, can_select):
+    # A sum selection is bounded by the total, not by a count, so max_cards is
+    # only a limit when the duel actually set one.
+    limiter = SelectionLimiter(max_cards)
     menu = VerticalMenu(_("Select cards"))
     if select_mode == 0:
         menu.append_item(_("Select cards with levels/ranks that total exactly {target}").format(target=target_sum))
@@ -59,7 +67,8 @@ def select_sum(client, player, select_mode, target_sum, min_cards, max_cards, mu
             menu.append_item(_("{name} (Level {level}) - must select").format(name=card.get_name(), level=level))
     for card in can_select:
         level = card.param & 0xffff
-        menu.append_item(wx.CheckBox, label=_("{name} (Level {level})").format(name=card.get_name(), level=level))
+        label = _("{name} (Level {level})").format(name=card.get_name(), level=level)
+        limiter.add(menu.append_item(wx.CheckBox, label=label), label=label)
     menu.append_item(_("Finish"), function=lambda: finish_sum_selection(client, menu, must_select, can_select, target_sum, select_mode))
     utils.get_ui_stack().push_ui(menu)
 

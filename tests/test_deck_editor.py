@@ -1,5 +1,5 @@
 """Tests for deck editor logic."""
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 
 def test_is_extra_deck_card_fusion(mocker):

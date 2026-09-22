@@ -94,7 +94,6 @@ def test_draw_branches_and_message_parser(mocker):
 
 
 def test_start_phase_win_and_lp_messages(mocker, tmp_path):
-    from game.card import card_constants
     from game.player import Player
     from ui.duel_messages import lpupdate, pay_cost, phase, recover, start, win
 
@@ -298,7 +297,6 @@ def test_selected_and_targeting_messages(mocker):
 
 def test_shuffle_deck_damage_equip_and_set_messages(mocker):
     from game.card import card_constants
-    from game.player import Player
     from ui.duel_messages import damage_step_damage, equip, set, shuffle_deck
 
     client, stack = _client(mocker)

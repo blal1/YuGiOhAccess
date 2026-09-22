@@ -64,6 +64,12 @@ def _ensure_engine():
 
 
 def _find_bot_database_paths() -> list[str]:
+    """Every card database the bot should know about.
+
+    The duel engine loads all of them, so handing the bot only cards.cdb left
+    it blind to everything in the other files: it cannot make a decision about
+    a card it has never heard of, and it would simply pass instead.
+    """
     candidates = [
         pathlib.Path(variables.APP_DATA_DIR) / "sync" / "databases2" / "content",
     ]
@@ -71,10 +77,14 @@ def _find_bot_database_paths() -> list[str]:
         candidates.append(pathlib.Path(variables.LOCAL_DATA_DIR) / "databases")
     for path in candidates:
         path = path.resolve()
-        if path.exists():
-            primary_db = path / "cards.cdb"
-            if primary_db.exists():
-                return [str(primary_db.resolve())]
+        if not path.exists():
+            continue
+        databases = sorted(path.glob("*.cdb"))
+        if not any(db.name == "cards.cdb" for db in databases):
+            # Without the main database the rest is not worth loading.
+            continue
+        logger.debug("Bot card databases from %s: %d file(s)", path, len(databases))
+        return [str(db.resolve()) for db in databases]
     return []
 
 
@@ -115,6 +125,20 @@ def _deck_file_name_to_windbot_key(deck: str) -> str:
     return stem
 
 
+def _room_join_token(client) -> str:
+    """What the bot must present to get into this room.
+
+    WindBot puts this in the password field of its join packet. A public server
+    only lets it into a protected room with the real password, so that wins when
+    there is one; otherwise the room id, which is what an open room expects.
+    """
+    memory = getattr(client, "memory", None)
+    password = getattr(memory, "room_password", "") if memory else ""
+    if password:
+        return str(password)
+    return str(client.room.roomid)
+
+
 def launch_bot_for_room(client, deck: str = "", hand: int = 0, chat: bool = True):
     """Launch an embedded bot targeting the current room on the current server.
 
@@ -133,13 +157,16 @@ def launch_bot_for_room(client, deck: str = "", hand: int = 0, chat: bool = True
         elif rock_paper_scissors_bot_behavior == "scissors":
             hand = 1
 
-    if not chat:
-        chat = variables.config.get("enable_bot_chat", True)
+    # The setting is the master switch and the caller can only be stricter.
+    # Consulting the setting only when the caller had already said no meant
+    # every normal call kept the default of True, and unticking "Enable bot
+    # chatter during duels" changed nothing at all.
+    chat = bool(chat) and bool(variables.config.get("enable_bot_chat", True))
 
     engine.launch_bot(
         host=client.server.address,
         port=client.server.lobby_port,
-        room_info=client.room.roomid,
+        room_info=_room_join_token(client),
         deck=_deck_file_name_to_windbot_key(deck),
         name="WindBot",
         hand=hand,

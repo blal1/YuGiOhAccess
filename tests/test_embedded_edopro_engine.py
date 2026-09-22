@@ -67,13 +67,21 @@ def test_lobby_create_join_packets_match_client_structs():
     assert room_payload["host_info"]["version"] == [0, 0, 0, 0]
 
     assert LobbyServer._encode_room_created(room) == (42).to_bytes(4, "little")
+    # The join reply has to be exactly what the client parses it back into,
+    # deck size limits and all. Written by hand it was twelve bytes short.
+    import ctypes
+
+    from game.edo import structs as client_structs
+
     joined = LobbyServer._encode_join_game(info)
-    assert len(joined) == 56
-    assert struct.unpack_from("<I", joined, 0)[0] == 123
-    assert struct.unpack_from("<I", joined, 12)[0] == 8000
-    assert struct.unpack_from("<I", joined, 24)[0] == 4043399681
-    assert struct.unpack_from("<i", joined, 32)[0] == 2
-    assert struct.unpack_from("<i", joined, 40)[0] == 3
+    assert len(joined) == ctypes.sizeof(client_structs.StocJoinGame)
+    parsed = client_structs.StocJoinGame.from_buffer_copy(joined)
+    assert parsed.info.banlist_hash == 123
+    assert parsed.info.starting_lp == 8000
+    assert parsed.info.handshake == 4043399681
+    assert parsed.info.t0_count == 2
+    assert parsed.info.best_of == 3
+    assert (parsed.info.limits.main.min, parsed.info.limits.main.max) == (40, 60)
 
 
 def test_lobby_join_uses_numeric_room_id_from_join_struct():
@@ -161,7 +169,7 @@ def test_lobby_refuses_duel_start_without_ocgcore():
             self.sent.append((packet_id, data))
 
     lobby = LobbyServer(duel_engine=None)
-    room = Room(1, {"t0_count": 1, "t1_count": 1})
+    room = Room(1, {"t0_count": 1, "t1_count": 1, "no_check_deck": 1})
     players = [FakeConn(0), FakeConn(1)]
     room.players = players
     for player in players:
@@ -194,7 +202,7 @@ def test_lobby_marks_windbot_ready_and_can_start_duel(mocker):
             self.sent.append((packet_id, data))
 
     lobby = LobbyServer(duel_engine=object())
-    room = Room(77, {"password": "", "t0_count": 1, "t1_count": 1})
+    room = Room(77, {"password": "", "t0_count": 1, "t1_count": 1, "no_check_deck": 1})
     lobby.rooms[77] = room
     host = FakeConn("Host")
     room.add_player(host)
@@ -244,7 +252,7 @@ def test_lobby_relays_chat_2_with_sender_name():
             self.sent.append((packet_id, data))
 
     lobby = LobbyServer()
-    room = Room(88, {"password": ""})
+    room = Room(88, {"password": "", "no_check_deck": 1})
     sender = FakeConn("WindBot", 1)
     receiver = FakeConn("Player", 0)
     room.players = [receiver, sender]
@@ -365,7 +373,7 @@ def test_lobby_try_start_auto_readies_local_bot_and_reports_missing_deck(mocker)
             self.sent.append((packet_id, data))
 
     lobby = LobbyServer(duel_engine=object())
-    room = Room(78, {"t0_count": 1, "t1_count": 1})
+    room = Room(78, {"t0_count": 1, "t1_count": 1, "no_check_deck": 1})
     host = FakeConn("Host", 0)
     bot = FakeConn("", 1)
     room.players = [host, bot]
@@ -426,7 +434,7 @@ def test_lobby_start_request_continues_when_bot_deck_arrives_late(mocker):
 
     mocker.patch("server.duel.DuelInstance", FakeDuel)
     lobby = LobbyServer(duel_engine=object())
-    room = Room(79, {"t0_count": 1, "t1_count": 1})
+    room = Room(79, {"t0_count": 1, "t1_count": 1, "no_check_deck": 1})
     host = FakeConn("Host", 0)
     bot = FakeConn("WindBot", 1)
     room.players = [host, bot]

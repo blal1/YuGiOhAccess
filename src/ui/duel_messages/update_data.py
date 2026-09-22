@@ -42,6 +42,26 @@ class QueryResult:
     def __repr__(self):
         return f"<QueryResult {self.fields}>"
 
+def _read_card_location(client, data):
+    """Read the ten byte card reference used by the reason and equip chunks.
+
+    The core writes ten zero bytes when there is no such card, so an empty
+    location means "none" rather than a card in the deck of player 0.
+    """
+    controler = client.read_u8(data)
+    location = client.read_u8(data)
+    sequence = client.read_u32(data)
+    position = client.read_u32(data)
+    if not location:
+        return {}
+    return {
+        "controler": controler,
+        "location": location,
+        "sequence": sequence,
+        "position": position,
+    }
+
+
 def parse_queries(client, controller, location, size, data):
     queries = []
     query = QueryResult()
@@ -77,7 +97,9 @@ def parse_queries(client, controller, location, size, data):
         if flags & card_constants.QUERY.ATTRIBUTE:
             query.attribute = client.read_u32(data)
         if flags & card_constants.QUERY.RACE:
-            query.race = (client.read_u32(data) << 32) + client.read_u32(data)
+            low = client.read_u32(data)
+            high = client.read_u32(data)
+            query.race = low | (high << 32)
         if flags & card_constants.QUERY.ATTACK:
             query.attack = client.read_u32(data)
         if flags & card_constants.QUERY.DEFENSE:
@@ -91,29 +113,10 @@ def parse_queries(client, controller, location, size, data):
         if flags & card_constants.QUERY.COVER:
             query.cover = client.read_u32(data)
         if flags & card_constants.QUERY.REASON_CARD:
-            size = client.read_u16(data)
-            query.reason_card = {}
-            if size:
-                query.reason_card['controler'] = client.read_u8(data)
-                query.reason_card['location'] = client.read_u8(data)
-                query.reason_card['sequence'] = client.read_u32(data)
-                query.reason_card['position'] = client.read_u32(data)
-            else:
-                # Skip the unused bytes
-                client.read_u64(data)
+            query.reason_card = _read_card_location(client, data)
         if flags & card_constants.QUERY.EQUIP_CARD:
-            size = client.read_u16(data)
-            query.equip_card = {}
-            if size:
-                query.equip_card['controler'] = client.read_u8(data)
-                query.equip_card['location'] = client.read_u8(data)
-                query.equip_card['sequence'] = client.read_u32(data)
-                query.equip_card['position'] = client.read_u32(data)
-            else:
-                # Skip the unused bytes
-                client.read_u64(data)
+            query.equip_card = _read_card_location(client, data)
         if flags & card_constants.QUERY.TARGET_CARD:
-            query.target_card_size = client.read_u16(data)
             query.target_card_count = client.read_u32(data)
             query.target_cards = []
             for _unused in range(query.target_card_count):
@@ -123,14 +126,12 @@ def parse_queries(client, controller, location, size, data):
                 position = client.read_u32(data)
                 query.target_cards.append((controler, location, sequence, position))
         if flags & card_constants.QUERY.OVERLAY_CARD:
-            query.overlay_card_size = client.read_u16(data)
             query.overlay_card_count = client.read_u32(data)
             query.overlay_cards = []
             for _unused in range(query.overlay_card_count):
                 card_code = client.read_u32(data)
                 query.overlay_cards.append(card_code)
         if flags & card_constants.QUERY.COUNTERS:
-            client.read_u16(data)  # padding, unused
             query.counters_count = client.read_u32(data)
             query.counters = []
             for _unused in range(query.counters_count):

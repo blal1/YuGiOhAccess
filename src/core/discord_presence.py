@@ -20,7 +20,7 @@ class DiscordPresenceManager(threading.Thread):
         logger.info("Initializing Discord Presence Manager")
         super().__init__()
         self.client_id = client_id
-        self.update_queue = queue.Queue()   # Thread-safe queue
+        self.update_queue: queue.Queue = queue.Queue()   # Thread-safe queue
         self.running = True
         self.rpc = None
         self.is_connected = False

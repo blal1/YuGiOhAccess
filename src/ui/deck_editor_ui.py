@@ -50,7 +50,7 @@ def deck_editor_main_menu(return_to=None):
     menu.set_help_text(_("Create and edit decks. Use arrow keys to navigate."))
     menu.append_item(_("New Deck"), lambda: new_deck(return_to))
     menu.append_item(_("Edit Existing Deck"), lambda: pick_deck_to_edit(return_to))
-    menu.append_item(_("Back"), return_to)
+    menu.append_cancel_item(_("Back"), return_to)
     return menu
 
 
@@ -78,7 +78,7 @@ def pick_deck_to_edit(return_to):
     menu = VerticalMenu(_("Select deck to edit"))
     for f in files:
         menu.append_item(str(f.stem), lambda f=f: load_and_edit(f, return_to))
-    menu.append_item(_("Back"), lambda: deck_editor_main_menu(return_to))
+    menu.append_cancel_item(_("Back"), lambda: deck_editor_main_menu(return_to))
     return menu
 
 
@@ -172,7 +172,7 @@ def choose_working_banlist(name, deck_data, return_to):
         menu.append_item(_("No banlists are installed."))
     for banlist_name in banlist_names:
         menu.append_item(str(banlist_name), lambda banlist_name=banlist_name: _set_working_banlist(name, deck_data, banlist_name, return_to))
-    menu.append_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
+    menu.append_cancel_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
     return menu
 
 
@@ -221,7 +221,7 @@ def search_card_to_add(name, deck_data, return_to, query=None):
     for code, card_name in rows:
         menu.append_card(code, _result_label(deck_data, code, card_name), lambda c=code: choose_add_destination(name, deck_data, c, return_to, query=query))
     menu.append_item(_("New search"), lambda: search_card_to_add(name, deck_data, return_to))
-    menu.append_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
+    menu.append_cancel_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
     return menu
 
 
@@ -248,7 +248,7 @@ def choose_add_destination(name, deck_data, code, return_to, query=None):
             _("Add {count} copies to main or extra deck").format(count=remaining),
             lambda: add_copies_to_deck(name, deck_data, code, remaining, return_to, after=back_to_results),
         )
-    menu.append_item(_("Back"), back_to_results)
+    menu.append_cancel_item(_("Back"), back_to_results)
     return menu
 
 
@@ -339,7 +339,7 @@ def remove_card_menu(name, deck_data, section, return_to):
         card = Card(code)
         label = _("{name} x{count}").format(name=card.get_name(), count=count) if count > 1 else card.get_name()
         menu.append_card(code, str(label), lambda c=code: _do_remove(name, deck_data, section, c, return_to, after=back_here))
-    menu.append_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
+    menu.append_cancel_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
     return menu
 
 
@@ -379,7 +379,7 @@ def view_deck_list(name, deck_data, section, return_to):
             card = Card(code)
             label = _("{name} x{count}").format(name=card.get_name(), count=count) if count > 1 else card.get_name()
             menu.append_card(code, str(label), lambda c=code: show_card_details(c))
-    menu.append_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
+    menu.append_cancel_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
     return menu
 
 
@@ -438,7 +438,7 @@ def check_deck_against_banlist(name, deck_data, return_to):
     menu = VerticalMenu(_("Check '{name}' against banlist").format(name=name))
     for banlist_name in manager.get_banlist_names():
         menu.append_item(str(banlist_name), lambda banlist_name=banlist_name: show_banlist_check_result(name, deck_data, banlist_name, return_to))
-    menu.append_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
+    menu.append_cancel_item(_("Back"), lambda: edit_deck(name, deck_data, return_to))
     return menu
 
 
@@ -461,7 +461,7 @@ def show_banlist_check_result(name, deck_data, banlist_name, return_to):
                 None,
             )
     menu.append_item(_("Use this banlist for copy limits"), lambda: _set_working_banlist(name, deck_data, banlist_name, return_to))
-    menu.append_item(_("Back"), lambda: check_deck_against_banlist(name, deck_data, return_to))
+    menu.append_cancel_item(_("Back"), lambda: check_deck_against_banlist(name, deck_data, return_to))
     return menu
 
 

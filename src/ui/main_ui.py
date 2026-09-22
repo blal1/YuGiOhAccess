@@ -73,6 +73,10 @@ def main_menu_view():
     main_menu.set_help_text(_("Main menu. Use the up and down arrow keys to navigate the menu, and press enter to select an option"))
     main_menu.append_item(_("YuGiOh Access, {version}").format(version=utils.version_string_to_pretty(variables.APP_VERSION)), None)
     main_menu.append_item(_("Play ({nickname})").format(nickname=current_nickname), server_ui.server_selection_menu)
+    main_menu.append_item(
+        _("Change nickname (currently {nickname})").format(nickname=current_nickname),
+        lambda: change_nickname(current_nickname),
+    )
     main_menu.append_item(_("Deck Editor"), _open_deck_editor)
     main_menu.append_item(_("Card Search"), _open_card_search)
     main_menu.append_item(_("Replay Viewer"), _open_replay_viewer)

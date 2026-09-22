@@ -13,9 +13,25 @@ def msg_equip(client, data, data_length):
     target = client.get_card(target_controller, target_location, target_sequence)
     equip(client, card, target)
 
+def _name_of(card):
+    """A card's name, or something to say when the client has not seen it.
+
+    ``get_card`` returns None for a zone we have not been told about, which is
+    why this message used to name neither side: guarding the whole sentence
+    was easier than guarding each half. Naming what is known is far more use
+    than "Card equipped to target."
+    """
+    if card is None:
+        return _("a card")
+    get_name = getattr(card, "get_name", None)
+    return get_name() if get_name else str(card)
+
+
 def equip(client, card, target):
-    # todo: fix
-    #utils.output(_("{card} equipped to {target}.").format(card=card.get_name(), target=target.get_name()))
-    utils.output(_("Card equipped to target."))
+    utils.output(
+        _("{card} equipped to {target}.").format(
+            card=_name_of(card), target=_name_of(target)
+        )
+    )
 
 

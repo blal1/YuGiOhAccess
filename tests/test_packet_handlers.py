@@ -1,5 +1,5 @@
 """Test that all packet handlers and duel message handlers are registered."""
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 
 def test_duel_message_handlers_registered(mocker):

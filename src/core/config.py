@@ -7,6 +7,10 @@ class Config:
     def __init__(self, defaults={}):
         self.defaults = defaults
         self.data = {}
+        # Where this config came from, and where set() writes it back. Set by
+        # load(); until then there is nowhere to save to, and a set() before
+        # the first load used to raise AttributeError rather than say so.
+        self.path = None
 
     def load(self, path):
         logger.debug(f"Attemping to load config from {path}")
@@ -25,6 +29,11 @@ class Config:
     def save(self, path=None):
         if not path:
             path = self.path
+        if not path:
+            # Losing a preference is bad; taking the application down over it
+            # is worse. This only happens before the first load().
+            logger.warning("Not saving the config: no path has been set yet")
+            return
         logger.debug(f"Saving config to {path}")
         with open(path, "w") as f:
             json.dump(self.data, f, indent=4)

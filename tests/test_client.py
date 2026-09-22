@@ -97,12 +97,27 @@ def test_get_card_invalid_zone(mocker):
     assert not client.get_card(0, 1, 1, max_retries=2)
 
 def test_get_card_valid_zone(mocker):
+    from game.card.card import Card
+
     server = mocker.MagicMock()
     duel_field = mocker.MagicMock()
     zone_key = ZONE_KEYS.PLAYER_HAND.format(4)
-    zone = Zone(zone_key, "random card")
+    card = Card(0)
+    zone = Zone(zone_key, card)
     duel_field.zones = {zone_key: zone}
     client = Client(server)
     client.set_duel_field(duel_field)
     client.what_player_am_i = 0
-    assert client.get_card(0, 2, 4, max_retries=2) == "random card"
+    assert client.get_card(0, 2, 4, max_retries=2) is card
+
+
+def test_get_card_ignores_an_empty_zones_label(mocker):
+    """An empty zone holds its label, which is not a card and must not pass."""
+    server = mocker.MagicMock()
+    duel_field = mocker.MagicMock()
+    zone_key = ZONE_KEYS.PLAYER_HAND.format(4)
+    duel_field.zones = {zone_key: Zone(zone_key, "Empty Monster 1")}
+    client = Client(server)
+    client.set_duel_field(duel_field)
+    client.what_player_am_i = 0
+    assert client.get_card(0, 2, 4, max_retries=1) is None

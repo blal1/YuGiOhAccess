@@ -17,7 +17,10 @@ class CountdownTimer:
         self.seconds = seconds
         self.lock = threading.Lock()
         self.running = False
-        self.thread = threading.Thread(target=self._run)
+        # A daemon thread: a duel clock has nothing to finish. As a normal
+        # thread it kept the whole process alive for the rest of the turn
+        # after the window had closed, so quitting mid duel appeared to hang.
+        self.thread = threading.Thread(target=self._run, daemon=True)
         self.thread.start()
 
     def _run(self):
@@ -36,7 +39,7 @@ class CountdownTimer:
             self.seconds = seconds
             if not self.running:
                 self.running = True
-                self.thread = threading.Thread(target=self._run)
+                self.thread = threading.Thread(target=self._run, daemon=True)
                 self.thread.start()
 
     def get_remaining_time(self):
@@ -44,27 +47,41 @@ class CountdownTimer:
             return self.seconds
 
     def stop(self):
+        # The join has to happen outside the lock: the counting thread takes
+        # the same lock on every tick, so waiting for it while holding the
+        # lock is a deadlock, and stop() never returned.
         with self.lock:
             self.running = False
-            self.thread.join()
+        self.thread.join()
 
     def handle_potential_sfx(self):
-        if self.seconds == 0:
-            utils.get_ui_stack().play_duel_sound_effect("timer/zero")
-        if self.seconds == 30:
-            utils.get_ui_stack().play_duel_sound_effect("timer/30")
-        if self.seconds <= 10:
-            # check if it's even or odd
-            if self.seconds % 2 == 0:
-                utils.get_ui_stack().play_duel_sound_effect("timer/even", x=-6.0)
-            else:
-                utils.get_ui_stack().play_duel_sound_effect("timer/odd", x=-6.0)
+        # Runs on the clock thread, where there may no longer be a window to
+        # play a sound through: the duel can end, or the application close,
+        # between two ticks. Letting that escape killed the thread, and with
+        # it the countdown the player is relying on.
+        try:
+            if self.seconds == 0:
+                utils.get_ui_stack().play_duel_sound_effect("timer/zero")
+            if self.seconds == 30:
+                utils.get_ui_stack().play_duel_sound_effect("timer/30")
+            if self.seconds <= 10:
+                # check if it's even or odd
+                if self.seconds % 2 == 0:
+                    utils.get_ui_stack().play_duel_sound_effect("timer/even", x=-6.0)
+                else:
+                    utils.get_ui_stack().play_duel_sound_effect("timer/odd", x=-6.0)
+        except Exception:
+            logger.debug("No window to play the turn timer through", exc_info=True)
 
 # this class is just to hold different attributes for the player during a duel
 class Player:
     def __init__(self, your_starting_lifepoints, opponent_starting_lifepoints):
         self.lifepoints = your_starting_lifepoints
         self.opponent_lifepoints = opponent_starting_lifepoints
+        # Bumped every time the duel replaces what the player may do. A menu
+        # built from one generation must not act during the next: the lists it
+        # indexed into have been thrown away and rebuilt.
+        self.state_generation = 0
         self.handle_potential_music_change(initial=True)
         self._chaining_cards = []
         # The chain that is actually building, link by link; distinct from
@@ -76,6 +93,10 @@ class Player:
         self._monster_settable = []
         self._spell_settable = []
         self._activatable = []
+        # Set here as well as in clear_all: the field can be walked between the
+        # duel starting and the first prompt arriving, and reading a zone asks
+        # every one of these lists whether the card is in it.
+        self._attackable = []
         self._can_go_to_battle_phase = 0
         self._can_go_to_main_phase2 = 0
         self._can_go_to_end_phase = 0
@@ -142,6 +163,7 @@ class Player:
         
 
     def clear_all(self):
+        self.state_generation = getattr(self, "state_generation", 0) + 1
         self.chaining_cards = []
         self.chain_stack = []
         self.summonable = []
@@ -150,7 +172,7 @@ class Player:
         self.monster_settable = []
         self.spell_settable = []
         self.activatable = []
-        self._attackable = []
+        self.attackable = []
         self.can_go_to_battle_phase = 0
         self.can_go_to_main_phase2 = 0
         self.can_go_to_end_phase = 0

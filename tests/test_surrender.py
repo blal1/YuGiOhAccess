@@ -1,5 +1,5 @@
 import struct
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock
 
 from game.edo import structs
 

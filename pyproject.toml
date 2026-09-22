@@ -31,15 +31,46 @@ dev-dependencies = [
     "pytest-randomly>=3.15.0",
     "pytest>=8.3.3",
     "ruff>=0.12.2",
+    "mypy>=1.11",
+    "pre-commit>=3.7",
 ]
+
+[tool.ruff]
+# winpaths.py is vendored third party code (see PKG-INFO); it is not ours to
+# tidy, and editing it would only make the next update harder.
+extend-exclude = ["winpaths.py"]
+
+[tool.ruff.lint.per-file-ignores]
+# The entry point re-executes itself inside the virtualenv before importing
+# anything heavy, so its imports cannot come first.
+"src/YuGiOhAccess.py" = ["E402"]
+
+[tool.mypy]
+files = ["src"]
+python_version = "3.11"
+# wxPython, cyal, pythonnet and friends ship no type information.
+ignore_missing_imports = true
+# Deliberately not strict: this turns up real mistakes (a set literal used as
+# a return annotation, an attribute read off a value that can be None) without
+# demanding annotations on every function in a codebase that has none.
+warn_unused_ignores = true
+warn_redundant_casts = true
 
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["tests"]
 
+[tool.coverage.report]
+# A floor, not a target. It is set just under where the suite currently sits
+# so that a change which stops testing something has to say so out loud.
+fail_under = 92
+show_missing = true
+
 [tool.coverage.run]
 omit = [
-    "src/server/*",
-    "src/bot/*",
+    # The entry point re-executes itself into the virtualenv before importing
+    # anything, so there is nothing here a test can meaningfully run.
     "src/YuGiOhAccess.py",
+    # Loading WindBot means loading a .NET runtime, which a test run cannot do.
+    "src/bot/engine.py",
 ]

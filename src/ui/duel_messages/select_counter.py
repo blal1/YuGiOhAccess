@@ -29,6 +29,9 @@ def msg_select_counter(client, data, data_length):
         sequence = client.read_u8(data)
         card_counter_count = client.read_u16(data)
         card = Card(code)
+        # Where the card is was read off the wire and then dropped, which left
+        # two copies of the same card indistinguishable in the menu.
+        card.set_location_and_position_info(controller, location, sequence, 0)
         card.counter_count = card_counter_count
         cards.append(card)
     select_counter(client, player, counter_type, quantity, cards)

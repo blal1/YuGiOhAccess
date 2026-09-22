@@ -18,15 +18,14 @@ def test_dotdict_hasattr_and_missing_attribute():
         _ = data.missing
 
 
-def test_i18n_language_listing_and_fallback(mocker, tmp_path):
+def test_i18n_language_listing_and_fallback(mocker, tmp_path, write_catalogue):
     from core import i18n
 
     mocker.patch("core.i18n._locale_dir", tmp_path / "missing")
     assert i18n.get_available_languages() == {"en": "English"}
 
     locale_dir = tmp_path / "locales"
-    (locale_dir / "fr" / "LC_MESSAGES").mkdir(parents=True)
-    (locale_dir / "fr" / "LC_MESSAGES" / "yugiohaccess.mo").write_bytes(b"bad")
+    write_catalogue(locale_dir / "fr" / "LC_MESSAGES" / "yugiohaccess.mo")
     (locale_dir / "not_a_lang").write_text("x")
     mocker.patch("core.i18n._locale_dir", locale_dir)
 

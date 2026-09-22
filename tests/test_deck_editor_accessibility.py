@@ -80,7 +80,12 @@ def _bare_choice_menu():
         menu.rows += 1
         return label
 
+    def append_cancel_item(label, function=None):
+        menu.cancel_action = function
+        return append_item(label, function)
+
     menu.append_item = append_item
+    menu.append_cancel_item = append_cancel_item
     return menu
 
 

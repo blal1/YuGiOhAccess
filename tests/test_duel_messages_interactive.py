@@ -1,7 +1,6 @@
 """Tests for interactive duel message handlers that create menus or require player response."""
-import io
 import struct
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock
 
 
 def _make_client(mocker, player_id=0):
@@ -423,7 +422,6 @@ class TestSelectPlace:
 
     def test_resolve_select_place_sends_response(self, mocker):
         from ui.duel_messages.select_place import resolve_select_place
-        from game.edo import structs
         client = MagicMock()
         client.useful_spec_to_location.return_value = (4, 0, False)  # location=4, seq=0, not opponent
 
@@ -442,7 +440,9 @@ class TestSelectPlace:
             (8, 1, True),
         ]
         zones = [MagicMock(label="pm0"), MagicMock(label="os1")]
-        old_handler = lambda: None
+
+        def old_handler():
+            return None
 
         resolve_select_place(client, 0, zones, old_handler)
 
@@ -845,7 +845,7 @@ class TestIdle:
         # read_cardlist is mocked so won't read more
 
         from ui.duel_messages.idle import msg_idlecmd
-        result = msg_idlecmd(client, data, len(data))
+        msg_idlecmd(client, data, len(data))
         # Should return early without setting player state
         client.player.clear_all.assert_not_called()
 

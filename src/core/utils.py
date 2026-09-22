@@ -7,7 +7,7 @@ import time
 import shutil
 from pathlib import Path
 import re
-from functools import wraps
+from functools import partial, wraps
 
 import requests
 import urllib
@@ -32,13 +32,17 @@ def setup_logging():
             file.unlink()
     # we want 2 handlers, 1 for the file, 1 for the console
     # set up the file handler
-    file_handler = logging.FileHandler(variables.LOG_FILE)
+    # The timestamp and logger name matter when reading back a duel: the client
+    # and the bundled local server both write here, and telling apart who sent a
+    # message from who answered it is the whole point of the trace.
+    log_format = logging.Formatter("%(asctime)s [%(name)s] %(message)s - %(levelname)s")
+    file_handler = logging.FileHandler(variables.LOG_FILE, encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(logging.Formatter("%(message)s - %(levelname)s"))
+    file_handler.setFormatter(log_format)
     # set up the console handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)
-    console_handler.setFormatter(logging.Formatter("%(message)s - %(levelname)s"))
+    console_handler.setFormatter(log_format)
     # set up the logger
     logging.basicConfig(level=logging.DEBUG, handlers=[file_handler, console_handler])
     # requests and urllib3 are too verbose, so we want to set them to warning
@@ -100,9 +104,11 @@ def setup():
         data_dir.mkdir(parents=True, exist_ok=True)
     else:
         logger.info("Data directory exists")
-        # done
-        logger.info("Setup complete")
-        run_velopack()
+    logger.info("Setup complete")
+    # Checking for updates has nothing to do with whether the data directory
+    # was already there. Hanging it off the else branch meant a fresh install
+    # never looked for an update, which is exactly when it matters most.
+    run_velopack()
 
 
 def log_debug_info():
@@ -187,23 +193,35 @@ def get_ui_stack():
 
 _LAST_UI_FUNCTION = None
 def get_last_ui_function():
+    """The screen builder that ran most recently.
+
+    Recorded when a decorated builder is *called*, not when it is decorated:
+    every module records itself at import time, so the decoration time value
+    was only ever the last module Python happened to import.
+    """
     return _LAST_UI_FUNCTION
 
 # Make an ui decorator that first pups the last, then runs the function, then pushes the returned value
 def ui_function(func):
-    global _LAST_UI_FUNCTION
-    _LAST_UI_FUNCTION = func
     @wraps(func)
     def wrapper(*args, **kwargs):
+        global _LAST_UI_FUNCTION
+        _LAST_UI_FUNCTION = func
         try:
             wx.GetTopLevelWindows()[0].pop_ui()
             result = func(*args, **kwargs)
-        except Exception as e:
+        except Exception:
             logging.getLogger(__name__).exception("Unhandled UI callback error in %s", func.__name__)
             output(_("An error occurred in the current menu. Returning to the previous screen if possible."))
             return wrapper
         if not result:
             return wrapper
+        # Remember how this screen was built, so refresh_ui() can build it
+        # again without the caller having to remember for it.
+        try:
+            result.rebuild = partial(wrapper, *args, **kwargs)
+        except (AttributeError, TypeError):
+            logging.getLogger(__name__).debug("Screen %s cannot remember how it was built", func.__name__)
         wx.GetTopLevelWindows()[0].push_ui(result)
     return wrapper
 
@@ -213,7 +231,7 @@ def get_discord_presence_manager():
         variables.DISCORD_PRESENCE_MANAGER.start()
     return variables.DISCORD_PRESENCE_MANAGER
 
-packet_handlers = {}
+packet_handlers: dict = {}
 
 def _handle_callback_exception(kind, item_id, func, exc, *args, **kwargs):
     logger = logging.getLogger(__name__)
@@ -244,7 +262,7 @@ def packet_handler(packet_id):
         return wrapper
     return decorator
 
-duel_message_handlers = {}
+duel_message_handlers: dict = {}
 
 def duel_message_handler(duel_message_id):
     def decorator(func):
@@ -262,12 +280,32 @@ def duel_message_handler(duel_message_id):
 
 
 
+def record_action(description):
+    """Note something the player did, for the in duel history.
+
+    Not spoken: the player just read the item they activated, so saying it
+    again would only get in the way. It still belongs in the history.
+    """
+    text = str(description).strip()
+    if not text:
+        return
+    logging.getLogger(__name__).debug("Player action: %s", text)
+    speech.MESSAGE_LOG.add(text, speech.Priority.INFO, spoken=False, kind=speech.Kind.ACTION)
+
+
 def get_main_menu_function():
     return get_ui_stack().get_main_ui()
 
-# we want a function that can refresh the current ui
-def refresh_ui():
-    get_ui_stack().refresh_ui()
+def refresh_ui(ui_function=None):
+    """Rebuild the screen that is on top of the stack.
+
+    With no argument the screen is rebuilt the way it was built the first
+    time, which ``ui_function`` records on it. Passing a builder explicitly
+    replaces the current screen with that one instead; it must be a
+    ``@ui_function`` decorated builder, since replacing the current screen is
+    the decorator's job.
+    """
+    get_ui_stack().refresh_ui(ui_function)
 
 def output(message, interrupt=False, priority=speech.Priority.INFO):
     """Send a message to the screen reader and record it in the replay log.

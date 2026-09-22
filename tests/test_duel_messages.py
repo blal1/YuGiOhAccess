@@ -1,13 +1,11 @@
 """Tests for duel message handlers: retry, shuffles, damage, sort_card, select_counter, select_sum."""
-import io
 import struct
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock
 
 
 def _make_client_mock(mocker, player_id=0):
     """Create a mock client with read helpers from real Client."""
     from game.client import Client
-    mock_server = MagicMock()
     mocker.patch.object(Client, "__init__", lambda self, *a, **kw: None)
     client = Client.__new__(Client)
     client.what_player_am_i = player_id

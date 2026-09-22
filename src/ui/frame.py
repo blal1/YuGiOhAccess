@@ -135,10 +135,21 @@ class YuGiOhAccessFrame(wx.Frame):
         while len(self.ui_stack) > 0:
             self.pop_ui()
 
-    def refresh_ui(self, ui_function):
+    def refresh_ui(self, ui_function=None):
+        """Build the current screen again.
+
+        With no builder the screen's own ``rebuild`` is used, which
+        ``utils.ui_function`` puts there when the screen is first pushed.
+        The builder replaces the current screen itself, so nothing is popped
+        here: doing both threw away the screen underneath as well.
+        """
         logger.info("Refreshing ui")
         logger.debug(f"Current ui stack: {self.prettify_ui_stack()}")
-        self.pop_ui()
+        if ui_function is None:
+            ui_function = getattr(self.ui_stack[-1], "rebuild", None) if self.ui_stack else None
+        if ui_function is None:
+            logger.warning("Nothing to refresh: the current screen does not know how it was built")
+            return
         ui_function()
 
     def get_main_ui(self):
@@ -186,6 +197,9 @@ class YuGiOhAccessFrame(wx.Frame):
         # keep in mind that the file is in duel/directory_name/random_sound_file.name
         self.sound_effects_audio_manager.play_audio(f"duel/{directory_name}/{random_sound_file.name}", x=x, y=y, z=z) 
 
+    # Effects we have already reported as missing, so each is logged once.
+    _missing_sound_effects: set = set()
+
     def play_duel_sound_effect(self, effect, x=0.0, y=0.0, z=0.0):
         # so the full path to the specific sound effect is sounds/duel/effect, .flac, .wav, .ogg or .opus
         resolved_file_path = None
@@ -195,7 +209,15 @@ class YuGiOhAccessFrame(wx.Frame):
                 resolved_file_path = file_path
                 break
         if not resolved_file_path:
-            logger.warning(f"Sound effect {effect} not found. Tried with extensions {'.flac', '.wav', '.ogg', '.opus'}")
+            # Once per effect, not once per event: a missing phase sound was
+            # filling the log with the same line dozens of times a duel and
+            # burying everything else.
+            if effect not in self._missing_sound_effects:
+                self._missing_sound_effects.add(effect)
+                logger.warning(
+                    "Sound effect %s has no file in %s (looked for .flac, .wav, .ogg, .opus)",
+                    effect, Path(variables.LOCAL_DATA_DIR) / "sounds" / "duel",
+                )
             return
         self.sound_effects_audio_manager.play_audio(f"duel/{effect}{resolved_file_path.suffix}", x=x, y=y, z=z)
 

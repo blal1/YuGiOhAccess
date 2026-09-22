@@ -105,7 +105,10 @@ class Deck:
                 extra_deck.append(card_id)
             elif fill_up_side_deck:
                 side_deck.append(card_id)
-        return Deck(main_deck, side_deck, "windbot")
+        # ``cards`` holds the main and extra deck together, the way every other
+        # constructor here fills it and the way to_windbot_format reads it back
+        # out. Passing the main deck alone dropped the extra deck on the floor.
+        return Deck(main_deck + extra_deck, side_deck, "windbot")
     
     def to_windbot_format(self):
         deck_string = ""

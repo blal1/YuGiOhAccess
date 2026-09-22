@@ -23,7 +23,7 @@ class Banlist:
         else:
             return 3 # standard limit
         
-    def is_deck_allowed(self, deck: Deck) -> {bool, dict}:
+    def is_deck_allowed(self, deck: Deck) -> tuple[bool, dict]:
         # the deck card pool should be cards + side. Alias variants count together.
         if not self.content:
             return True, {}

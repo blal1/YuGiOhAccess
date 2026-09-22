@@ -345,6 +345,13 @@ class StocRPSResult(ctypes.Structure):
         return f"<StocRPSResult result0: {result0} result1: {result1}>"
 
 class StocTimeLimit(ctypes.Structure):
+    """STOC_TIME_LIMIT: how much of a player's clock is left.
+
+    Packed, like every other packet on this wire. Left unpacked, ctypes put a
+    padding byte between the two fields and expected four bytes where a server
+    sends three, so every clock update from a real server failed to parse.
+    """
+    _pack_ = 1
     _fields_ = [
         ('team', ctypes.c_uint8),
         ('time', ctypes.c_uint16),

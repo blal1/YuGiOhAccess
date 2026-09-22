@@ -1,0 +1,50 @@
+# Checks that run before a commit, so CI stops being the first place a
+# problem is noticed. Install once with:
+#
+#     uv run pre-commit install
+#
+# Everything here is also run in CI; this only moves the feedback earlier.
+# Run it over the whole tree at any time with:
+#
+#     uv run pre-commit run --all-files
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.2
+    hooks:
+      - id: ruff
+        name: lint with ruff
+        args: [--fix]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        # The card scripts and databases are third party assets, and the
+        # .po/.pot files are generated; reformatting either is noise.
+        exclude: ^(src/data/|locales/)
+      - id: end-of-file-fixer
+        exclude: ^(src/data/|locales/)
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        # The sounds and databases are already committed; this is here to stop
+        # anything *new* and large arriving by accident.
+        args: [--maxkb=2048]
+        exclude: ^src/data/
+
+  - repo: local
+    hooks:
+      - id: no-build-output
+        name: no build output committed
+        entry: python scripts/check_repo_hygiene.py
+        language: system
+        pass_filenames: false
+
+      - id: sound-effects-present
+        name: every duel sound effect has a file
+        entry: python scripts/build_sound_effects.py --check
+        language: system
+        pass_filenames: false
+        files: ^(src/ui/|src/data/sounds/)

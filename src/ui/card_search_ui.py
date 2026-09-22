@@ -96,7 +96,7 @@ def card_search_menu(return_to=None):
     menu.append_item(_("Search by name"), lambda: search_by_name(return_to))
     menu.append_item(_("Search by description"), lambda: search_by_description(return_to))
     menu.append_item(_("Advanced search"), lambda: advanced_search(return_to))
-    menu.append_item(_("Back"), return_to)
+    menu.append_cancel_item(_("Back"), return_to)
     return menu
 
 

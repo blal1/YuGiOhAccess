@@ -12,7 +12,6 @@ For strings with variables:
 """
 
 import gettext
-import locale
 import logging
 from pathlib import Path
 
@@ -22,8 +21,28 @@ logger = logging.getLogger(__name__)
 
 _DOMAIN = "yugiohaccess"
 _current_translation: gettext.GNUTranslations | gettext.NullTranslations = gettext.NullTranslations()
-_locale_dir: Path = Path(__file__).parent.parent.parent / "locales"
 
+
+def _default_locale_dir() -> Path:
+    """Where the compiled catalogues live.
+
+    In a packaged build everything is unpacked beside the executable, so the
+    path from this module's own location lands outside the bundle entirely.
+    That made the UI English-only in every release, however complete the
+    translations were.
+    """
+    if getattr(variables, "IS_FROZEN", False):
+        return Path(variables.EXECUTABLE_DIR) / "locales"
+    return Path(__file__).parent.parent.parent / "locales"
+
+
+_locale_dir: Path = _default_locale_dir()
+
+# What to call each language, in that language. This is a naming table, not a
+# statement that a translation exists: what the player is offered comes from
+# the catalogues actually on disk. A language listed here with nothing behind
+# it is simply never shown, and a language on disk with no entry here is shown
+# under its own code.
 SUPPORTED_LANGUAGES = {
     "en": "English",
     "fr": "Français",
@@ -35,8 +54,6 @@ SUPPORTED_LANGUAGES = {
     "zh": "中文",
     "ko": "한국어",
     "ar": "العربية",
-    "tr": "Türkçe",
-    "ru": "Русский",
 }
 
 
@@ -44,18 +61,46 @@ def get_locale_dir() -> Path:
     return _locale_dir
 
 
+def catalogue_is_translated(mo_file: Path) -> bool:
+    """Whether a compiled catalogue holds any translation at all.
+
+    A .po file with every entry left blank still compiles to a valid .mo; it
+    just contains nothing but its own header. Seven of those shipped, and each
+    one put a language in the settings menu that changed absolutely nothing
+    when the player picked it.
+    """
+    try:
+        with open(mo_file, "rb") as handle:
+            catalogue = gettext.GNUTranslations(handle)
+    except Exception:
+        # Anything at all: unreadable, truncated, not a catalogue. A broken
+        # file on disk must not take the settings menu down with it, and a
+        # language whose catalogue will not load is one we cannot offer.
+        logger.warning("Could not read the translation catalogue %s", mo_file, exc_info=True)
+        return False
+    # Every catalogue carries one entry for its own metadata header, keyed by
+    # the empty string. Anything beyond that is a real translation.
+    return any(key for key in catalogue._catalog)  # type: ignore[attr-defined]
+
+
 def get_available_languages() -> dict[str, str]:
-    """Return dict of language code → display name for languages that have .mo files."""
+    """Language code -> display name, for languages the player can actually use.
+
+    Only catalogues that contain translations are offered. Listing one that is
+    empty is worse than not offering the language at all: the player chooses
+    it, is told the language changed, and every word stays in English.
+    """
     available = {"en": "English"}
     if not _locale_dir.exists():
         return available
-    for lang_dir in _locale_dir.iterdir():
+    for lang_dir in sorted(_locale_dir.iterdir()):
         if not lang_dir.is_dir():
             continue
         mo_file = lang_dir / "LC_MESSAGES" / f"{_DOMAIN}.mo"
-        if mo_file.exists():
-            code = lang_dir.name
-            available[code] = SUPPORTED_LANGUAGES.get(code, code)
+        if not mo_file.exists() or not catalogue_is_translated(mo_file):
+            continue
+        code = lang_dir.name
+        available[code] = SUPPORTED_LANGUAGES.get(code, code)
     return available
 
 
@@ -72,6 +117,14 @@ def setup(lang_code: str = ""):
     if lang_code == "en":
         _current_translation = gettext.NullTranslations()
         logger.info("UI language set to English (no translation)")
+        return
+
+    if lang_code not in get_available_languages():
+        # A language saved in the config before its translation was withdrawn,
+        # or one that was only ever an empty catalogue. Say so once rather
+        # than claiming to have switched to it.
+        logger.warning("No usable translation for '%s', falling back to English", lang_code)
+        _current_translation = gettext.NullTranslations()
         return
 
     locale_path = str(_locale_dir)

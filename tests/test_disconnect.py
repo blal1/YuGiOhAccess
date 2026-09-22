@@ -1,5 +1,5 @@
 """Test client disconnect detection."""
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 
 def test_handle_disconnect_outputs_message(mocker):

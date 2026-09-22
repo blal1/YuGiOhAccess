@@ -46,7 +46,6 @@ def _patch_room_ui(mocker, tmp_path):
 
 def test_room_packet_handlers_and_display(mocker, tmp_path):
     from game.edo import structs
-    from ui import room_ui
 
     room_ui, _ = _patch_room_ui(mocker, tmp_path)
     client = _client()

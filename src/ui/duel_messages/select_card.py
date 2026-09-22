@@ -10,7 +10,9 @@ from game.card.location_conversion import LocationConversion
 from game.edo import structs
 
 from ui.base_ui import VerticalMenu
+from ui.selection_limit import SelectionLimiter
 
+from core import speech
 from core import utils
 from core.i18n import _
 from game.edo import message_constants
@@ -84,10 +86,14 @@ def show_menu_with_presentable_cards(client, cards, presentable_cards, min_cards
     question = _("Select {min} to {max} card(s) as tribute").format(min=min_cards, max=max_cards) if is_tribute else _("Select {min} to {max} card(s)").format(min=min_cards, max=max_cards)
     select_card_menu = VerticalMenu(str(question))
     select_card_menu.append_item(str(question))
+    # The duel accepts at most max_cards, so the menu holds the player to it
+    # rather than letting them build an answer that will be thrown back.
+    limiter = SelectionLimiter(max_cards)
     for card in presentable_cards:
-        select_card_menu.append_item(wx.CheckBox, label=card)
+        checkbox = select_card_menu.append_item(wx.CheckBox, label=card)
+        limiter.add(checkbox, label=card)
     if cancelable:
-        select_card_menu.append_item(_("Cancel"), function=lambda: cancel_card_selection(client))
+        select_card_menu.append_cancel_item(_("Cancel"), function=lambda: cancel_card_selection(client))
         utils.output(_("Press Escape to cancel selection"))
     select_card_menu.append_item(_("Finish"), function=lambda: finish_card_selection(client, select_card_menu, cards, min_cards, max_cards, is_tribute))
     utils.get_ui_stack().push_ui(select_card_menu)
@@ -102,6 +108,25 @@ def finish_card_selection(client, select_card_menu, cards, min_cards, max_cards,
         if checkbox.IsChecked():
             selected_cards.append(i)
     logger.debug(f"Selected cards:\nLength: {len(selected_cards)}\n{selected_cards}")
+    # Last line of defence. The menu already stops the player ticking too many,
+    # but an answer outside the range is one the core throws straight back, and
+    # a refusal here is far easier to act on than a retry prompt.
+    if len(selected_cards) < min_cards:
+        utils.output(
+            _("Select at least {min} card(s). You have selected {count}.").format(
+                min=min_cards, count=len(selected_cards)
+            ),
+            priority=speech.Priority.CRITICAL,
+        )
+        return
+    if max_cards and len(selected_cards) > max_cards:
+        utils.output(
+            _("Select at most {max} card(s). You have selected {count}.").format(
+                max=max_cards, count=len(selected_cards)
+            ),
+            priority=speech.Priority.CRITICAL,
+        )
+        return
     buf = b""
     # pack an uint with the value of 1, to signal to the server
     buf += struct.pack('I', 1)

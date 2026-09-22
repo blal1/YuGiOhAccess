@@ -9,7 +9,7 @@ from core import utils
 from core import variables
 from core.i18n import _
 
-from game.edo import banlists, structs, structs_utils
+from game.edo import banlists, structs
 from game.card.card import Card
 
 from game.card import ydke
@@ -143,7 +143,7 @@ def display_room_menu(client):
             room_menu.append_item(_("Ready"), lambda: handle_room_menu_ready_or_start(client))
     if client.memory.is_host and len(users) > 1:
         room_menu.append_item(_("Remove a player"), lambda: handle_room_menu_kick(client))
-    room_menu.append_item(_("Back"), lambda: handle_me_disconnect(client))
+    room_menu.append_cancel_item(_("Back"), lambda: handle_me_disconnect(client))
     utils.get_discord_presence_manager().update_presence(
         state=_("In a room"),
         details=_("Waiting for an opponent"),
@@ -155,7 +155,7 @@ def display_room_menu(client):
 def _room_unavailable_menu(client):
     room_menu = DynamicVerticalMenu(_("Room unavailable"))
     room_menu.append_item(_("Room information could not be loaded."))
-    room_menu.append_item(_("Back"), lambda: handle_me_disconnect(client))
+    room_menu.append_cancel_item(_("Back"), lambda: handle_me_disconnect(client))
     return room_menu
 
 
@@ -282,7 +282,7 @@ def handle_room_menu_kick(client):
             _("Remove {name}").format(name=user.get("name", "")),
             lambda pos=user.get("pos", 0), name=user.get("name", ""): send_kick(client, pos, name),
         )
-    menu.append_item(_("Back"), lambda: display_room_menu(client))
+    menu.append_cancel_item(_("Back"), lambda: display_room_menu(client))
     return menu
 
 
@@ -301,7 +301,7 @@ def handle_room_menu_select_deck(client):
     deck_menu.append_item(_("My Decks"), lambda: handle_room_menu_show_deck_menu(client, _("My Decks"), variables.DECK_DIR))
     deck_menu.append_item(_("Import deck from deck string"), lambda: handle_import_deck_show_menu(client))
     deck_menu.append_item(_("Import all decks from YuGiOh MUD"), lambda: handle_import_all_decks(client))
-    deck_menu.append_item(_("Back"), lambda: display_room_menu(client))
+    deck_menu.append_cancel_item(_("Back"), lambda: display_room_menu(client))
     return deck_menu
 
 @utils.ui_function
@@ -316,7 +316,7 @@ def handle_room_menu_show_deck_menu(client, name, deck_dir):
             continue
         # give full path to the deck file
         deck_menu.append_item(str(deck_file.stem), lambda deck_file=deck_file: handle_deck_menu_select_deck(client, deck_file))
-    deck_menu.append_item(_("Back"), lambda: handle_room_menu_select_deck(client))
+    deck_menu.append_cancel_item(_("Back"), lambda: handle_room_menu_select_deck(client))
     return deck_menu
 
 
@@ -325,7 +325,7 @@ def handle_room_menu_check_deck_against_banlist(client):
     menu = VerticalMenu(_("Check deck against room banlist"))
     menu.append_item(_("Public Decks"), lambda: handle_room_menu_show_banlist_deck_menu(client, _("Public Decks"), variables.LOCAL_DATA_DIR / "decks"))
     menu.append_item(_("My Decks"), lambda: handle_room_menu_show_banlist_deck_menu(client, _("My Decks"), variables.DECK_DIR))
-    menu.append_item(_("Back"), lambda: display_room_menu(client))
+    menu.append_cancel_item(_("Back"), lambda: display_room_menu(client))
     return menu
 
 
@@ -339,7 +339,7 @@ def handle_room_menu_show_banlist_deck_menu(client, name, deck_dir):
         deck_menu.append_item(_("No decks found."), None)
     for deck_file in deck_files:
         deck_menu.append_item(str(deck_file.stem), lambda deck_file=deck_file: show_room_banlist_check_result(client, deck_file))
-    deck_menu.append_item(_("Back"), lambda: handle_room_menu_check_deck_against_banlist(client))
+    deck_menu.append_cancel_item(_("Back"), lambda: handle_room_menu_check_deck_against_banlist(client))
     return deck_menu
 
 
@@ -362,7 +362,7 @@ def show_room_banlist_check_result(client, deck_file):
                 ),
                 None,
             )
-    menu.append_item(_("Back"), lambda: handle_room_menu_check_deck_against_banlist(client))
+    menu.append_cancel_item(_("Back"), lambda: handle_room_menu_check_deck_against_banlist(client))
     return menu
 
 @utils.ui_function
@@ -374,7 +374,7 @@ def handle_import_all_decks(client):
     username_input = deck_menu.append_item(wx.TextCtrl, label=_("Username"))
     password_input = deck_menu.append_item(wx.TextCtrl, label=_("Password"))
     deck_menu.append_item(_("Import"), lambda: handle_import_all_decks_import(client, username_input.GetValue(), password_input.GetValue()))
-    deck_menu.append_item(_("Back"), lambda: handle_room_menu_select_deck(client))
+    deck_menu.append_cancel_item(_("Back"), lambda: handle_room_menu_select_deck(client))
     return deck_menu
 
 def handle_import_all_decks_import(client, username, password):
@@ -441,7 +441,7 @@ def handle_deck_menu_select_deck(client, deck_file):
         for card_code, card_info in reason.items():
             card = Card(card_code)
             banned_deck_message.append_item(_("{card} is limited to {limit} and you have {found} in your deck.\n").format(card=card.name, limit=card_info.limit, found=card_info.found), lambda: None)
-        banned_deck_message.append_item(_("Back"), lambda: handle_room_menu_select_deck(client))
+        banned_deck_message.append_cancel_item(_("Back"), lambda: handle_room_menu_select_deck(client))
         return banned_deck_message
     deck = structs.Deck()
     deck.set_main_deck(parsed_deck.cards)
@@ -467,7 +467,7 @@ def handle_import_deck_show_menu(client):
     name_input = deck_import_menu.append_item(wx.TextCtrl, label=_("Deck name"))
     deck_input = deck_import_menu.append_item(wx.TextCtrl, label=_("YDKE Deck string"))
     deck_import_menu.append_item(_("Import"), lambda: handle_deck_import_import_deck(client, name_input.GetValue(), deck_input.GetValue()))
-    deck_import_menu.append_item(_("Back"), lambda: handle_room_menu_select_deck(client))
+    deck_import_menu.append_cancel_item(_("Back"), lambda: handle_room_menu_select_deck(client))
     return deck_import_menu
 
 def handle_deck_import_import_deck(client, name, deck_string):
@@ -516,7 +516,7 @@ def handle_add_bot_as_opponent(client):
     bot_menu.append_item(_("Random"), lambda: add_bot_to_room(client, "", available_decks))
     for label, deck in _bot_choices(available_decks):
         bot_menu.append_item(str(label), lambda deck=deck: add_bot_to_room(client, deck, available_decks))
-    bot_menu.append_item(_("Back"), lambda: display_room_menu(client))
+    bot_menu.append_cancel_item(_("Back"), lambda: display_room_menu(client))
     utils.get_ui_stack().push_ui(bot_menu)
 
 
@@ -592,7 +592,7 @@ def _bot_choices(available_decks) -> list[tuple[str, str]]:
     used to read raw file names off disk instead.
     """
     playable = [str(deck) for deck in available_decks]
-    catalogue = {}
+    catalogue: dict = {}
     for entry in _load_bot_catalogue():
         if isinstance(entry, dict) and entry.get("deck"):
             catalogue.setdefault(str(entry["deck"]), entry)

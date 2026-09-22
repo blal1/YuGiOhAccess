@@ -17,7 +17,8 @@ def _client():
 
 
 def _query_chunk(flags, payload):
-    return struct.pack("h", len(payload) + 4) + struct.pack("I", int(flags)) + payload
+    """One ocgcore query chunk: [u16 size][u32 flag][payload]."""
+    return struct.pack("<H", len(payload) + 4) + struct.pack("<I", int(flags)) + payload
 
 
 def test_query_result_dynamic_fields():
@@ -34,58 +35,55 @@ def test_query_result_dynamic_fields():
 
 
 def test_parse_queries_all_major_flags_and_skips():
+    """A full card, in the one-chunk-per-field layout ocgcore emits."""
     from game.card import card_constants
     from ui.duel_messages.update_data import parse_queries
 
     client = _client()
-    flags = (
-        card_constants.QUERY.CODE
-        | card_constants.QUERY.POSITION
-        | card_constants.QUERY.ALIAS
-        | card_constants.QUERY.TYPE
-        | card_constants.QUERY.LEVEL
-        | card_constants.QUERY.RANK
-        | card_constants.QUERY.ATTRIBUTE
-        | card_constants.QUERY.RACE
-        | card_constants.QUERY.ATTACK
-        | card_constants.QUERY.DEFENSE
-        | card_constants.QUERY.BASE_ATTACK
-        | card_constants.QUERY.BASE_DEFENSE
-        | card_constants.QUERY.REASON
-        | card_constants.QUERY.COVER
-        | card_constants.QUERY.REASON_CARD
-        | card_constants.QUERY.EQUIP_CARD
-        | card_constants.QUERY.TARGET_CARD
-        | card_constants.QUERY.OVERLAY_CARD
-        | card_constants.QUERY.COUNTERS
-        | card_constants.QUERY.OWNER
-        | card_constants.QUERY.STATUS
-        | card_constants.QUERY.IS_PUBLIC
-        | card_constants.QUERY.LSCALE
-        | card_constants.QUERY.RSCALE
-        | card_constants.QUERY.LINK
-        | card_constants.QUERY.IS_HIDDEN
-        | card_constants.QUERY.END
-    )
-    payload = b""
-    for value in (100, 1, 200, 300, 4, 4, 5):
-        payload += struct.pack("I", value)
-    payload += struct.pack("I", 6) + struct.pack("I", 7)
-    for value in (1500, 1200, 1600, 1300, 9, 10):
-        payload += struct.pack("I", value)
-    payload += struct.pack("h", 10) + struct.pack("B", 0) + struct.pack("B", card_constants.LOCATION.GRAVE) + struct.pack("I", 1) + struct.pack("I", 2)
-    payload += struct.pack("h", 10) + struct.pack("B", 1) + struct.pack("B", card_constants.LOCATION.HAND) + struct.pack("I", 3) + struct.pack("I", 4)
-    payload += struct.pack("h", 10) + struct.pack("I", 1)
-    payload += struct.pack("B", 0) + struct.pack("B", card_constants.LOCATION.MONSTER_ZONE) + struct.pack("I", 5) + struct.pack("I", 6)
-    payload += struct.pack("h", 8) + struct.pack("I", 2) + struct.pack("I", 111) + struct.pack("I", 222)
-    payload += struct.pack("h", 4) + struct.pack("I", 1) + struct.pack("I", 0x10001)
-    payload += struct.pack("B", 0)
-    for value in (55, 1, 2, 3, 0x20, 0x04):
-        payload += struct.pack("I", value)
-    payload += struct.pack("B", 1)
+    Q = card_constants.QUERY
 
-    chunk = struct.pack("h", 151) + struct.pack("I", int(flags)) + payload
-    queries = parse_queries(client, 0, card_constants.LOCATION.MONSTER_ZONE, 153, io.BytesIO(chunk))
+    def loc_info(controller, location, sequence, position):
+        return struct.pack("<BBII", controller, location, sequence, position)
+
+    buffer = b""
+    for flag, value in (
+        (Q.CODE, 100),
+        (Q.POSITION, 1),
+        (Q.ALIAS, 200),
+        (Q.TYPE, 300),
+        (Q.LEVEL, 4),
+        (Q.RANK, 4),
+        (Q.ATTRIBUTE, 5),
+        (Q.ATTACK, 1500),
+        (Q.DEFENSE, 1200),
+        (Q.BASE_ATTACK, 1600),
+        (Q.BASE_DEFENSE, 1300),
+        (Q.REASON, 9),
+        (Q.COVER, 10),
+        (Q.STATUS, 55),
+    ):
+        buffer += _query_chunk(flag, struct.pack("<I", value))
+    buffer += _query_chunk(Q.RACE, struct.pack("<Q", 0x40))
+    buffer += _query_chunk(Q.REASON_CARD, loc_info(0, int(card_constants.LOCATION.GRAVE), 1, 2))
+    buffer += _query_chunk(Q.EQUIP_CARD, loc_info(1, int(card_constants.LOCATION.HAND), 3, 4))
+    buffer += _query_chunk(
+        Q.TARGET_CARD,
+        struct.pack("<I", 1) + loc_info(0, int(card_constants.LOCATION.MONSTER_ZONE), 5, 6),
+    )
+    buffer += _query_chunk(Q.OVERLAY_CARD, struct.pack("<III", 2, 111, 222))
+    buffer += _query_chunk(Q.COUNTERS, struct.pack("<II", 1, 0x10001))
+    buffer += _query_chunk(Q.OWNER, struct.pack("<B", 0))
+    buffer += _query_chunk(Q.IS_PUBLIC, struct.pack("<B", 1))
+    buffer += _query_chunk(Q.LSCALE, struct.pack("<I", 2))
+    buffer += _query_chunk(Q.RSCALE, struct.pack("<I", 3))
+    buffer += _query_chunk(Q.LINK, struct.pack("<II", 0x20, 0x04))
+    buffer += _query_chunk(Q.IS_HIDDEN, struct.pack("<B", 1))
+    buffer += _query_chunk(Q.END, b"")
+
+    queries = parse_queries(
+        client, 0, card_constants.LOCATION.MONSTER_ZONE, len(buffer), io.BytesIO(buffer)
+    )
+
     assert len(queries) == 1
     q = queries[0]
     assert q.code == 100
@@ -93,16 +91,17 @@ def test_parse_queries_all_major_flags_and_skips():
     assert q.controller == 0
     assert q.location == card_constants.LOCATION.MONSTER_ZONE
     assert q.sequence == 0
-    assert q.race == (6 << 32) + 7
+    assert q.race == 0x40
     assert q.reason_card["location"] == card_constants.LOCATION.GRAVE
     assert q.equip_card["controler"] == 1
     assert q.target_cards == [(0, card_constants.LOCATION.MONSTER_ZONE, 5, 6)]
     assert q.overlay_cards == [111, 222]
     assert q.counters == [0x10001]
-    assert q.link
-    assert q.link_marker
+    assert q.is_public == 1
+    assert q.link == 0x20
+    assert q.link_marker == 0x04
 
-    skipped = struct.pack("h", 0)
+    skipped = struct.pack("<H", 0)
     queries = parse_queries(client, 0, card_constants.LOCATION.HAND, len(skipped), io.BytesIO(skipped))
     assert queries[0].onfield_skipped is True
 
@@ -112,14 +111,15 @@ def test_parse_queries_empty_nested_cards_and_size_error():
     from ui.duel_messages.update_data import parse_queries
 
     client = _client()
-    flags = card_constants.QUERY.REASON_CARD | card_constants.QUERY.EQUIP_CARD | card_constants.QUERY.END
-    payload = struct.pack("h", 0) + struct.pack("Q", 0) + struct.pack("h", 0) + struct.pack("Q", 0)
-    chunk = _query_chunk(flags, payload)
-    q = parse_queries(client, 0, card_constants.LOCATION.HAND, len(chunk), io.BytesIO(chunk))[0]
+    # The core writes ten zero bytes when there is no reason or equip card.
+    buffer = _query_chunk(card_constants.QUERY.REASON_CARD, b"\x00" * 10)
+    buffer += _query_chunk(card_constants.QUERY.EQUIP_CARD, b"\x00" * 10)
+    buffer += _query_chunk(card_constants.QUERY.END, b"")
+    q = parse_queries(client, 0, card_constants.LOCATION.HAND, len(buffer), io.BytesIO(buffer))[0]
     assert q.reason_card == {}
     assert q.equip_card == {}
 
-    bad = struct.pack("h", 10) + struct.pack("I", int(card_constants.QUERY.CODE)) + struct.pack("I", 1)
+    bad = struct.pack("<H", 10) + struct.pack("<I", int(card_constants.QUERY.CODE)) + struct.pack("<I", 1)
     with pytest.raises(RuntimeError):
         parse_queries(client, 0, card_constants.LOCATION.HAND, len(bad), io.BytesIO(bad))
 

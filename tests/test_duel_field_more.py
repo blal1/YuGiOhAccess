@@ -476,7 +476,6 @@ def test_remove_card_rebuilds_opponent_and_public_zones(mocker):
 
     mocker.patch("ui.duel_field.LocationConversion.from_card_location", side_effect=location_for)
 
-    query = _query(controller=1, location=card_constants.LOCATION.HAND, sequence=0, position=1)
     for location, prefix, appender in [
         (card_constants.LOCATION.HAND, "oh", field.append_card_to_opponent_hand),
         (card_constants.LOCATION.EXTRA, "ox", field.append_card_to_opponent_extra_deck),
@@ -534,7 +533,6 @@ def test_remove_card_rebuilds_opponent_and_public_zones(mocker):
 
 
 def test_key_handlers_and_enter_space_paths(mocker):
-    from game.card import card_constants
     from ui.duel_field import Zone
 
     mocker.patch("ui.duel_field.Card", FakeCard)

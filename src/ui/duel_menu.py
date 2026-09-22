@@ -1,6 +1,7 @@
 import struct
 
 from game.edo import structs, structs_utils
+from ui import duel_history_ui
 from ui.base_ui import CallbackInputUI, VerticalMenu
 from core import utils
 from core.i18n import _
@@ -20,15 +21,27 @@ def show_duel_menu(client):
             backspace_menu.append_item(_("Main phase 2"), function=lambda: send_main_phase2(client))
         if client.player.can_go_to_end_phase:
             backspace_menu.append_item(_("End turn"), function=lambda: send_end_phase(client))
+        if client.player.can_shuffle:
+            # The core offers this on every idle prompt where the hand may be
+            # shuffled. It was read off the wire and then had nowhere to go,
+            # so a player who knew their hand order had been revealed could
+            # not do the one thing that fixes it.
+            backspace_menu.append_item(_("Shuffle hand"), function=lambda: send_shuffle_hand(client))
     else:
         backspace_menu.append_item(_("{phase}, Opponents turn. {lp} / {opp_lp} lifepoints. Turn {turn}").format(
             phase=phase_str, lp=client.player.lifepoints, opp_lp=client.player.opponent_lifepoints, turn=client.turn_count))
     backspace_menu.append_item(_("Read chain"), lambda: read_chain_stack(client))
     backspace_menu.append_item(_("Chat"), lambda: open_chat_input(client))
     backspace_menu.append_item(_("Chat history"), lambda: show_chat_history(client))
+    backspace_menu.append_item(_("Duel history"), lambda: show_duel_history(client))
     backspace_menu.append_item(_("Surrender"), lambda: confirm_surrender(client))
-    backspace_menu.append_item(_("Close"), lambda: utils.get_ui_stack().pop_ui())
+    backspace_menu.append_cancel_item(_("Close"), lambda: utils.get_ui_stack().pop_ui())
     utils.get_ui_stack().push_ui(backspace_menu)
+
+
+def show_duel_history(client):
+    utils.get_ui_stack().pop_ui()
+    duel_history_ui.show_duel_history(client)
 
 
 def confirm_surrender(client):
@@ -84,6 +97,12 @@ def read_chain_stack(client):
 def send_battle_phase(client):
     utils.get_ui_stack().pop_ui()
     client.send(structs.ClientIdType.RESPONSE, struct.pack('I', 6))
+
+def send_shuffle_hand(client):
+    # The idle command the core reads as "shuffle my hand", alongside 6 for
+    # the battle phase and 7 for the end phase.
+    utils.get_ui_stack().pop_ui()
+    client.send(structs.ClientIdType.RESPONSE, struct.pack('I', 8))
 
 def send_main_phase2(client):
     utils.get_ui_stack().pop_ui()

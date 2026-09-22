@@ -1,5 +1,4 @@
 import base64
-import io
 import socket
 import struct
 from unittest.mock import MagicMock
@@ -84,7 +83,9 @@ def test_ydke_json_windbot_roundtrips_and_errors(mocker):
     assert "Main+extra deck" in str(parsed)
 
     windbot = Deck.from_windbot_format("#created by test\n#main\n10\n#extra\n20\n!side\n30\n")
-    assert windbot.cards == [10]
+    # cards holds the main and the extra deck together, the way to_windbot_format
+    # reads it back out; the extra deck used to be parsed and then thrown away.
+    assert windbot.cards == [10, 20]
     assert windbot.side == [30]
     with pytest.raises(ValueError):
         Deck.from_windbot_format("#main\nnot-int")
@@ -278,7 +279,6 @@ def test_servers_list_and_local_availability(mocker):
 
 
 def test_edo_struct_reprs_bytes_and_helpers():
-    import ctypes
 
     from game.edo import structs
 

@@ -52,7 +52,6 @@ def select_chain(client, player, size, spe_count, forced, chains):
     for i in range(size):
         et, card, desc = chains[i]
         card.chain_index = i
-        chain_count = chain_cards.count(card)
         card.effect_description = card.get_effect_description(desc, True)
         chain_cards.append(card)
     cancel_message = _("Press escape to cancel chaining")
